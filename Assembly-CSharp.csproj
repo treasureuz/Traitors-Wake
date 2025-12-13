@@ -48,8 +48,6 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\Tile.cs" />
     <Compile Include="Assets\Scripts\GridManager.cs" />
-    <Compile Include="Assets\Scripts\InputManager.cs" />
-    <Compile Include="Assets\Scripts\Player.cs" />
     <Reference Include="UnityEngine">
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.3.0f1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>
     </Reference>

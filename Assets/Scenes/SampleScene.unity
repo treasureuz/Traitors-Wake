@@ -405,6 +405,7 @@ MonoBehaviour:
   _cam: {fileID: 519420032}
   _width: 16
   _height: 9
+  _spawnedTile: {fileID: 0}
 --- !u!4 &1199878959
 Transform:
   m_ObjectHideFlags: 0
