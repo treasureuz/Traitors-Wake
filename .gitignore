@@ -5,6 +5,7 @@
 [Bb]uild/
 [Bb]uilds/
 [Ll]ogs/
+*.log
 UserSettings/
 
 # Package cache (never commit)
