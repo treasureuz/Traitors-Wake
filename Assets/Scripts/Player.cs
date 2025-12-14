@@ -1,29 +1,28 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Numerics;
+using System.Linq;
 using UnityEngine;
-using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
 
 public class Player : MonoBehaviour {
     [SerializeField] private float _playerTimeToMove = 0.5f;
-    [SerializeField] private List<Vector3> _moves;
+    [SerializeField] private Vector3 spawnPos =  Vector3.zero;
+    [SerializeField] private Stack<Vector3> _moves;
     
     public float PlayerTimeToMove => this._playerTimeToMove;
-    public List<Vector3> GetMoves() => this._moves;
+    public Vector3 SpawnPos => spawnPos;
     
     public float aiTimeToMove { get; set; }
     public bool isMoving { get; private set; }
-    public bool isEnded { get; private set; }
+    public bool isEnded { get; set; }
 
-    void Start() {
-        this._moves = new List<Vector3>();
-        this.transform.position = Vector3.zero;
+    void Awake() {
+        this._moves = new Stack<Vector3>();
+        ResetSettings();
     }
 
     public IEnumerator MovePlayer(Player player, Vector3 direction, float timeToMove) {
-        if (this.isMoving) yield break;
+        if (this.isEnded || this.isMoving) yield break;
         this.isMoving = true;
         
         Vector3 startPos = player.transform.position;
@@ -42,16 +41,23 @@ public class Player : MonoBehaviour {
         }
         player.transform.position = targetPos;
         
-        this._moves.Add(direction);
+        this._moves.Push(direction);
         this.isMoving = false;
-
-        if (player.transform.position == new Vector3(GridManager.instance.Width - 1, GridManager.instance.Height - 1)) {
-            player.isEnded = true;
-        }
     }
 
-    public void ClearMoves() {
+    public bool CompareMoves(Player otherPlayer) {
+        return this._moves.SequenceEqual(otherPlayer._moves);
+    }
+
+    public void UndoMove() {
+        if (this._moves.Count == 0) return;
+        this.transform.position -= this._moves.Pop();
+    }
+    
+    public void ResetSettings() {
         this._moves.Clear();
+        this.transform.position = spawnPos;
+        this.isEnded = false;
     }
 }
     
