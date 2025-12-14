@@ -2,12 +2,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class GridManager : MonoBehaviour {
-    [SerializeField] private Player _playerPrefab;
     [SerializeField] private Tile _tilePrefab; 
     [SerializeField] private Transform _cam;
     [SerializeField] private int _width, _height;
-    public int GetWidth => this._width;
-    public int GetHeight => this._height;
+    public int Width => this._width;
+    public int Height => this._height;
     
     public static GridManager instance;
     
@@ -20,7 +19,7 @@ public class GridManager : MonoBehaviour {
     
     void Start() {
         this._tiles = new Dictionary<Vector2, Tile>();
-        Instantiate(this._playerPrefab, this._playerPrefab.transform.position, Quaternion.identity);
+        
         GenerateGrid();
     }
     

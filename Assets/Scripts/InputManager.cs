@@ -26,10 +26,12 @@ public class InputManager : MonoBehaviour {
     }
 
     void Update() {
-        if (this._up.IsPressed() && !this._player._isMoving) StartCoroutine(this._player.MovePlayer(this._player.transform, Vector3.up));
-        if (this._down.IsPressed() && !this._player._isMoving) StartCoroutine(this._player.MovePlayer(this._player.transform, Vector3.down));
-        if (this._left.IsPressed() && !this._player._isMoving) StartCoroutine(this._player.MovePlayer(this._player.transform, Vector3.left));
-        if (this._right.IsPressed() && !this._player._isMoving) StartCoroutine(this._player.MovePlayer(this._player.transform, Vector3.right));
+        if (this._up.IsPressed() && !this._player.IsMoving) {
+            StartCoroutine(this._player.MovePlayer(this._player.transform, Vector3.up));
+        }
+        if (this._down.IsPressed() && !this._player.IsMoving) StartCoroutine(this._player.MovePlayer(this._player.transform, Vector3.down));
+        if (this._left.IsPressed() && !this._player.IsMoving) StartCoroutine(this._player.MovePlayer(this._player.transform, Vector3.left));
+        if (this._right.IsPressed() && !this._player.IsMoving) StartCoroutine(this._player.MovePlayer(this._player.transform, Vector3.right));
     }
 }
 
