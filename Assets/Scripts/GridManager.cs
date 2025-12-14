@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GridManager : MonoBehaviour {
@@ -19,7 +20,6 @@ public class GridManager : MonoBehaviour {
     
     void Start() {
         this._tiles = new Dictionary<Vector2, Tile>();
-        
         GenerateGrid();
     }
     
@@ -39,5 +39,11 @@ public class GridManager : MonoBehaviour {
         return this._tiles.GetValueOrDefault(position);
     }
 
-    
+    public void SetWidth(int width) {
+        this._width = width;
+    }
+
+    public void SetHeight(int height) {
+        this._height = height;
+    }
 }

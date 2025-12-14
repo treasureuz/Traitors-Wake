@@ -4,10 +4,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class InputManager : MonoBehaviour {
-    [SerializeField] private Player _player;
-    
     private static PlayerInput playerInput;
-   
+    private Player _player;
     
     private InputAction _up;
     private InputAction _down;
@@ -16,6 +14,7 @@ public class InputManager : MonoBehaviour {
 
     void Awake() {
         playerInput = this.GetComponent<PlayerInput>();
+        this._player = this.GetComponent<Player>();
     }
 
     void Start() {
@@ -26,12 +25,19 @@ public class InputManager : MonoBehaviour {
     }
 
     void Update() {
-        if (this._up.IsPressed() && !this._player.IsMoving) {
-            StartCoroutine(this._player.MovePlayer(this._player.transform, Vector3.up));
+        if (this._player.isEnded || this._player.isMoving) return;
+        if (this._up.IsPressed()) {
+            StartCoroutine(this._player.MovePlayer(this._player, Vector3.up, this._player.PlayerTimeToMove));
         }
-        if (this._down.IsPressed() && !this._player.IsMoving) StartCoroutine(this._player.MovePlayer(this._player.transform, Vector3.down));
-        if (this._left.IsPressed() && !this._player.IsMoving) StartCoroutine(this._player.MovePlayer(this._player.transform, Vector3.left));
-        if (this._right.IsPressed() && !this._player.IsMoving) StartCoroutine(this._player.MovePlayer(this._player.transform, Vector3.right));
+        if (this._down.IsPressed()) {
+            StartCoroutine(this._player.MovePlayer(this._player, Vector3.down, this._player.PlayerTimeToMove));
+        }
+        if (this._left.IsPressed()) {
+            StartCoroutine(this._player.MovePlayer(this._player, Vector3.left, this._player.PlayerTimeToMove));
+        }
+        if (this._right.IsPressed()) {
+            StartCoroutine(this._player.MovePlayer(this._player, Vector3.right, this._player.PlayerTimeToMove));
+        }
     }
 }
 

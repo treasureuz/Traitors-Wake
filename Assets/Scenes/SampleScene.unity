@@ -149,6 +149,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
   _aiPlayerPrefab: {fileID: 8860221829043882386, guid: 658e6bce8f378bf4fbfbcb64b4197dba, type: 3}
+  _playerPrefab: {fileID: 8392707146380620319, guid: 2ec11d17ab26e4040b0f6d0eb96e404c, type: 3}
+  easyNumOfDirs: 6
+  normalNumOfDirs: 4
+  hardNumOfDirs: 3
+  _easyAITimeToMove: 0.32
+  _normalAITimeToMove: 0.18
+  _hardAITimeToMove: 0.1
+  _difficulty: 0
 --- !u!4 &394150585
 Transform:
   m_ObjectHideFlags: 0
@@ -447,8 +455,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GridManager
   _tilePrefab: {fileID: 7414746083576426236, guid: 5f2aab7ea5ac0ed43ab19d95545fd262, type: 3}
   _cam: {fileID: 519420032}
-  _width: 4
-  _height: 4
+  _width: 8
+  _height: 8
 --- !u!4 &1199878959
 Transform:
   m_ObjectHideFlags: 0
