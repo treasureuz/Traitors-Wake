@@ -106,8 +106,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 680a5a2a4a8662a44bb77261b8402837, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player
-  _playerTimeToMove: 0.3
-  _moves: []
+  _playerTimeToMove: 0.23
+  spawnPos: {x: 0, y: 0, z: 0}
 --- !u!114 &3795036767035478747
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -120,7 +120,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 167eb1845e0e06846a3f656601483ade, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InputManager
-  _player: {fileID: 8392707146380620319}
 --- !u!114 &6189003184355162730
 MonoBehaviour:
   m_ObjectHideFlags: 0

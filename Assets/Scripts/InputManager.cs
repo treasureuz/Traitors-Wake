@@ -25,18 +25,18 @@ public class InputManager : MonoBehaviour {
     }
 
     void Update() {
-        if (this._player.isEnded || this._player.isMoving) return;
+        if (!GameManager.instance._aiPlayer.isEnded || this._player.isEnded) return;
         if (this._up.IsPressed()) {
-            StartCoroutine(this._player.MovePlayer(this._player, Vector3.up, this._player.PlayerTimeToMove));
+            StartCoroutine(this._player.MovePlayer(Vector3.up, this._player.PlayerTimeToMove));
         }
         if (this._down.IsPressed()) {
-            StartCoroutine(this._player.MovePlayer(this._player, Vector3.down, this._player.PlayerTimeToMove));
+            StartCoroutine(this._player.MovePlayer(Vector3.down, this._player.PlayerTimeToMove));
         }
         if (this._left.IsPressed()) {
-            StartCoroutine(this._player.MovePlayer(this._player, Vector3.left, this._player.PlayerTimeToMove));
+            StartCoroutine(this._player.MovePlayer(Vector3.left, this._player.PlayerTimeToMove));
         }
         if (this._right.IsPressed()) {
-            StartCoroutine(this._player.MovePlayer(this._player, Vector3.right, this._player.PlayerTimeToMove));
+            StartCoroutine(this._player.MovePlayer(Vector3.right, this._player.PlayerTimeToMove));
         }
     }
 }

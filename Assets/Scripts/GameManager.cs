@@ -10,10 +10,6 @@ public class GameManager : MonoBehaviour {
     [SerializeField] private int _normalNumOfDirs = 3;
     [SerializeField] private int _hardNumOfDirs = 2;
     
-    [SerializeField] private float _easyAITimeToMove = 0.32f;
-    [SerializeField] private float _normalAITimeToMove = 0.18f;
-    [SerializeField] private float _hardAITimeToMove = 0.1f;
-
     [SerializeField] private int _easyMinGrid = 4;
     [SerializeField] private int _easyMaxGrid = 8;
 
@@ -22,13 +18,30 @@ public class GameManager : MonoBehaviour {
 
     [SerializeField] private int _hardMinGrid = 12;
     [SerializeField] private int _hardMaxGrid = 17;
+    
+    [SerializeField] private float _easyTimeToMemorize = 3.5f;
+    [SerializeField] private float _normalTimeToMemorize = 3f;
+    [SerializeField] private float _hardTimeToMemorize = 2.3f;
+    
+    [SerializeField] private float _easyTimeToComplete = 12f;
+    [SerializeField] private float _normalTimeToComplete = 10f;
+    [SerializeField] private float _hardTimeToComplete = 8f;
+    
+    [SerializeField] private float _easyAITimeToMove = 0.32f;
+    [SerializeField] private float _normalAITimeToMove = 0.18f;
+    [SerializeField] private float _hardAITimeToMove = 0.1f;
+    
 
     public Vector3 FinishPos => this.finishPos;
     public static GameManager instance;
     
     public Player _player { get; private set; }
     public Player _aiPlayer { get; private set; }
+    private AIManager _aiManager;
+    
     public int numOfDirs {get; private set;}
+    public float timeToMemorize { get; private set; }
+    public float timeToComplete { get; private set; }
 
     public enum Difficulty {
         Easy,
@@ -42,11 +55,10 @@ public class GameManager : MonoBehaviour {
         instance = this;
         this._aiPlayer = Instantiate(this._aiPlayerPrefab, this._aiPlayerPrefab.SpawnPos, Quaternion.identity);
         this._player = Instantiate(this._playerPrefab, this._playerPrefab.SpawnPos, Quaternion.identity);
+        this._aiManager = this._aiPlayer.GetComponent<AIManager>();
     }
     
     void Start() {
-        //HandleDifficultySettings();
-        
         StartCoroutine(LevelManager.instance.StartLevel(this._aiPlayer.GetComponent<AIManager>()));
     }
     
@@ -56,21 +68,27 @@ public class GameManager : MonoBehaviour {
                 numOfDirs = _easyNumOfDirs; 
                 GridManager.instance.SetWidth(Random.Range(this._easyMinGrid, this._easyMaxGrid));
                 GridManager.instance.SetHeight(Random.Range(this._easyMinGrid, this._easyMaxGrid));
-                this._aiPlayer.aiTimeToMove = this._easyAITimeToMove;
+                this.timeToMemorize = this._easyTimeToMemorize;
+                this.timeToComplete = this._easyTimeToComplete;
+                this._aiManager.aiTimeToMove = this._easyAITimeToMove;
                 break;
             }
             case Difficulty.Normal: {
                 numOfDirs = _normalNumOfDirs; 
                 GridManager.instance.SetWidth(Random.Range(this._normalMinGrid, this._normalMaxGrid));
                 GridManager.instance.SetHeight(Random.Range(this._normalMinGrid, this._normalMaxGrid));
-                this._aiPlayer.aiTimeToMove = this._normalAITimeToMove;
+                this.timeToMemorize = this._normalTimeToMemorize;
+                this.timeToComplete = this._normalTimeToComplete;
+                this._aiManager.aiTimeToMove = this._normalAITimeToMove;
                 break;
             }
             case Difficulty.Hard: {
                 numOfDirs = _hardNumOfDirs; 
                 GridManager.instance.SetWidth(Random.Range(this._hardMinGrid, this._hardMaxGrid));
                 GridManager.instance.SetHeight(Random.Range(this._hardMinGrid, this._hardMaxGrid));
-                this._aiPlayer.aiTimeToMove = this._hardAITimeToMove;
+                this.timeToMemorize = this._hardTimeToMemorize;
+                this.timeToComplete = this._hardTimeToComplete;
+                this._aiManager.aiTimeToMove = this._hardAITimeToMove;
                 break;
             }
         }
@@ -79,7 +97,7 @@ public class GameManager : MonoBehaviour {
 
     public void IncrementDifficulty() {
         if (this._difficulty == Difficulty.Hard) return;
-        this._difficulty += 1;
+        SetDifficulty(++this._difficulty);
     }
     public void SetDifficulty(Difficulty diff) {
         this._difficulty = diff;
