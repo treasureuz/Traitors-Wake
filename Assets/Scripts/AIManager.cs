@@ -19,9 +19,8 @@ public class AIManager : MonoBehaviour {
 
     void Awake() {
         this._aiPlayer = this.GetComponent<Player>();
-        this._lineIndex = 0;
+        //this._lineIndex = 0;
         this._lineRenderer.positionCount = 1;
-        this._lineRenderer.SetPosition(0, this._aiPlayer.SpawnPos);
     }
     
     public IEnumerator MoveSequence() {
@@ -31,7 +30,8 @@ public class AIManager : MonoBehaviour {
         do num = Random.Range(0, directions.Length);
         while (directions[num] == Vector3.left || directions[num] == Vector3.down);
         this._randomDir = directions[num];
-        
+
+        this._lineIndex = 0;
         while (this.transform.position != GameManager.instance.FinishPos) {
             StartCoroutine(LerpLineRenderer(this.aiTimeToMove));
             yield return StartCoroutine(this._aiPlayer.MovePlayer(this._randomDir, this.aiTimeToMove));
@@ -47,7 +47,6 @@ public class AIManager : MonoBehaviour {
 
             // Remove reverse direction (e.g. if Vector3.up was the previous dir and is in the list, remove Vector3.down)
             validDirs.Remove(-this._randomDir);
-            
             this._randomDir = NextDir();
         }
         this._aiPlayer.isEnded = true;
@@ -59,7 +58,7 @@ public class AIManager : MonoBehaviour {
         
         var elapsedTime = 0f;
         this._lineIndex++;
-        _lineRenderer.positionCount = this._lineIndex + 1;
+        this._lineRenderer.positionCount = this._lineIndex + 1;
         while (elapsedTime < timeToMove) {
             this._lineRenderer.SetPosition(this._lineRenderer.positionCount - 1, 
                 Vector3.Lerp(startPos, targetPos, elapsedTime / timeToMove));
@@ -83,7 +82,11 @@ public class AIManager : MonoBehaviour {
         return weightedDirs[Random.Range(0, weightedDirs.Count)];
     }
 
-    public void ResetLineRenderer() {
-        this._lineRenderer.positionCount = 0;
+    public void SetLRPosition(int val, Vector3 pos) {
+        this._lineRenderer.SetPosition(val, pos);
+    }
+    
+    public void SetLRPosCount(int val) {
+        this._lineRenderer.positionCount = val;
     }
 }

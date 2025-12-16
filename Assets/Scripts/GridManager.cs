@@ -24,7 +24,7 @@ public class GridManager : MonoBehaviour {
         for (var x = 0; x < this._width; x++) {
             for (var y = 0; y < this._height; y++) {
                 this._spawnedTile = Instantiate(this._tilePrefab, new Vector3(x, y), Quaternion.identity);
-                this._spawnedTile.Init(x, y);
+                this._spawnedTile.ColorTiles(x, y);
                 this._tiles.Add(new Vector2(x, y), this._spawnedTile);
             }
         }

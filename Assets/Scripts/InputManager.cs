@@ -25,7 +25,7 @@ public class InputManager : MonoBehaviour {
     }
 
     void Update() {
-        if (!GameManager.instance._aiPlayer.isEnded || this._player.isEnded) return;
+        if (GameManager.instance.aiPlayer.isMoving || Player.isMemorizing || this._player.isEnded) return;
         if (this._up.IsPressed()) {
             StartCoroutine(this._player.MovePlayer(Vector3.up, this._player.PlayerTimeToMove));
         }
