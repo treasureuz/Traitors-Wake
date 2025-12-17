@@ -6,31 +6,37 @@ public class LevelManager : MonoBehaviour {
     
     public static LevelManager instance;
     private int _currentLevel;
-
-    //private bool _isLevelPlaying;
     
     void Awake() {
         instance = this;
-    }
-
-    void Start() {
-        GameManager.instance.SetDifficulty(GameManager.Difficulty.Easy);
+        Player.isReset = true;
     }
     
     public IEnumerator GenerateLevel() {
+        if (Player.isReset) {
+            this._currentLevel = 0;
+            GameManager.instance.SetDifficulty(GameManager.Difficulty.Easy);
+            Player.isReset = false;
+        } 
         this._currentLevel++; // Increment current level
-            
+
+        // Increment difficulty if current level is greater than levelEndPerDiff
+        // Else continue with same difficulty from previous level
+        if (this._currentLevel > GameManager.instance.levelEndPerDiff) {
+            GameManager.instance.IncrementDifficulty();
+        } else GameManager.instance.SetDifficulty(GameManager.instance.GetDifficulty);
+        
         // Set buttons to false and wait X amount of time before generating level
         UIManager.instance.SetButtons(false);
         yield return new WaitForSeconds(this._timeBeforeLevelStart);
             
-        // Reset all "Player" settings before generating level
+        // Reset all "Player" settings before re-generating a level
         GameManager.instance.aiPlayer.ResetSettings();
         GameManager.instance.player.ResetSettings();
             
         GameManager.instance.aiManager.SetLRPosCount(1); // Set LineRenderer position count to 1
             
-        UIManager.instance.DisplayLevelText(_currentLevel); // Display current level
+        UIManager.instance.DisplayLevelText(this._currentLevel); // Display current level
         GridManager.instance.GenerateGrid(); // Generates grid based on difficulty
             
         // Set lineRenderer to the AI's spawn position
@@ -52,7 +58,6 @@ public class LevelManager : MonoBehaviour {
         // Compare stack of moves between the AI and the player
         // Stops the loop if you failed the level
         if (!UIManager.instance.CanAdvanceLevel()) yield break;
-        GameManager.instance.IncrementDifficulty();
         
         //Recursively generate new randomized levels
         StartCoroutine(GenerateLevel());

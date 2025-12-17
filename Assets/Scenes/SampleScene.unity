@@ -475,24 +475,24 @@ MonoBehaviour:
   _playerPrefab: {fileID: 8392707146380620319, guid: 2ec11d17ab26e4040b0f6d0eb96e404c, type: 3}
   _aiPlayerPrefab: {fileID: 8860221829043882386, guid: 658e6bce8f378bf4fbfbcb64b4197dba, type: 3}
   finishPos: {x: 0, y: 0, z: 0}
-  _easyNumOfDirs: 5
-  _normalNumOfDirs: 4
-  _hardNumOfDirs: 3
+  _easyNumOfDirs: 6
+  _normalNumOfDirs: 5
+  _hardNumOfDirs: 4
   _easyMinGrid: 2
   _easyMaxGrid: 5
   _normalMinGrid: 4
-  _normalMaxGrid: 7
-  _hardMinGrid: 6
-  _hardMaxGrid: 9
-  _easyLevelCount: 4
-  _normalLevelCount: 3
-  _hardLevelCount: 2
+  _normalMaxGrid: 8
+  _hardMinGrid: 7
+  _hardMaxGrid: 11
+  _easyLevelEnd: 4
+  _normalLevelEnd: 7
+  _hardLevelEnd: 9
   _easyTimeToMemorize: 3.5
-  _normalTimeToMemorize: 3
-  _hardTimeToMemorize: 2.3
-  _easyTimeToComplete: 12
-  _normalTimeToComplete: 11.5
-  _hardTimeToComplete: 11
+  _normalTimeToMemorize: 3.2
+  _hardTimeToMemorize: 3
+  _easyTimeToComplete: 12.8
+  _normalTimeToComplete: 12.5
+  _hardTimeToComplete: 11.5
   _easyAITimeToMove: 0.45
   _normalAITimeToMove: 0.38
   _hardAITimeToMove: 0.3
@@ -1679,6 +1679,10 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+  - eventID: 1
+    callback:
+      m_PersistentCalls:
+        m_Calls:
         - m_Target: {fileID: 383298188}
           m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
           m_MethodName: OnRestartExit

@@ -37,6 +37,9 @@ public class GridManager : MonoBehaviour {
     }
 
     private void ClearGrid() {
+        foreach (Tile tile in this._tiles.Values) {
+            Destroy(tile.gameObject);
+        }
         this._tiles.Clear();
     }
 

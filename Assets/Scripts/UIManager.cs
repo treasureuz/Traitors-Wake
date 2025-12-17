@@ -21,14 +21,12 @@ public class UIManager : MonoBehaviour {
     public static UIManager instance;
     
     private RectTransform _topTextBGTransform;
-    private TextMeshProUGUI _restartButtonText;
     private const string loadingNextLevel = "Loading Next Level...";
 
     void Awake() {
         instance = this;
         this._topTextBGTransform = this._topTextTMP.GetComponentInParent<Image>().rectTransform;
         this._restartButton.gameObject.SetActive(false);
-        this._restartButtonText = this._restartButton.GetComponentInChildren<TextMeshProUGUI>();
     }
     
     public void OnSubmit() {
@@ -51,7 +49,7 @@ public class UIManager : MonoBehaviour {
     public void OnReset() {
         Debug.Log("Reset");
         EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
-        GameManager.instance.player.ResetSettings();
+        StartCoroutine(GameManager.instance.player.ResetMoves(GameManager.instance.player.PlayerTimeToMove));
     }
     
     public void OnRestart() {
@@ -78,7 +76,7 @@ public class UIManager : MonoBehaviour {
             this._topTextTMP.text = loadingNextLevel;
             rv = true;
         } else {
-            Player.hasReset = true;
+            Player.isReset = true;
             this._topTextTMP.text = "<color=#FF0000>*Translation Mismatch*</color>";
             this._topTextBGTransform.sizeDelta = new Vector2(this._failedTextBGWidth, this._topTextBGTransform.sizeDelta.y);
             this._restartButton.gameObject.SetActive(true);

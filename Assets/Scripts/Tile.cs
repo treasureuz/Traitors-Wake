@@ -8,6 +8,4 @@ public class Tile : MonoBehaviour {
         bool isOffset = (x % 2 == 0 && y  % 2 != 0) || (x % 2 != 0 && y % 2 == 0);
         _renderer.color = isOffset ? this._offsetColor : this._baseColor;
     }
-    
-    
 }
