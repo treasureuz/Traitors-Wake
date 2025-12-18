@@ -44,6 +44,7 @@ public class Player : MonoBehaviour {
         this.transform.position = targetPos;
         
         this._moves.Add(direction);
+        ActivatePowerUp();
         this.isMoving = false;
     }
 
@@ -88,7 +89,15 @@ public class Player : MonoBehaviour {
         this.transform.position = targetPos;
         this.isMoving = false;
     }
-    
+
+    private void ActivatePowerUp() {
+        if (this != GameManager.instance.player) return;
+        foreach (Tile tile in GridManager.instance.GetChestTiles()) {
+            if (tile.isActivated || this.transform.position != tile.transform.position) continue;
+            tile.isActivated = true;
+            Debug.Log("Treasure chest found");
+        }
+    }
     public void ResetSettings() {
         this._moves.Clear();
         this.transform.position = this._spawnPos;

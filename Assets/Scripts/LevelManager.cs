@@ -15,7 +15,7 @@ public class LevelManager : MonoBehaviour {
     public IEnumerator GenerateLevel() {
         if (Player.isReset) {
             this._currentLevel = 0;
-            GameManager.instance.SetDifficulty(GameManager.Difficulty.Easy);
+            GameManager.instance.SetDifficulty(GameManager.instance.StartDifficulty);
             Player.isReset = false;
         } 
         this._currentLevel++; // Increment current level
@@ -24,7 +24,7 @@ public class LevelManager : MonoBehaviour {
         // Else continue with same difficulty from previous level
         if (this._currentLevel > GameManager.instance.levelEndPerDiff) {
             GameManager.instance.IncrementDifficulty();
-        } else GameManager.instance.SetDifficulty(GameManager.instance.GetDifficulty);
+        } else GameManager.instance.SetDifficulty(GameManager.instance.difficulty);
         
         // Set buttons to false and wait X amount of time before generating level
         UIManager.instance.SetButtons(false);
@@ -33,6 +33,7 @@ public class LevelManager : MonoBehaviour {
         // Reset all "Player" settings before re-generating a level
         GameManager.instance.aiPlayer.ResetSettings();
         GameManager.instance.player.ResetSettings();
+        GridManager.instance.ClearChestTiles();
             
         GameManager.instance.aiManager.SetLRPosCount(1); // Set LineRenderer position count to 1
             

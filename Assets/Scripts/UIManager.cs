@@ -11,6 +11,7 @@ public class UIManager : MonoBehaviour {
     [SerializeField] private Button _submitButton;
     [SerializeField] private Button _restartButton;
     [SerializeField] private TextMeshProUGUI _topTextTMP;
+    [SerializeField] private RectTransform _actionButtons;
 
     [SerializeField] private float _baseLevelTextBGWidth = 480f;
     [SerializeField] private float _normalLevelTextBGWidth = 550f;
@@ -86,10 +87,10 @@ public class UIManager : MonoBehaviour {
     }
     
     public void DisplayLevelText(float level) {
-        this._topTextBGTransform.sizeDelta = GameManager.instance.GetDifficulty == GameManager.Difficulty.Normal 
+        this._topTextBGTransform.sizeDelta = GameManager.instance.difficulty == GameManager.Difficulty.Normal 
             ? new Vector2(this._normalLevelTextBGWidth, this._topTextBGTransform.sizeDelta.y) 
             : new Vector2(this._baseLevelTextBGWidth, this._topTextBGTransform.sizeDelta.y);
-        this._topTextTMP.text = $"{{Level {level}: {GameManager.instance.GetDifficulty}}}";
+        this._topTextTMP.text = $"{{Level {level}: {GameManager.instance.difficulty}}}";
     }
 
     public IEnumerator DisplayTimeToMemorize(float time) {

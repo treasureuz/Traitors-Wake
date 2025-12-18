@@ -106,4 +106,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Tile
   _offsetColor: {r: 0.7215686, g: 0.5254902, b: 0.04313726, a: 1}
   _baseColor: {r: 0.5647059, g: 0.29803923, b: 0.105882354, a: 1}
-  _renderer: {fileID: 8496734474472047767}
+  _spriteRenderer: {fileID: 8496734474472047767}

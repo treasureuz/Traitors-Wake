@@ -19,7 +19,6 @@ public class AIManager : MonoBehaviour {
 
     void Awake() {
         this._aiPlayer = this.GetComponent<Player>();
-        //this._lineIndex = 0;
         this._lineRenderer.positionCount = 1;
     }
     
