@@ -1,16 +1,13 @@
 using UnityEngine;
 
-public class PowerUpManager : MonoBehaviour
-{
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
+public class PowerUpManager : MonoBehaviour {
+    public static PowerUpManager instance;
+    
+    void Awake() {
+        instance = this;
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+    
+    public void ActivatePowerUp() {
+        Debug.Log("Activating PowerUp");
     }
 }

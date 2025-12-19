@@ -26,10 +26,10 @@ public class InputManager : MonoBehaviour {
 
     void Update() {
         if (GameManager.instance.aiPlayer.isMoving || Player.isMemorizing || this._player.isEnded) return;
-        if (this._up.IsPressed()) StartCoroutine(this._player.MovePlayer(Vector3.up, this._player.PlayerTimeToMove));
-        if (this._down.IsPressed()) StartCoroutine(this._player.MovePlayer(Vector3.down, this._player.PlayerTimeToMove));
-        if (this._left.IsPressed()) StartCoroutine(this._player.MovePlayer(Vector3.left, this._player.PlayerTimeToMove));
-        if (this._right.IsPressed()) StartCoroutine(this._player.MovePlayer(Vector3.right, this._player.PlayerTimeToMove));
+        if (this._up.IsPressed()) StartCoroutine(this._player.MovePlayer(Vector2Int.up, this._player.PlayerTimeToMove));
+        if (this._down.IsPressed()) StartCoroutine(this._player.MovePlayer(Vector2Int.down, this._player.PlayerTimeToMove));
+        if (this._left.IsPressed()) StartCoroutine(this._player.MovePlayer(Vector2Int.left, this._player.PlayerTimeToMove));
+        if (this._right.IsPressed()) StartCoroutine(this._player.MovePlayer(Vector2Int.right, this._player.PlayerTimeToMove));
     }
 }
 

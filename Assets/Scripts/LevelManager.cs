@@ -33,7 +33,7 @@ public class LevelManager : MonoBehaviour {
         // Reset all "Player" settings before re-generating a level
         GameManager.instance.aiPlayer.ResetSettings();
         GameManager.instance.player.ResetSettings();
-        GridManager.instance.ClearChestTiles();
+        GridManager.instance.ClearAllTiles();
             
         GameManager.instance.aiManager.SetLRPosCount(1); // Set LineRenderer position count to 1
             
@@ -41,7 +41,7 @@ public class LevelManager : MonoBehaviour {
         GridManager.instance.GenerateGrid(); // Generates grid based on difficulty
             
         // Set lineRenderer to the AI's spawn position
-        GameManager.instance.aiManager.SetLRPosition(0, GameManager.instance.aiPlayer.SpawnPos);
+        GameManager.instance.aiManager.SetLRPosition(0, Player.SpawnPos());
             
         // After move sequence, remove AI path trace, and enable player button actions
         yield return StartCoroutine(GameManager.instance.aiManager.MoveSequence());
@@ -49,6 +49,7 @@ public class LevelManager : MonoBehaviour {
             
         // After timeToMemorize is done, wait an additional 0.5 seconds and sets Player.isMemorizing to false so player can move
         yield return new WaitForSeconds(0.5f); 
+        // Add powerup check
         GameManager.instance.aiManager.SetLRPosCount(0); // Reset LineRenderer position count
         Player.isMemorizing = false;
         UIManager.instance.SetButtons(true);

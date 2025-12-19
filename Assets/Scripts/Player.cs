@@ -6,30 +6,30 @@ using Vector3 = UnityEngine.Vector3;
 
 public class Player : MonoBehaviour {
     [SerializeField] private float _playerTimeToMove = 0.5f;
-    [SerializeField] private Vector3 _spawnPos =  Vector3.zero;
+    public static Vector2Int spawnPos = Vector2Int.zero;
     
     public float PlayerTimeToMove => this._playerTimeToMove;
-    public Vector3 SpawnPos => _spawnPos;
-
+    public static Vector3 SpawnPos() => new (spawnPos.x, spawnPos.y);
     public static bool isMemorizing;
     public static bool isReset;
     
     public bool isMoving { get; private set; }
     public bool isEnded { get; set; }
     
-    [SerializeField] private List<Vector3> _moves;
+    [SerializeField] private List<Vector2Int> _moves;
 
     void Awake() {
-        this._moves = new List<Vector3>();
+        this._moves = new List<Vector2Int>();
         ResetSettings();
     }
 
-    public IEnumerator MovePlayer(Vector3 direction, float timeToMove) {
+    public IEnumerator MovePlayer(Vector2Int direction, float timeToMove) {
         if (this.isEnded || this.isMoving) yield break;
         this.isMoving = true;
         
-        Vector3 startPos = this.transform.position;
-        Vector3 targetPos = startPos + direction;
+        Vector2Int startPos = new ((int)this.transform.position.x, (int)this.transform.position.y);
+        Vector2Int targetPos = startPos + direction;
+        
         if (targetPos.x < 0 || targetPos.x > GridManager.instance.Width - 1 || targetPos.y < 0 
             || targetPos.y > GridManager.instance.Height - 1) {
             this.isMoving = false;
@@ -37,38 +37,40 @@ public class Player : MonoBehaviour {
         } 
         var elapsedTime = 0f;
         while (elapsedTime < timeToMove) {
-            this.transform.position = Vector3.Lerp(startPos, targetPos, elapsedTime / timeToMove);
+            this.transform.position = Vector2.Lerp(startPos, targetPos, elapsedTime / timeToMove);
             elapsedTime += Time.deltaTime;
             yield return null;
         }
-        this.transform.position = targetPos;
-        
-        this._moves.Add(direction);
-        ActivatePowerUp();
+        this.transform.position = new Vector3(targetPos.x, targetPos.y);
+        Vector2Int pos = new ((int)this.transform.position.x, (int)this.transform.position.y);
+        this._moves.Add(pos);
         this.isMoving = false;
+
+        if (this != GameManager.instance.player || GridManager.instance.GetChestTileWithPos(pos).isActivated) yield break;
+        GridManager.instance.GetChestTileWithPos(pos).isActivated = true;
+        PowerUpManager.instance.ActivatePowerUp();
     }
 
     public bool MovesEquals(Player otherPlayer) {
         return this._moves.SequenceEqual(otherPlayer._moves);
     }
-
+    
     public IEnumerator UndoMove(float timeToMove) {
         if (this._moves.Count == 0 || this.isMoving) yield break;
         this.isMoving = true;
 
-        Vector3 moveToRemove = this._moves[^1]; // ^1: gets the end index of a list
-        Vector3 startPos = this.transform.position;
-        Vector3 targetPos = startPos - moveToRemove; 
+        Vector2Int startPos = new ((int)this.transform.position.x, (int)this.transform.position.y);
+        Vector2Int moveToRemove = this._moves[^1]; // ^1: gets the end index of a list
 
-       this._moves.RemoveAt(this._moves.Count - 1); // Remove the last move from the list
+        this._moves.RemoveAt(this._moves.Count - 1); // Remove the last move from the list
 
         var elapsedTime = 0f;
         while (elapsedTime < timeToMove) {
-            this.transform.position = Vector3.Lerp(startPos, targetPos, elapsedTime / timeToMove);
+            this.transform.position = Vector2.Lerp(startPos, moveToRemove, elapsedTime / timeToMove);
             elapsedTime += Time.deltaTime;
             yield return null;
         }
-        this.transform.position = targetPos;
+        this.transform.position = new Vector3(moveToRemove.x, moveToRemove.y);
         this.isMoving = false;
     }
 
@@ -77,31 +79,31 @@ public class Player : MonoBehaviour {
         this._moves.Clear();
         this.isMoving = true;
         
-        Vector3 startPos = this.transform.position;
-        Vector3 targetPos = this._spawnPos; 
+        Vector2Int startPos = new ((int)this.transform.position.x, (int)this.transform.position.y);
+        Vector2Int targetPos = spawnPos;
 
         var elapsedTime = 0f;
         while (elapsedTime < timeToMove) {
-            this.transform.position = Vector3.Lerp(startPos, targetPos, elapsedTime / timeToMove);
+            this.transform.position = Vector2.Lerp(startPos, targetPos, elapsedTime / timeToMove);
             elapsedTime += Time.deltaTime;
             yield return null;
         }
-        this.transform.position = targetPos;
+        this.transform.position = new Vector3(targetPos.x, targetPos.y);
         this.isMoving = false;
     }
-
-    private void ActivatePowerUp() {
-        if (this != GameManager.instance.player) return;
-        foreach (Tile tile in GridManager.instance.GetChestTiles()) {
-            if (tile.isActivated || this.transform.position != tile.transform.position) continue;
-            tile.isActivated = true;
-            Debug.Log("Treasure chest found");
-        }
-    }
+    
     public void ResetSettings() {
         this._moves.Clear();
-        this.transform.position = this._spawnPos;
+        this.transform.position = SpawnPos();
         this.isEnded = false;
+    }
+    
+    public int GetMovesCount() {
+        return this._moves.Count;
+    }
+
+    public Vector2Int GetPosByIndex(int index) {
+        return this._moves[index];
     }
 }
     

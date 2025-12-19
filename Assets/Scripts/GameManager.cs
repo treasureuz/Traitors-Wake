@@ -5,7 +5,7 @@ public class GameManager : MonoBehaviour {
     [SerializeField] private Player _playerPrefab;
     [SerializeField] private Player _aiPlayerPrefab;
 
-    [SerializeField] private Vector3 _finishPos;
+    [SerializeField] private Vector2Int _finishPos;
     [SerializeField] private Difficulty _startDifficulty = Difficulty.Easy;
     
     [Header("Number of Directions")]
@@ -43,7 +43,7 @@ public class GameManager : MonoBehaviour {
     [SerializeField] private float _normalAITimeToMove = 0.18f;
     [SerializeField] private float _hardAITimeToMove = 0.1f;
 
-    public Vector3 FinishPos => this._finishPos;
+    public Vector2Int FinishPos => this._finishPos;
     public Difficulty StartDifficulty => this._startDifficulty;
     
     public static GameManager instance;
@@ -66,8 +66,8 @@ public class GameManager : MonoBehaviour {
 
     void Awake() {
         instance = this;
-        this.aiPlayer = Instantiate(this._aiPlayerPrefab, this._aiPlayerPrefab.SpawnPos, Quaternion.identity);
-        this.player = Instantiate(this._playerPrefab, this._playerPrefab.SpawnPos, Quaternion.identity);
+        this.aiPlayer = Instantiate(this._aiPlayerPrefab, Player.SpawnPos(), Quaternion.identity);
+        this.player = Instantiate(this._playerPrefab, Player.SpawnPos(), Quaternion.identity);
         this.aiManager = this.aiPlayer.GetComponent<AIManager>();
     }
     
@@ -108,7 +108,7 @@ public class GameManager : MonoBehaviour {
                 break;
             }
         }
-        this._finishPos = new Vector3(GridManager.instance.Width - 1, GridManager.instance.Height - 1);
+        this._finishPos = new Vector2Int(GridManager.instance.Width - 1, GridManager.instance.Height - 1);
     }
     
     public void IncrementDifficulty() {
