@@ -83,11 +83,8 @@ public class AIManager : MonoBehaviour {
         return weightedDirs[Random.Range(0, weightedDirs.Count)];
     }
 
-    public void SetLRPosition(int val, Vector3 pos) {
-        this._lineRenderer.SetPosition(val, pos);
-    }
+    public void SetLRPosition(int val, Vector3 pos) => this._lineRenderer.SetPosition(val, pos);
+    public void SetLRPosCount(int val) => this._lineRenderer.positionCount = val;
     
-    public void SetLRPosCount(int val) {
-        this._lineRenderer.positionCount = val;
-    }
+    public void SetLineRendererStatus(bool b) => this._lineRenderer.enabled = b;
 }

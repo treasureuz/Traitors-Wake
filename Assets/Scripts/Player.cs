@@ -42,13 +42,23 @@ public class Player : MonoBehaviour {
             yield return null;
         }
         this.transform.position = new Vector3(targetPos.x, targetPos.y);
+        
         Vector2Int pos = new ((int)this.transform.position.x, (int)this.transform.position.y);
         this._moves.Add(pos);
         this.isMoving = false;
-
-        if (this != GameManager.instance.player || GridManager.instance.GetChestTileWithPos(pos).isActivated) yield break;
-        GridManager.instance.GetChestTileWithPos(pos).isActivated = true;
-        PowerUpManager.instance.ActivatePowerUp();
+        
+        if (this != GameManager.instance.player) yield break;
+        
+        Tile.TileType tileType = GridManager.instance.GetGridTileWithPosition(pos).GetCurrentTileType();
+        switch (tileType) {
+            // Check if current tile position is a TileType.Obstacle or a TileType.Chest
+            case Tile.TileType.Obstacle:
+                GridManager.instance.TryActivateObstacleTile(pos);
+                break;
+            case Tile.TileType.Chest:
+                GridManager.instance.TryActivateChestTile(pos); // this calls ActivatePowerUp()
+                break;
+        }
     }
 
     public bool MovesEquals(Player otherPlayer) {

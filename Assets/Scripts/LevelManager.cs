@@ -6,6 +6,7 @@ public class LevelManager : MonoBehaviour {
     
     public static LevelManager instance;
     private int _currentLevel;
+    private int _levelDiff;
     
     void Awake() {
         instance = this;
@@ -15,14 +16,17 @@ public class LevelManager : MonoBehaviour {
     public IEnumerator GenerateLevel() {
         if (Player.isReset) {
             this._currentLevel = 0;
+            this._levelDiff = 0;
             GameManager.instance.SetDifficulty(GameManager.instance.StartDifficulty);
             Player.isReset = false;
         } 
         this._currentLevel++; // Increment current level
-
+        this._levelDiff++; // Increment level per difficulty
+        
         // Increment difficulty if current level is greater than levelEndPerDiff
         // Else continue with same difficulty from previous level
-        if (this._currentLevel > GameManager.instance.levelEndPerDiff) {
+        if (this._levelDiff > GameManager.instance.levelsPerDiff) {
+            this._levelDiff = 0; // Reset level per difficulty
             GameManager.instance.IncrementDifficulty();
         } else GameManager.instance.SetDifficulty(GameManager.instance.difficulty);
         
@@ -30,31 +34,33 @@ public class LevelManager : MonoBehaviour {
         UIManager.instance.SetButtons(false);
         yield return new WaitForSeconds(this._timeBeforeLevelStart);
             
-        // Reset all "Player" settings before re-generating a level
+        // Reset all "Player" related settings before re-generating a level
         GameManager.instance.aiPlayer.ResetSettings();
+        GameManager.instance.aiManager.SetLRPosCount(0); // Reset LineRenderer position count
         GameManager.instance.player.ResetSettings();
         GridManager.instance.ClearAllTiles();
-            
+        
         GameManager.instance.aiManager.SetLRPosCount(1); // Set LineRenderer position count to 1
-            
+        GameManager.instance.aiManager.SetLineRendererStatus(true); // Enable LineRenderer
+        
         UIManager.instance.DisplayLevelText(this._currentLevel); // Display current level
         GridManager.instance.GenerateGrid(); // Generates grid based on difficulty
             
         // Set lineRenderer to the AI's spawn position
         GameManager.instance.aiManager.SetLRPosition(0, Player.SpawnPos());
-            
+        
         // After move sequence, remove AI path trace, and enable player button actions
         yield return StartCoroutine(GameManager.instance.aiManager.MoveSequence());
         yield return StartCoroutine(UIManager.instance.DisplayTimeToMemorize(GameManager.instance.timeToMemorize));
             
         // After timeToMemorize is done, wait an additional 0.5 seconds and sets Player.isMemorizing to false so player can move
         yield return new WaitForSeconds(0.5f); 
-        // Add powerup check
-        GameManager.instance.aiManager.SetLRPosCount(0); // Reset LineRenderer position count
+        
+        GameManager.instance.aiManager.SetLineRendererStatus(false); // Disable LineRenderer
         Player.isMemorizing = false;
         UIManager.instance.SetButtons(true);
             
-        yield return StartCoroutine(UIManager.instance.DisplayTimeToComplete(GameManager.instance.timeToComplete));
+        yield return StartCoroutine(UIManager.instance.DisplayTimeToComplete());
         UIManager.instance.SetButtons(false); // Disable buttons so player position isn't overwritten
             
         // Compare stack of moves between the AI and the player

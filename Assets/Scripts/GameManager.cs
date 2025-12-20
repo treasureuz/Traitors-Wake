@@ -24,9 +24,9 @@ public class GameManager : MonoBehaviour {
     [SerializeField] private int _hardMaxGrid = 17;
 
     [Header("Level End Per Difficulty")] 
-    [SerializeField] private int _easyLevelEnd = 4;
-    [SerializeField] private int _normalLevelEnd = 7;
-    [SerializeField] private int _hardLevelEnd = 9;
+    [SerializeField] private int _easyLevels = 4;
+    [SerializeField] private int _normalLevels = 3;
+    [SerializeField] private int _hardLevels = 2;
     
     [Header("Time To Memorize")]
     [SerializeField] private float _easyTimeToMemorize = 3.5f;
@@ -53,7 +53,7 @@ public class GameManager : MonoBehaviour {
     public AIManager aiManager { get; private set; }
     
     public int numOfDirs {get; private set;}
-    public int levelEndPerDiff { get; private set; }
+    public int levelsPerDiff { get; private set; }
     public float timeToMemorize { get; private set; }
     public float timeToComplete { get; private set; }
 
@@ -81,7 +81,7 @@ public class GameManager : MonoBehaviour {
                 this.numOfDirs = this._easyNumOfDirs; 
                 GridManager.instance.SetWidth(Random.Range(this._easyMinGrid, this._easyMaxGrid));
                 GridManager.instance.SetHeight(Random.Range(this._easyMinGrid, this._easyMaxGrid));
-                this.levelEndPerDiff = this._easyLevelEnd;
+                this.levelsPerDiff = this._easyLevels;
                 this.timeToMemorize = this._easyTimeToMemorize;
                 this.timeToComplete = this._easyTimeToComplete;
                 this.aiManager.aiTimeToMove = this._easyAITimeToMove;
@@ -91,7 +91,7 @@ public class GameManager : MonoBehaviour {
                 this.numOfDirs = this._normalNumOfDirs; 
                 GridManager.instance.SetWidth(Random.Range(this._normalMinGrid, this._normalMaxGrid));
                 GridManager.instance.SetHeight(Random.Range(this._normalMinGrid, this._normalMaxGrid));
-                this.levelEndPerDiff = this._normalLevelEnd;
+                this.levelsPerDiff = this._normalLevels;
                 this.timeToMemorize = this._normalTimeToMemorize;
                 this.timeToComplete = this._normalTimeToComplete;
                 this.aiManager.aiTimeToMove = this._normalAITimeToMove;
@@ -101,7 +101,7 @@ public class GameManager : MonoBehaviour {
                 this.numOfDirs = this._hardNumOfDirs; 
                 GridManager.instance.SetWidth(Random.Range(this._hardMinGrid, this._hardMaxGrid));
                 GridManager.instance.SetHeight(Random.Range(this._hardMinGrid, this._hardMaxGrid));
-                this.levelEndPerDiff = this._hardLevelEnd;
+                this.levelsPerDiff = this._hardLevels;
                 this.timeToMemorize = this._hardTimeToMemorize;
                 this.timeToComplete = this._hardTimeToComplete;
                 this.aiManager.aiTimeToMove = this._hardAITimeToMove;
@@ -115,8 +115,13 @@ public class GameManager : MonoBehaviour {
         if (this.difficulty == Difficulty.Hard) return;
         SetDifficulty(++this.difficulty);
     }
+    
     public void SetDifficulty(Difficulty diff) {
         this.difficulty = diff;
         HandleDifficultySettings();
+    }
+
+    public void SetTimeToComplete(float time) {
+        this.timeToComplete = time;
     }
 }

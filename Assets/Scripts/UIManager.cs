@@ -87,6 +87,7 @@ public class UIManager : MonoBehaviour {
     }
     
     public void DisplayLevelText(float level) {
+        //Adjust topText size based on the level text
         this._topTextBGTransform.sizeDelta = GameManager.instance.difficulty == GameManager.Difficulty.Normal 
             ? new Vector2(this._normalLevelTextBGWidth, this._topTextBGTransform.sizeDelta.y) 
             : new Vector2(this._baseLevelTextBGWidth, this._topTextBGTransform.sizeDelta.y);
@@ -94,6 +95,7 @@ public class UIManager : MonoBehaviour {
     }
 
     public IEnumerator DisplayTimeToMemorize(float time) {
+        //Adjust topText size based on the timeToMemorize text
         this._topTextBGTransform.sizeDelta = new Vector2(this._memorizeTextBGWidth, this._topTextBGTransform.sizeDelta.y);
         while (time > 0f) {
             Player.isMemorizing = true;
@@ -105,12 +107,13 @@ public class UIManager : MonoBehaviour {
         this._topTextTMP.text = $"{{Memorize The Path: [{0f:F2}s]}}";
     }
     
-    public IEnumerator DisplayTimeToComplete(float time) {
+    public IEnumerator DisplayTimeToComplete() {
+        //Adjust topText size based on the timeToComplete text
         this._topTextBGTransform.sizeDelta = new Vector2(this._completeTextBGWidth, this._topTextBGTransform.sizeDelta.y);
-        while (!GameManager.instance.player.isEnded && time > 0f) {
+        while (!GameManager.instance.player.isEnded && GameManager.instance.timeToComplete > 0f) {
             // float.ToString("F2") or $"{float:F2}" converts the float value to 2 decimal places
-            this._topTextTMP.text = $"{{Complete in: [{time:F2}s]!}}";
-            time -= Time.deltaTime;
+            this._topTextTMP.text = $"{{Complete in: [{GameManager.instance.timeToComplete:F2}s]!}}";
+            GameManager.instance.SetTimeToComplete(GameManager.instance.timeToComplete - Time.deltaTime);
             yield return null;
         }
         this._topTextTMP.text = $"{{Complete in: [{0f:F2}s]!}}";

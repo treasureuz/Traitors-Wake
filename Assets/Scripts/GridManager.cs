@@ -4,8 +4,6 @@ using Unity.VisualScripting;
 using UnityEngine;
 
 public class GridManager : MonoBehaviour {
-    [SerializeField] private Color _chestColor = Color.gold;
-    [SerializeField] private Color _obstacleColor = Color.grey;
     [SerializeField] private Tile _tilePrefab; 
     [SerializeField] private Transform _cam;
     [SerializeField] private int _width, _height;
@@ -17,7 +15,7 @@ public class GridManager : MonoBehaviour {
     
     private readonly Dictionary<Vector2Int, Tile> _tiles = new();
     private readonly Dictionary<Vector2Int, Tile> _chestTiles = new();
-    private readonly List<Tile> _obstacleTiles = new();
+    private readonly Dictionary<Vector2Int, Tile> _obstacleTiles = new();
     
     private Tile _spawnedTile;
 
@@ -30,7 +28,7 @@ public class GridManager : MonoBehaviour {
         for (var x = 0; x < this._width; x++) {
             for (var y = 0; y < this._height; y++) {
                 this._spawnedTile = Instantiate(this._tilePrefab, new Vector3(x, y), Quaternion.identity);
-                this._spawnedTile.Init(x, y);
+                this._spawnedTile.AddToTileTypes(Tile.TileType.Regular); // this calls Init()
                 this._tiles.Add(new Vector2Int(x, y), this._spawnedTile);
             }
         }
@@ -54,12 +52,21 @@ public class GridManager : MonoBehaviour {
             while (this._chestTiles.ContainsValue(GetGridTileWithPosition(randomPos)));
 
             Tile chestTile = GetGridTileWithPosition(randomPos);
-
+            
+            chestTile.AddToTileTypes(Tile.TileType.Chest); // this calls Init()
             chestTile.name = $"Chest Tile {randomPos.x}, {randomPos.y}";
-            chestTile.GetComponent<SpriteRenderer>().color = this._chestColor;
-
+            
             this._chestTiles.Add(new Vector2Int(randomPos.x, randomPos.y), chestTile);
         }
+    }
+    
+    public void TryActivateChestTile(Vector2Int position) {
+        Tile chestTile = this._chestTiles.GetValueOrDefault(position);
+        if (!chestTile || chestTile.isActivated) return;
+        chestTile.isActivated = true;
+        PowerUpManager.instance.ActivatePowerUp();
+        chestTile.PopTileType(); // this calls Init();
+        this._chestTiles.Remove(position);
     }
 
     // ReSharper disable Unity.PerformanceAnalysis
@@ -70,38 +77,40 @@ public class GridManager : MonoBehaviour {
             // Generate a random tile position that is not in the obstacle tile already (no duplicates)
             // Uses the moves of the AI, not including the last one.
             do randomIndex = Random.Range(0, GameManager.instance.aiPlayer.GetMovesCount() - 1);
-            while (this._obstacleTiles.Contains(GetGridTileWithPosition(GameManager.instance.aiPlayer.GetPosByIndex(randomIndex))));
+            while (this._obstacleTiles.ContainsValue(GetGridTileWithPosition(GameManager.instance.aiPlayer.GetPosByIndex(randomIndex))));
 
-            Debug.Log(randomIndex);
             Tile obstacleTile = GetGridTileWithPosition(GameManager.instance.aiPlayer.GetPosByIndex(randomIndex));
+            var xPos = (int) obstacleTile.transform.position.x;
+            var yPos = (int) obstacleTile.transform.position.y;
             
-            if (!obstacleTile) break;
-
-            obstacleTile.name =
-                $"Obstacle Tile {obstacleTile.transform.position.x}, {obstacleTile.transform.position.y}";
-            obstacleTile.GetComponent<SpriteRenderer>().color = this._obstacleColor;
-            obstacleTile.AddComponent<BoxCollider2D>();
+            obstacleTile.AddToTileTypes(Tile.TileType.Obstacle); // this calls Init()
+            obstacleTile.name = $"Obstacle Tile {xPos}, {yPos}";
             
-            this._obstacleTiles.Add(obstacleTile);
+            this._obstacleTiles.Add(new Vector2Int(xPos, yPos), obstacleTile);
         }
     }
 
-    public Tile GetChestTileWithPos(Vector2Int position) {
-        return this._chestTiles.GetValueOrDefault(position);
+    // TODO: Replace for "OnCollisionEnter2D"
+    public void TryActivateObstacleTile(Vector2Int position) {
+        Tile obstacleTile = this._obstacleTiles.GetValueOrDefault(position);
+        if (!obstacleTile) return;
+        obstacleTile.PopTileType(); // this calls Init();
+        this._obstacleTiles.Remove(position);
     }
-
+    
+    // public bool IsObstacleTile(Vector2Int pos) {
+    //     return this._obstacleTiles.ContainsKey(pos);
+    // }
+    
     private void ClearChestTiles() {
-        foreach (Tile tile in this._chestTiles.Values) {
-            tile.Init((int)tile.transform.position.x, (int)tile.transform.position.y);
-        }
-
+        foreach (Tile tile in this._chestTiles.Values) tile.PopTileType(); // this calls Init()
         this._chestTiles.Clear();
     }
 
     // ReSharper disable Unity.PerformanceAnalysis
-    private void ClearObstacleTiles() {
-        foreach (Tile tile in this._obstacleTiles) {
-            tile.Init((int)tile.transform.position.x, (int)tile.transform.position.y);
+    public void ClearObstacleTiles() {
+        foreach (Tile tile in this._obstacleTiles.Values) {
+            tile.PopTileType(); // this calls Init()
             Destroy(tile.GetComponent<BoxCollider2D>());
         }
         this._obstacleTiles.Clear();
@@ -117,7 +126,7 @@ public class GridManager : MonoBehaviour {
         this._tiles.Clear();
     }
     
-    private Tile GetGridTileWithPosition(Vector2Int position) {
+    public Tile GetGridTileWithPosition(Vector2Int position) {
         return this._tiles.GetValueOrDefault(position);
     }
     

@@ -2,6 +2,15 @@ using UnityEngine;
 
 public class PowerUpManager : MonoBehaviour {
     public static PowerUpManager instance;
+
+    private enum PowerUp {
+        GiveAmmo = 0, 
+        LineTrace = 1, 
+        IncreaseCompleteTime = 2, 
+        ClearObstacles = 3
+    }
+    
+    [SerializeField] private PowerUp _powerUp;
     
     void Awake() {
         instance = this;
@@ -9,5 +18,34 @@ public class PowerUpManager : MonoBehaviour {
     
     public void ActivatePowerUp() {
         Debug.Log("Activating PowerUp");
+        var randomPowerUpNum = Random.Range(0, 4); // Get random number between 0 - PowerUp.length (3)
+        this._powerUp = (PowerUp) randomPowerUpNum;
+        Debug.Log(this._powerUp);
+        HandlePowerUps();
+    }
+
+    private void HandlePowerUps() {
+        switch (this._powerUp) {
+            case PowerUp.GiveAmmo: {
+                var randomNum = Random.Range(10, 26); // Amount of ammo to give the player (between 10 - 25) 
+                Debug.Log($"Gave {randomNum} ammo");
+                break;
+            }
+            case PowerUp.LineTrace: {
+                // Enable the AIManager.LineRenderer after timeToMemorize is done
+                GameManager.instance.aiManager.SetLineRendererStatus(true);
+                break;
+            }
+            case PowerUp.IncreaseCompleteTime: {
+                var randomNum = Random.Range(3, 9); // Amount to increase the timeToComplete by (between 3 - 8)
+                GameManager.instance.SetTimeToComplete(GameManager.instance.timeToComplete + randomNum);
+                break;
+            }
+            case PowerUp.ClearObstacles: {
+                Debug.Log("Clearing obstacles");
+                GridManager.instance.ClearObstacleTiles();
+                break;
+            }
+        }
     }
 }
