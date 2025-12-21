@@ -1,7 +1,6 @@
 using UnityEngine;
 
 public class PowerUpManager : MonoBehaviour {
-    public static PowerUpManager instance;
 
     private enum PowerUp {
         GiveAmmo = 0, 
@@ -11,10 +10,6 @@ public class PowerUpManager : MonoBehaviour {
     }
     
     [SerializeField] private PowerUp _powerUp;
-    
-    void Awake() {
-        instance = this;
-    }
     
     public void ActivatePowerUp() {
         Debug.Log("Activating PowerUp");

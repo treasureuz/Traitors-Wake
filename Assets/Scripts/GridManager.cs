@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class GridManager : MonoBehaviour {
@@ -8,10 +6,10 @@ public class GridManager : MonoBehaviour {
     [SerializeField] private Transform _cam;
     [SerializeField] private int _width, _height;
     
+    public static GridManager instance;
+    
     public int Width => this._width;
     public int Height => this._height;
-    
-    public static GridManager instance;
     
     private readonly Dictionary<Vector2Int, Tile> _tiles = new();
     private readonly Dictionary<Vector2Int, Tile> _chestTiles = new();
@@ -32,9 +30,7 @@ public class GridManager : MonoBehaviour {
                 this._tiles.Add(new Vector2Int(x, y), this._spawnedTile);
             }
         }
-        
-        MakeChestTiles(6);
-        
+        MakeChestTiles(6); // Make X amount of chest tiles
         // Position the cam position at the center of the grid (based on the width and height)
         var centerWidth = (float) this._width / 2 - 0.5f;
         var centerHeight = (float) this._height / 2 - 0.5f;
@@ -46,24 +42,25 @@ public class GridManager : MonoBehaviour {
         for (var i = 0; i < number; i++) {
             Vector2Int randomPos;
 
-            // Generate a random tile position that is not in the chest tile already (no duplicates)
+            // Generate a random tile position that is not in the chest tile list already (no duplicates)
             // Uses the positions of the grid tiles
             do randomPos = new Vector2Int(Random.Range(1, this._width), Random.Range(1, this._height));
             while (this._chestTiles.ContainsValue(GetGridTileWithPosition(randomPos)));
 
             Tile chestTile = GetGridTileWithPosition(randomPos);
-            chestTile.AddToTileTypes(Tile.TileType.Chest); // this calls Init()
             chestTile.name = $"Chest Tile {randomPos.x}, {randomPos.y}";
-            
+            chestTile.AddToTileTypes(Tile.TileType.Chest); // this calls Init()
             this._chestTiles.Add(new Vector2Int(randomPos.x, randomPos.y), chestTile);
         }
     }
     
-    public void TryActivateChestTile(Vector2Int position) {
+    // ReSharper disable Unity.PerformanceAnalysis
+    public void TryOpenChestTile(Vector2Int position) {
         Tile chestTile = this._chestTiles.GetValueOrDefault(position);
-        if (!chestTile || chestTile.isActivated) return;
-        chestTile.isActivated = true;
-        PowerUpManager.instance.ActivatePowerUp();
+        if (!chestTile || chestTile.isOpened) return;
+        // If chestTile is not opened and the player's position is on it, open the chest and activate its PowerUp
+        chestTile.isOpened = true; 
+        chestTile.GetComponent<PowerUpManager>().ActivatePowerUp();
         chestTile.PopTileType(); // this calls Init();
         this._chestTiles.Remove(position);
     }
@@ -73,19 +70,19 @@ public class GridManager : MonoBehaviour {
         for (var i = 0; i < number; i++) {
             Vector2Int randomPos;
 
-            // Generate a random tile position that is not in the obstacle tile already (no duplicates)
+            // Generate a random tile position that is not in the obstacle tile list already (no duplicates)
             // Uses the moves of the AI, not including the last one.
             do {
-                randomPos = GameManager.instance.difficulty == GameManager.Difficulty.Hard ?
-                    GameManager.instance.aiPlayer.GetMovesPosByIndex(Random.Range(0, GameManager.instance.aiPlayer.GetMovesCount() - 1)) 
+                randomPos = GameManager.instance.difficulty == GameManager.Difficulty.Hard ? 
+                    GameManager.instance.aiPlayer.GetMovesPosByIndex
+                        (Random.Range(0, GameManager.instance.aiPlayer.GetMovesCount() - 1)) 
                     : new Vector2Int(Random.Range(1, this._width), Random.Range(1, this._height));
             }
             while (this._obstacleTiles.ContainsValue(GetGridTileWithPosition(randomPos)));
 
             Tile obstacleTile = GetGridTileWithPosition(randomPos);
-            obstacleTile.AddToTileTypes(Tile.TileType.Obstacle); // this calls Init()
             obstacleTile.name = $"Obstacle Tile {randomPos.x}, {randomPos.y}";
-            
+            obstacleTile.AddToTileTypes(Tile.TileType.Obstacle); // this calls Init()
             this._obstacleTiles.Add(new Vector2Int(randomPos.x, randomPos.y), obstacleTile);
         }
     }
@@ -101,6 +98,13 @@ public class GridManager : MonoBehaviour {
     // public bool IsObstacleTile(Vector2Int pos) {
     //     return this._obstacleTiles.ContainsKey(pos);
     // }
+    
+    public void SetWidth(int width) => this._width = width;
+    public void SetHeight(int height) => this._height = height;
+    
+    public Tile GetGridTileWithPosition(Vector2Int position) {
+        return this._tiles.GetValueOrDefault(position);
+    }
     
     private void ClearChestTiles() {
         foreach (Tile tile in this._chestTiles.Values) tile.PopTileType(); // this calls Init()
@@ -125,12 +129,4 @@ public class GridManager : MonoBehaviour {
         foreach (Tile tile in this._tiles.Values) Destroy(tile.gameObject);
         this._tiles.Clear();
     }
-    
-    public Tile GetGridTileWithPosition(Vector2Int position) {
-        return this._tiles.GetValueOrDefault(position);
-    }
-    
-    public void SetWidth(int width) => this._width = width;
-    public void SetHeight(int height) => this._height = height;
-    
 }

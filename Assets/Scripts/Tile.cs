@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 public class Tile : MonoBehaviour {
     [SerializeField] private Color _offsetColor, _baseColor;
@@ -12,7 +10,7 @@ public class Tile : MonoBehaviour {
 
     private Stack<TileType> _tileTypesList;
     
-    public bool isActivated { get; set; }
+    public bool isOpened { get; set; }
 
     public enum TileType {
         Regular, 
@@ -42,6 +40,7 @@ public class Tile : MonoBehaviour {
             }
             case TileType.Chest: {
                 this._spriteRenderer.color = this._chestColor;
+                this.AddComponent<PowerUpManager>();
                 break;
             }
             case TileType.Obstacle: {
@@ -53,13 +52,11 @@ public class Tile : MonoBehaviour {
     }
 
     public void AddToTileTypes(TileType tileType) {
-        this._tileTypesList.Push(tileType);
-        Init();
+        this._tileTypesList.Push(tileType); Init();
     }
     
     public void PopTileType() {
-        this._tileTypesList.Pop();
-        Init();
+        this._tileTypesList.Pop(); Init();
     }
     
     public TileType GetCurrentTileType() {

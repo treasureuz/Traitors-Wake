@@ -58,7 +58,7 @@ public class Player : MonoBehaviour {
                 GridManager.instance.TryActivateObstacleTile(currentPos);
                 break;
             case Tile.TileType.Chest:
-                GridManager.instance.TryActivateChestTile(currentPos); // this calls ActivatePowerUp()
+                GridManager.instance.TryOpenChestTile(currentPos); // this calls ActivatePowerUp()
                 break;
         }
     }
