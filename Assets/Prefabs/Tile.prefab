@@ -104,6 +104,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03660b6483aaa8247bb79c26d3d26fa8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Tile
-  _offsetColor: {r: 0.7215686, g: 0.5254902, b: 0.04313726, a: 1}
-  _baseColor: {r: 0.5647059, g: 0.29803923, b: 0.105882354, a: 1}
+  _offsetColor: {r: 0, g: 0.5764706, b: 0.8509804, a: 1}
+  _baseColor: {r: 0, g: 0.8235294, b: 1, a: 1}
+  _chestColor: {r: 1, g: 0.8431373, b: 0, a: 1}
+  _obstacleColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   _spriteRenderer: {fileID: 8496734474472047767}

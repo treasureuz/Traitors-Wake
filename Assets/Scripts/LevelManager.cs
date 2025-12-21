@@ -47,7 +47,7 @@ public class LevelManager : MonoBehaviour {
         GridManager.instance.GenerateGrid(); // Generates grid based on difficulty
             
         // Set lineRenderer to the AI's spawn position
-        GameManager.instance.aiManager.SetLRPosition(0, Player.SpawnPos());
+        GameManager.instance.aiManager.SetLRPosition(0, Player.SpawnPosV3());
         
         // After move sequence, remove AI path trace, and enable player button actions
         yield return StartCoroutine(GameManager.instance.aiManager.MoveSequence());

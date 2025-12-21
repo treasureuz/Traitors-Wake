@@ -6,10 +6,10 @@ using Vector3 = UnityEngine.Vector3;
 
 public class Player : MonoBehaviour {
     [SerializeField] private float _playerTimeToMove = 0.5f;
-    public static Vector2Int spawnPos = Vector2Int.zero;
+    private static readonly Vector2Int spawnPos = Vector2Int.zero;
     
     public float PlayerTimeToMove => this._playerTimeToMove;
-    public static Vector3 SpawnPos() => new (spawnPos.x, spawnPos.y);
+    public static Vector3 SpawnPosV3() => new (spawnPos.x, spawnPos.y, 0);
     public static bool isMemorizing;
     public static bool isReset;
     
@@ -17,9 +17,11 @@ public class Player : MonoBehaviour {
     public bool isEnded { get; set; }
     
     [SerializeField] private List<Vector2Int> _moves;
-
+    private List<Vector2Int> _directions;
+    
     void Awake() {
         this._moves = new List<Vector2Int>();
+        this._directions = new List<Vector2Int>();
         ResetSettings();
     }
 
@@ -42,21 +44,21 @@ public class Player : MonoBehaviour {
             yield return null;
         }
         this.transform.position = new Vector3(targetPos.x, targetPos.y);
+        Vector2Int currentPos = new ((int) this.transform.position.x, (int) this.transform.position.y);
         
-        Vector2Int pos = new ((int)this.transform.position.x, (int)this.transform.position.y);
-        this._moves.Add(pos);
+        this._moves.Add(currentPos); // Add current player position to the moves list
+        this._directions.Add(direction); // Add the direction the player moved to the directions list
         this.isMoving = false;
         
         if (this != GameManager.instance.player) yield break;
-        
-        Tile.TileType tileType = GridManager.instance.GetGridTileWithPosition(pos).GetCurrentTileType();
+        Tile.TileType tileType = GridManager.instance.GetGridTileWithPosition(currentPos).GetCurrentTileType();
         switch (tileType) {
             // Check if current tile position is a TileType.Obstacle or a TileType.Chest
             case Tile.TileType.Obstacle:
-                GridManager.instance.TryActivateObstacleTile(pos);
+                GridManager.instance.TryActivateObstacleTile(currentPos);
                 break;
             case Tile.TileType.Chest:
-                GridManager.instance.TryActivateChestTile(pos); // this calls ActivatePowerUp()
+                GridManager.instance.TryActivateChestTile(currentPos); // this calls ActivatePowerUp()
                 break;
         }
     }
@@ -69,18 +71,20 @@ public class Player : MonoBehaviour {
         if (this._moves.Count == 0 || this.isMoving) yield break;
         this.isMoving = true;
 
-        Vector2Int startPos = new ((int)this.transform.position.x, (int)this.transform.position.y);
-        Vector2Int moveToRemove = this._moves[^1]; // ^1: gets the end index of a list
-
+        Vector2Int moveToRemove = this._directions[^1]; // ^1: gets the end index of the directions list
+        Vector2Int startPos = new ((int) this.transform.position.x, (int) this.transform.position.y);
+        Vector2Int targetPos = startPos - moveToRemove;
+        
         this._moves.RemoveAt(this._moves.Count - 1); // Remove the last move from the list
-
+        this._directions.RemoveAt(this._directions.Count - 1); // Remove the last direction from the list
+        
         var elapsedTime = 0f;
         while (elapsedTime < timeToMove) {
-            this.transform.position = Vector2.Lerp(startPos, moveToRemove, elapsedTime / timeToMove);
+            this.transform.position = Vector2.Lerp(startPos, targetPos, elapsedTime / timeToMove);
             elapsedTime += Time.deltaTime;
             yield return null;
         }
-        this.transform.position = new Vector3(moveToRemove.x, moveToRemove.y);
+        this.transform.position = new Vector3(targetPos.x, targetPos.y, 0);
         this.isMoving = false;
     }
 
@@ -89,7 +93,7 @@ public class Player : MonoBehaviour {
         this._moves.Clear();
         this.isMoving = true;
         
-        Vector2Int startPos = new ((int)this.transform.position.x, (int)this.transform.position.y);
+        Vector2Int startPos = new ((int) this.transform.position.x, (int) this.transform.position.y);
         Vector2Int targetPos = spawnPos;
 
         var elapsedTime = 0f;
@@ -104,7 +108,7 @@ public class Player : MonoBehaviour {
     
     public void ResetSettings() {
         this._moves.Clear();
-        this.transform.position = SpawnPos();
+        this.transform.position = SpawnPosV3();
         this.isEnded = false;
     }
     
@@ -112,7 +116,7 @@ public class Player : MonoBehaviour {
         return this._moves.Count;
     }
 
-    public Vector2Int GetPosByIndex(int index) {
+    public Vector2Int GetMovesPosByIndex(int index) {
         return this._moves[index];
     }
 }

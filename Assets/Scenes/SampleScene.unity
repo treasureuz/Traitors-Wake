@@ -154,7 +154,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1000, y: 80}
+  m_SizeDelta: {x: 1000, y: 85}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &9976319
 MonoBehaviour:
@@ -292,8 +292,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 200}
-  m_SizeDelta: {x: 285, y: 90}
+  m_AnchoredPosition: {x: -400, y: -480}
+  m_SizeDelta: {x: 278, y: 83}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &363075455
 MonoBehaviour:
@@ -427,7 +427,7 @@ MonoBehaviour:
   _baseLevelTextBGWidth: 485
   _normalLevelTextBGWidth: 550
   _memorizeTextBGWidth: 800
-  _completeTextBGWidth: 650
+  _completeTextBGWidth: 680
   _failedTextBGWidth: 720
 --- !u!4 &383298189
 Transform:
@@ -476,19 +476,17 @@ MonoBehaviour:
   _playerPrefab: {fileID: 8392707146380620319, guid: 2ec11d17ab26e4040b0f6d0eb96e404c, type: 3}
   _aiPlayerPrefab: {fileID: 8860221829043882386, guid: 658e6bce8f378bf4fbfbcb64b4197dba, type: 3}
   _finishPos: {x: 0, y: 0}
-  _startDifficulty: 1
-  _easyNumOfDirs: 6
-  _normalNumOfDirs: 5
-  _hardNumOfDirs: 4
-  _easyMinGrid: 2
-  _easyMaxGrid: 5
-  _normalMinGrid: 4
-  _normalMaxGrid: 7
-  _hardMinGrid: 6
-  _hardMaxGrid: 9
-  _easyLevelEnd: 4
-  _normalLevelEnd: 7
-  _hardLevelEnd: 9
+  _startDifficulty: 0
+  _easyNumOfDirs: 12
+  _normalNumOfDirs: 10
+  _hardNumOfDirs: 8
+  _minWidth: 7
+  _maxWidth: 8
+  _minHeight: 6
+  _maxHeight: 7
+  _easyLevels: 4
+  _normalLevels: 3
+  _hardLevels: 2
   _easyTimeToMemorize: 3.5
   _normalTimeToMemorize: 3.2
   _hardTimeToMemorize: 3
@@ -801,8 +799,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 285, y: 90}
+  m_AnchoredPosition: {x: 0, y: -480}
+  m_SizeDelta: {x: 278, y: 83}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &752158881
 MonoBehaviour:
@@ -1037,7 +1035,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 500, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1093235359
@@ -1075,8 +1073,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 485}
-  m_SizeDelta: {x: 485, y: 80}
+  m_AnchoredPosition: {x: 0, y: 480}
+  m_SizeDelta: {x: 485, y: 85}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1093235361
 MonoBehaviour:
@@ -1145,12 +1143,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6daaa9c1b59c3aa47ab8608f4e4c8d4e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GridManager
-  _chestColor: {r: 1, g: 0.8431373, b: 0, a: 1}
-  _obstacleColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   _tilePrefab: {fileID: 7414746083576426236, guid: 5f2aab7ea5ac0ed43ab19d95545fd262, type: 3}
   _cam: {fileID: 519420032}
-  _width: 8
-  _height: 8
+  _width: 9
+  _height: 7
 --- !u!4 &1199878959
 Transform:
   m_ObjectHideFlags: 0
@@ -1332,6 +1328,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc063676efcfdc2498419d8ab14c0ed4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PowerUpManager
+  _powerUp: 0
 --- !u!4 &1416630519
 Transform:
   m_ObjectHideFlags: 0
@@ -1915,8 +1912,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -200}
-  m_SizeDelta: {x: 285, y: 90}
+  m_AnchoredPosition: {x: 400, y: -480}
+  m_SizeDelta: {x: 278, y: 83}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2005356302
 MonoBehaviour:

@@ -50,7 +50,7 @@ public class AIManager : MonoBehaviour {
             this._randomDir = NextDir();
         }
         this._aiPlayer.isEnded = true;
-        GridManager.instance.MakeObstacleTile(3);
+        GridManager.instance.MakeObstacleTile(7);
     }
 
     private IEnumerator LerpLineRenderer(float timeToMove) {
@@ -85,6 +85,5 @@ public class AIManager : MonoBehaviour {
 
     public void SetLRPosition(int val, Vector3 pos) => this._lineRenderer.SetPosition(val, pos);
     public void SetLRPosCount(int val) => this._lineRenderer.positionCount = val;
-    
     public void SetLineRendererStatus(bool b) => this._lineRenderer.enabled = b;
 }

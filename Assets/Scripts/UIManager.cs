@@ -58,6 +58,7 @@ public class UIManager : MonoBehaviour {
         EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
         this._restartButton.gameObject.SetActive(false);
         this._topTextTMP.text = loadingNextLevel;
+        OnRestartExit(); // change Restart text color back to original color;
         StartCoroutine(LevelManager.instance.GenerateLevel());
     }
 
@@ -112,11 +113,11 @@ public class UIManager : MonoBehaviour {
         this._topTextBGTransform.sizeDelta = new Vector2(this._completeTextBGWidth, this._topTextBGTransform.sizeDelta.y);
         while (!GameManager.instance.player.isEnded && GameManager.instance.timeToComplete > 0f) {
             // float.ToString("F2") or $"{float:F2}" converts the float value to 2 decimal places
-            this._topTextTMP.text = $"{{Complete in: [{GameManager.instance.timeToComplete:F2}s]!}}";
+            this._topTextTMP.text = $"{{Complete In: [{GameManager.instance.timeToComplete:F2}s]!}}";
             GameManager.instance.SetTimeToComplete(GameManager.instance.timeToComplete - Time.deltaTime);
             yield return null;
         }
-        this._topTextTMP.text = $"{{Complete in: [{0f:F2}s]!}}";
+        this._topTextTMP.text = $"{{Complete In: [{0f:F2}s]!}}";
         // After timeToComplete is done or the submit button was clicked, set player.isEnded to true 
         GameManager.instance.player.isEnded = true; 
     }
