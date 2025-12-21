@@ -13,17 +13,22 @@ public class GameManager : MonoBehaviour {
     [SerializeField] private int _normalNumOfDirs = 3;
     [SerializeField] private int _hardNumOfDirs = 2;
     
-    [Header("Min/Max Grid Numbers")]
-    [SerializeField] private int _easyMinGrid = 4;
-    [SerializeField] private int _easyMaxGrid = 8;
+    // [Header("Min/Max Grid Numbers")]
+    // [SerializeField] private int _easyMinGrid = 4;
+    // [SerializeField] private int _easyMaxGrid = 8;
+    //
+    // [SerializeField] private int _normalMinGrid = 8;
+    // [SerializeField] private int _normalMaxGrid = 12;
+    //
+    // [SerializeField] private int _hardMinGrid = 12;
+    // [SerializeField] private int _hardMaxGrid = 17;
 
-    [SerializeField] private int _normalMinGrid = 8;
-    [SerializeField] private int _normalMaxGrid = 12;
-
-    [SerializeField] private int _hardMinGrid = 12;
-    [SerializeField] private int _hardMaxGrid = 17;
-
-    [Header("Level End Per Difficulty")] 
+    [SerializeField] private int _minWidth = 7;
+    [SerializeField] private int _maxWidth = 9;
+    [SerializeField] private int _minHeight = 6;
+    [SerializeField] private int _maxHeight = 7;
+    
+    [Header("Levels Per Difficulty")] 
     [SerializeField] private int _easyLevels = 4;
     [SerializeField] private int _normalLevels = 3;
     [SerializeField] private int _hardLevels = 2;
@@ -66,8 +71,8 @@ public class GameManager : MonoBehaviour {
 
     void Awake() {
         instance = this;
-        this.aiPlayer = Instantiate(this._aiPlayerPrefab, Player.SpawnPos(), Quaternion.identity);
-        this.player = Instantiate(this._playerPrefab, Player.SpawnPos(), Quaternion.identity);
+        this.aiPlayer = Instantiate(this._aiPlayerPrefab, Player.SpawnPosV3(), Quaternion.identity);
+        this.player = Instantiate(this._playerPrefab, Player.SpawnPosV3(), Quaternion.identity);
         this.aiManager = this.aiPlayer.GetComponent<AIManager>();
     }
     
@@ -79,8 +84,8 @@ public class GameManager : MonoBehaviour {
         switch (this.difficulty) {
             case Difficulty.Easy: {
                 this.numOfDirs = this._easyNumOfDirs; 
-                GridManager.instance.SetWidth(Random.Range(this._easyMinGrid, this._easyMaxGrid));
-                GridManager.instance.SetHeight(Random.Range(this._easyMinGrid, this._easyMaxGrid));
+                // GridManager.instance.SetWidth(Random.Range(this._easyMinGrid, this._easyMaxGrid));
+                // GridManager.instance.SetHeight(Random.Range(this._easyMinGrid, this._easyMaxGrid));
                 this.levelsPerDiff = this._easyLevels;
                 this.timeToMemorize = this._easyTimeToMemorize;
                 this.timeToComplete = this._easyTimeToComplete;
@@ -89,8 +94,8 @@ public class GameManager : MonoBehaviour {
             }
             case Difficulty.Normal: {
                 this.numOfDirs = this._normalNumOfDirs; 
-                GridManager.instance.SetWidth(Random.Range(this._normalMinGrid, this._normalMaxGrid));
-                GridManager.instance.SetHeight(Random.Range(this._normalMinGrid, this._normalMaxGrid));
+                // GridManager.instance.SetWidth(Random.Range(this._normalMinGrid, this._normalMaxGrid));
+                // GridManager.instance.SetHeight(Random.Range(this._normalMinGrid, this._normalMaxGrid));
                 this.levelsPerDiff = this._normalLevels;
                 this.timeToMemorize = this._normalTimeToMemorize;
                 this.timeToComplete = this._normalTimeToComplete;
@@ -99,8 +104,8 @@ public class GameManager : MonoBehaviour {
             }
             case Difficulty.Hard: {
                 this.numOfDirs = this._hardNumOfDirs; 
-                GridManager.instance.SetWidth(Random.Range(this._hardMinGrid, this._hardMaxGrid));
-                GridManager.instance.SetHeight(Random.Range(this._hardMinGrid, this._hardMaxGrid));
+                // GridManager.instance.SetWidth(Random.Range(this._hardMinGrid, this._hardMaxGrid));
+                // GridManager.instance.SetHeight(Random.Range(this._hardMinGrid, this._hardMaxGrid));
                 this.levelsPerDiff = this._hardLevels;
                 this.timeToMemorize = this._hardTimeToMemorize;
                 this.timeToComplete = this._hardTimeToComplete;
@@ -108,6 +113,10 @@ public class GameManager : MonoBehaviour {
                 break;
             }
         }
+        // Randomize width and height (not based on difficulty) 
+        GridManager.instance.SetWidth(Random.Range(this._minWidth, this._maxWidth + 1));
+        GridManager.instance.SetHeight(Random.Range(this._minHeight, this._maxHeight + 1));
+        // Set finishPos based on the above set width and height
         this._finishPos = new Vector2Int(GridManager.instance.Width - 1, GridManager.instance.Height - 1);
     }
     

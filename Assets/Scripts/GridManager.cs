@@ -32,11 +32,11 @@ public class GridManager : MonoBehaviour {
                 this._tiles.Add(new Vector2Int(x, y), this._spawnedTile);
             }
         }
-        if (GameManager.instance.difficulty > GameManager.Difficulty.Easy) {
-            MakeChestTiles(3);
-        }
-        // Positioning the cam position on the grid (based on the width and height)
-        var centerWidth = (float) this._width / 2 + 1.25f;
+        
+        MakeChestTiles(6);
+        
+        // Position the cam position at the center of the grid (based on the width and height)
+        var centerWidth = (float) this._width / 2 - 0.5f;
         var centerHeight = (float) this._height / 2 - 0.5f;
         this._cam.position = new Vector3(centerWidth, centerHeight, -10); 
     }
@@ -48,11 +48,10 @@ public class GridManager : MonoBehaviour {
 
             // Generate a random tile position that is not in the chest tile already (no duplicates)
             // Uses the positions of the grid tiles
-            do randomPos = new Vector2Int(Random.Range(1, this._width), Random.Range(0, this._height));
+            do randomPos = new Vector2Int(Random.Range(1, this._width), Random.Range(1, this._height));
             while (this._chestTiles.ContainsValue(GetGridTileWithPosition(randomPos)));
 
             Tile chestTile = GetGridTileWithPosition(randomPos);
-            
             chestTile.AddToTileTypes(Tile.TileType.Chest); // this calls Init()
             chestTile.name = $"Chest Tile {randomPos.x}, {randomPos.y}";
             
@@ -72,21 +71,22 @@ public class GridManager : MonoBehaviour {
     // ReSharper disable Unity.PerformanceAnalysis
     public void MakeObstacleTile(int number) {
         for (var i = 0; i < number; i++) {
-            int randomIndex;
+            Vector2Int randomPos;
 
             // Generate a random tile position that is not in the obstacle tile already (no duplicates)
             // Uses the moves of the AI, not including the last one.
-            do randomIndex = Random.Range(0, GameManager.instance.aiPlayer.GetMovesCount() - 1);
-            while (this._obstacleTiles.ContainsValue(GetGridTileWithPosition(GameManager.instance.aiPlayer.GetPosByIndex(randomIndex))));
+            do {
+                randomPos = GameManager.instance.difficulty == GameManager.Difficulty.Hard ?
+                    GameManager.instance.aiPlayer.GetMovesPosByIndex(Random.Range(0, GameManager.instance.aiPlayer.GetMovesCount() - 1)) 
+                    : new Vector2Int(Random.Range(1, this._width), Random.Range(1, this._height));
+            }
+            while (this._obstacleTiles.ContainsValue(GetGridTileWithPosition(randomPos)));
 
-            Tile obstacleTile = GetGridTileWithPosition(GameManager.instance.aiPlayer.GetPosByIndex(randomIndex));
-            var xPos = (int) obstacleTile.transform.position.x;
-            var yPos = (int) obstacleTile.transform.position.y;
-            
+            Tile obstacleTile = GetGridTileWithPosition(randomPos);
             obstacleTile.AddToTileTypes(Tile.TileType.Obstacle); // this calls Init()
-            obstacleTile.name = $"Obstacle Tile {xPos}, {yPos}";
+            obstacleTile.name = $"Obstacle Tile {randomPos.x}, {randomPos.y}";
             
-            this._obstacleTiles.Add(new Vector2Int(xPos, yPos), obstacleTile);
+            this._obstacleTiles.Add(new Vector2Int(randomPos.x, randomPos.y), obstacleTile);
         }
     }
 
