@@ -22,13 +22,17 @@ public class PowerUpManager : MonoBehaviour {
     private void HandlePowerUps() {
         switch (this._powerUp) {
             case PowerUp.GiveAmmo: {
-                var randomNum = Random.Range(10, 26); // Amount of ammo to give the player (between 10 - 25) 
+                var maxNum = GameManager.instance.weaponManager.GetMaxMagazineCount() -
+                             GameManager.instance.weaponManager.GetCurrentMagazineCount();
+                var randomNum = Random.Range(0, maxNum + 1); // Amount of ammo to give the player (between 0 - maxNum) 
+                GameManager.instance.weaponManager.SetCurrentMagazineCount(randomNum);
+                UIManager.instance.IncreaseBulletBar(GameManager.instance.weaponManager.GetCurrentMagazineCount() - randomNum);
                 Debug.Log($"Gave {randomNum} ammo");
                 break;
             }
             case PowerUp.LineTrace: {
                 // Enable the AIManager.LineRenderer after timeToMemorize is done
-                GameManager.instance.aiManager.SetLineRendererStatus(true);
+                GameManager.instance.traitorManager.SetLineRendererStatus(true);
                 break;
             }
             case PowerUp.IncreaseCompleteTime: {

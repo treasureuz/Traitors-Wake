@@ -4,20 +4,19 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 using Vector3 = UnityEngine.Vector3;
 
-public class AIManager : MonoBehaviour {
+public class TraitorManager : MonoBehaviour {
     [SerializeField] private Player _playerPrefab;
     [SerializeField] private LineRenderer _lineRenderer;
     
     private static readonly Vector2Int[] directions = { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
     private static readonly List<Vector2Int> validDirs = new();
     
-    private Player _aiPlayer;
+    private Player _traitor;
     private Vector2Int _randomDir;
-    public float aiTimeToMove { get; set; }
     private int _lineIndex;
 
     void Awake() {
-        this._aiPlayer = this.GetComponent<Player>();
+        this._traitor = this.GetComponent<Player>();
         this._lineRenderer.positionCount = 1;
     }
     
@@ -32,8 +31,8 @@ public class AIManager : MonoBehaviour {
         this._lineIndex = 0;
         Vector3 finishPos = new (GameManager.instance.FinishPos.x, GameManager.instance.FinishPos.y);
         while (this.transform.position != finishPos) {
-            StartCoroutine(LerpLineRenderer(this.aiTimeToMove));
-            yield return StartCoroutine(this._aiPlayer.MovePlayer(this._randomDir, this.aiTimeToMove));
+            StartCoroutine(LerpLineRenderer(this._traitor.TimeToMove));
+            yield return StartCoroutine(this._traitor.MovePlayer(this._randomDir, this._traitor.TimeToMove));
             
             Vector2Int gridPos = Vector2Int.RoundToInt(transform.position);
             
@@ -48,7 +47,7 @@ public class AIManager : MonoBehaviour {
             validDirs.Remove(-this._randomDir);
             this._randomDir = NextDir();
         }
-        this._aiPlayer.isEnded = true;
+        this._traitor.hasEnded = true;
         GridManager.instance.MakeObstacleTile(7);
     }
 

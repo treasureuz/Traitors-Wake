@@ -10,15 +10,15 @@ public class LevelManager : MonoBehaviour {
     
     void Awake() {
         instance = this;
-        Player.isReset = true;
+        Player.hasResetLevel = true;
     }
     
     public IEnumerator GenerateLevel() {
-        if (Player.isReset) {
+        if (Player.hasResetLevel) {
             this._currentLevel = 0;
             this._levelDiff = 0;
             GameManager.instance.SetDifficulty(GameManager.instance.StartDifficulty);
-            Player.isReset = false;
+            Player.hasResetLevel = false;
         } 
         this._currentLevel++; // Increment current level
         this._levelDiff++; // Increment level per difficulty
@@ -35,28 +35,28 @@ public class LevelManager : MonoBehaviour {
         yield return new WaitForSeconds(this._timeBeforeLevelStart);
             
         // Reset all "Player" related settings before re-generating a level
-        GameManager.instance.aiPlayer.ResetSettings();
-        GameManager.instance.aiManager.SetLRPosCount(0); // Reset LineRenderer position count
+        GameManager.instance.traitor.ResetSettings();
+        GameManager.instance.traitorManager.SetLRPosCount(0); // Reset LineRenderer position count
         GameManager.instance.player.ResetSettings();
         GridManager.instance.ClearAllTiles();
         
-        GameManager.instance.aiManager.SetLRPosCount(1); // Set LineRenderer position count to 1
-        GameManager.instance.aiManager.SetLineRendererStatus(true); // Enable LineRenderer
+        GameManager.instance.traitorManager.SetLRPosCount(1); // Set LineRenderer position count to 1
+        GameManager.instance.traitorManager.SetLineRendererStatus(true); // Enable LineRenderer
         
         UIManager.instance.DisplayLevelText(this._currentLevel); // Display current level
         GridManager.instance.GenerateGrid(); // Generates grid based on difficulty
             
         // Set lineRenderer to the AI's spawn position
-        GameManager.instance.aiManager.SetLRPosition(0, Player.SpawnPosV3());
+        GameManager.instance.traitorManager.SetLRPosition(0, Player.SpawnPosV3());
         
         // After move sequence, remove AI path trace, and enable player button actions
-        yield return StartCoroutine(GameManager.instance.aiManager.MoveSequence());
+        yield return StartCoroutine(GameManager.instance.traitorManager.MoveSequence());
         yield return StartCoroutine(UIManager.instance.DisplayTimeToMemorize(GameManager.instance.timeToMemorize));
             
         // After timeToMemorize is done, wait an additional 0.5 seconds and sets Player.isMemorizing to false so player can move
         yield return new WaitForSeconds(0.5f); 
         
-        GameManager.instance.aiManager.SetLineRendererStatus(false); // Disable LineRenderer
+        GameManager.instance.traitorManager.SetLineRendererStatus(false); // Disable LineRenderer
         Player.isMemorizing = false;
         UIManager.instance.SetButtons(true);
             
@@ -64,10 +64,15 @@ public class LevelManager : MonoBehaviour {
         UIManager.instance.SetButtons(false); // Disable buttons so player position isn't overwritten
             
         // Compare stack of moves between the AI and the player
-        // Stops the loop if you failed the level
-        if (!UIManager.instance.CanAdvanceLevel()) yield break;
+        // Stops the loop if you failed the level and display text
+        UIManager.instance.DisplayFinishText();
+        if (!CanAdvanceLevel()) yield break;
         
-        //Recursively generate new randomized levels
+        // Recursively generate new randomized levels
         StartCoroutine(GenerateLevel());
+    }
+
+    public static bool CanAdvanceLevel() {
+        return GameManager.instance.player.MovesEquals(GameManager.instance.traitor);
     }
 }

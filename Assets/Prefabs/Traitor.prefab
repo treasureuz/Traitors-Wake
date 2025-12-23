@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 363989662899450924}
   - component: {fileID: 8932715277332121152}
   m_Layer: 0
-  m_Name: AIPlayer
+  m_Name: Traitor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

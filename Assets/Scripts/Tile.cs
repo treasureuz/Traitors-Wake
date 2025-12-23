@@ -36,16 +36,17 @@ public class Tile : MonoBehaviour {
                 var y = this.transform.position.y;
                 var isOffset = (x % 2 == 0 && y  % 2 != 0) || (x % 2 != 0 && y % 2 == 0);
                 this._spriteRenderer.color = isOffset ? this._offsetColor : this._baseColor;
+                this.tag = "RegularTile";
                 break;
             }
             case TileType.Chest: {
                 this._spriteRenderer.color = this._chestColor;
-                this.AddComponent<PowerUpManager>();
+                this.tag = "ChestTile";
                 break;
             }
             case TileType.Obstacle: {
                 this._spriteRenderer.color = this._obstacleColor;
-                this.AddComponent<BoxCollider2D>();
+                this.tag = "ObstacleTile";
                 break;
             }
         }
@@ -64,8 +65,10 @@ public class Tile : MonoBehaviour {
     }
 
     // For TileType.Obstacle
-    // private void OnCollisionEnter2D(Collision2D other) {
-    //     Debug.Log("Collision!");
-    //     PopTileType();
-    // }
+    private void OnCollisionEnter2D(Collision2D other) {
+        Debug.Log("Collision!");
+        PopTileType(); // Removes TileType.Obstacle
+        Vector2Int tilePos = new ((int)this.transform.position.x, (int)this.transform.position.y);
+        GridManager.instance.RemoveObstacleTile(tilePos); // Removes the tile from obstacle tiles list56
+    }
 }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GridManager : MonoBehaviour {
@@ -41,7 +42,6 @@ public class GridManager : MonoBehaviour {
     private void MakeChestTiles(int number) {
         for (var i = 0; i < number; i++) {
             Vector2Int randomPos;
-
             // Generate a random tile position that is not in the chest tile list already (no duplicates)
             // Uses the positions of the grid tiles
             do randomPos = new Vector2Int(Random.Range(1, this._width), Random.Range(1, this._height));
@@ -49,6 +49,7 @@ public class GridManager : MonoBehaviour {
 
             Tile chestTile = GetGridTileWithPosition(randomPos);
             chestTile.name = $"Chest Tile {randomPos.x}, {randomPos.y}";
+            chestTile.AddComponent<PowerUpManager>();
             chestTile.AddToTileTypes(Tile.TileType.Chest); // this calls Init()
             this._chestTiles.Add(new Vector2Int(randomPos.x, randomPos.y), chestTile);
         }
@@ -69,35 +70,28 @@ public class GridManager : MonoBehaviour {
     public void MakeObstacleTile(int number) {
         for (var i = 0; i < number; i++) {
             Vector2Int randomPos;
-
             // Generate a random tile position that is not in the obstacle tile list already (no duplicates)
             // Uses the moves of the AI, not including the last one.
             do {
                 randomPos = GameManager.instance.difficulty == GameManager.Difficulty.Hard ? 
-                    GameManager.instance.aiPlayer.GetMovesPosByIndex
-                        (Random.Range(0, GameManager.instance.aiPlayer.GetMovesCount() - 1)) 
+                    GameManager.instance.traitor.GetMovesPosByIndex
+                        (Random.Range(0, GameManager.instance.traitor.GetMovesCount() - 1)) 
                     : new Vector2Int(Random.Range(1, this._width), Random.Range(1, this._height));
             }
             while (this._obstacleTiles.ContainsValue(GetGridTileWithPosition(randomPos)));
 
             Tile obstacleTile = GetGridTileWithPosition(randomPos);
+            obstacleTile.AddComponent<BoxCollider2D>();
             obstacleTile.name = $"Obstacle Tile {randomPos.x}, {randomPos.y}";
             obstacleTile.AddToTileTypes(Tile.TileType.Obstacle); // this calls Init()
             this._obstacleTiles.Add(new Vector2Int(randomPos.x, randomPos.y), obstacleTile);
         }
     }
-
-    // TODO: Replace for "OnCollisionEnter2D"
-    public void TryActivateObstacleTile(Vector2Int position) {
-        Tile obstacleTile = this._obstacleTiles.GetValueOrDefault(position);
-        if (!obstacleTile) return;
-        obstacleTile.PopTileType(); // this calls Init();
+    
+    public void RemoveObstacleTile(Vector2Int position) {
+        Destroy(this._obstacleTiles[position].GetComponent<BoxCollider2D>());
         this._obstacleTiles.Remove(position);
     }
-    
-    // public bool IsObstacleTile(Vector2Int pos) {
-    //     return this._obstacleTiles.ContainsKey(pos);
-    // }
     
     public void SetWidth(int width) => this._width = width;
     public void SetHeight(int height) => this._height = height;

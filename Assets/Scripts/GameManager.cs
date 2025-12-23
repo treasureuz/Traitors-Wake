@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour {
     [SerializeField] private Player _playerPrefab;
-    [SerializeField] private Player _aiPlayerPrefab;
+    [SerializeField] private Player _traitorPrefab;
 
     [SerializeField] private Vector2Int _finishPos;
     [SerializeField] private Difficulty _startDifficulty = Difficulty.Easy;
@@ -12,16 +12,7 @@ public class GameManager : MonoBehaviour {
     [SerializeField] private int _normalNumOfDirs = 3;
     [SerializeField] private int _hardNumOfDirs = 2;
     
-    // [Header("Min/Max Grid Numbers")]
-    // [SerializeField] private int _easyMinGrid = 4;
-    // [SerializeField] private int _easyMaxGrid = 8;
-    //
-    // [SerializeField] private int _normalMinGrid = 8;
-    // [SerializeField] private int _normalMaxGrid = 12;
-    //
-    // [SerializeField] private int _hardMinGrid = 12;
-    // [SerializeField] private int _hardMaxGrid = 17;
-
+    [Header("Min/Max Grid Numbers")]
     [SerializeField] private int _minWidth = 7;
     [SerializeField] private int _maxWidth = 9;
     [SerializeField] private int _minHeight = 6;
@@ -43,9 +34,9 @@ public class GameManager : MonoBehaviour {
     [SerializeField] private float _hardTimeToComplete = 11.5f;
     
     [Header("Time To Move")]
-    [SerializeField] private float _easyAITimeToMove = 0.32f;
-    [SerializeField] private float _normalAITimeToMove = 0.18f;
-    [SerializeField] private float _hardAITimeToMove = 0.1f;
+    [SerializeField] private float _easyTraitorTimeToMove = 0.42f;
+    [SerializeField] private float _normalTraitorTimeToMove = 0.35f;
+    [SerializeField] private float _hardTraitorTimeToMove = 0.3f;
 
     public Vector2Int FinishPos => this._finishPos;
     public Difficulty StartDifficulty => this._startDifficulty;
@@ -53,8 +44,9 @@ public class GameManager : MonoBehaviour {
     public static GameManager instance;
         
     public Player player { get; private set; }
-    public Player aiPlayer { get; private set; }
-    public AIManager aiManager { get; private set; }
+    public Player traitor { get; private set; }
+    public TraitorManager traitorManager { get; private set; }
+    public WeaponManager weaponManager { get; private set; }
     
     public int numOfDirs {get; private set;}
     public int levelsPerDiff { get; private set; }
@@ -70,9 +62,10 @@ public class GameManager : MonoBehaviour {
 
     void Awake() {
         instance = this;
-        this.aiPlayer = Instantiate(this._aiPlayerPrefab, Player.SpawnPosV3(), Quaternion.identity);
+        this.traitor = Instantiate(this._traitorPrefab, Player.SpawnPosV3(), Quaternion.identity);
         this.player = Instantiate(this._playerPrefab, Player.SpawnPosV3(), Quaternion.identity);
-        this.aiManager = this.aiPlayer.GetComponent<AIManager>();
+        this.traitorManager = this.traitor.GetComponent<TraitorManager>();
+        this.weaponManager = this.player.GetComponent<WeaponManager>();
     }
     
     void Start() {
@@ -83,38 +76,34 @@ public class GameManager : MonoBehaviour {
         switch (this.difficulty) {
             case Difficulty.Easy: {
                 this.numOfDirs = this._easyNumOfDirs; 
-                // GridManager.instance.SetWidth(Random.Range(this._easyMinGrid, this._easyMaxGrid));
-                // GridManager.instance.SetHeight(Random.Range(this._easyMinGrid, this._easyMaxGrid));
                 this.levelsPerDiff = this._easyLevels;
                 this.timeToMemorize = this._easyTimeToMemorize;
                 this.timeToComplete = this._easyTimeToComplete;
-                this.aiManager.aiTimeToMove = this._easyAITimeToMove;
+                this.traitor.SetTimeToMove(this._easyTraitorTimeToMove);
                 break;
             }
             case Difficulty.Normal: {
                 this.numOfDirs = this._normalNumOfDirs; 
-                // GridManager.instance.SetWidth(Random.Range(this._normalMinGrid, this._normalMaxGrid));
-                // GridManager.instance.SetHeight(Random.Range(this._normalMinGrid, this._normalMaxGrid));
                 this.levelsPerDiff = this._normalLevels;
                 this.timeToMemorize = this._normalTimeToMemorize;
                 this.timeToComplete = this._normalTimeToComplete;
-                this.aiManager.aiTimeToMove = this._normalAITimeToMove;
+                this.traitor.SetTimeToMove(this._normalTraitorTimeToMove);
                 break;
             }
             case Difficulty.Hard: {
                 this.numOfDirs = this._hardNumOfDirs; 
-                // GridManager.instance.SetWidth(Random.Range(this._hardMinGrid, this._hardMaxGrid));
-                // GridManager.instance.SetHeight(Random.Range(this._hardMinGrid, this._hardMaxGrid));
                 this.levelsPerDiff = this._hardLevels;
                 this.timeToMemorize = this._hardTimeToMemorize;
                 this.timeToComplete = this._hardTimeToComplete;
-                this.aiManager.aiTimeToMove = this._hardAITimeToMove;
+                this.traitor.SetTimeToMove(this._hardTraitorTimeToMove);
                 break;
             }
         }
         // Randomize width and height (not based on difficulty) 
         GridManager.instance.SetWidth(Random.Range(this._minWidth, this._maxWidth + 1));
         GridManager.instance.SetHeight(Random.Range(this._minHeight, this._maxHeight + 1));
+        // GridManager.instance.SetWidth(3);
+        // GridManager.instance.SetHeight(3);
         // Set finishPos based on the above set width and height
         this._finishPos = new Vector2Int(GridManager.instance.Width - 1, GridManager.instance.Height - 1);
     }

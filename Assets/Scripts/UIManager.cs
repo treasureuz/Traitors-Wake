@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -18,6 +19,9 @@ public class UIManager : MonoBehaviour {
     [SerializeField] private float _memorizeTextBGWidth = 800f;
     [SerializeField] private float _completeTextBGWidth = 650f;
     [SerializeField] private float _failedTextBGWidth = 720f;
+
+    [SerializeField] private List<Image> _bulletBars;
+    [SerializeField] private TextMeshProUGUI _bulletsText;
     
     public static UIManager instance;
     
@@ -31,10 +35,10 @@ public class UIManager : MonoBehaviour {
     }
     
     public void OnSubmit() {
-        Debug.Log($"Submit: {GameManager.instance.player.isEnded}");
+        Debug.Log($"Submit: {GameManager.instance.player.hasEnded}");
         EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
         
-        GameManager.instance.player.isEnded = true;
+        GameManager.instance.player.hasEnded = true;
         
         // Disable undo and reset after submission
         this._undoButton.interactable = false;
@@ -44,13 +48,13 @@ public class UIManager : MonoBehaviour {
     public void OnUndo() {
         Debug.Log("Undo");
         EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
-        StartCoroutine(GameManager.instance.player.UndoMove(GameManager.instance.player.PlayerTimeToMove));
+        StartCoroutine(GameManager.instance.player.UndoMove(GameManager.instance.player.TimeToMove));
     }
     
     public void OnReset() {
         Debug.Log("Reset");
         EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
-        StartCoroutine(GameManager.instance.player.ResetMoves(GameManager.instance.player.PlayerTimeToMove));
+        StartCoroutine(GameManager.instance.player.ResetMoves(GameManager.instance.player.TimeToMove));
     }
     
     public void OnRestart() {
@@ -71,20 +75,29 @@ public class UIManager : MonoBehaviour {
         TextMeshProUGUI restartText = this._restartButton.GetComponentInChildren<TextMeshProUGUI>();
         restartText.text = "<color=#FFB90D>[RESTART]</color>";
     }
+
+    public void IncreaseBulletBar(int startBar) {
+        this._bulletsText.text = $"({GameManager.instance.weaponManager.GetCurrentMagazineCount()}/" +
+                                 $"{GameManager.instance.weaponManager.GetMaxMagazineCount()})";
+        for (var i = startBar; i < GameManager.instance.weaponManager.GetCurrentMagazineCount(); i++) {
+            this._bulletBars[i].enabled = true;
+        }
+    }
     
-    public bool CanAdvanceLevel() {
-        bool rv;
-        if (GameManager.instance.player.MovesEquals(GameManager.instance.aiPlayer)) {
-            this._topTextTMP.text = loadingNextLevel;
-            rv = true;
-        } else {
-            Player.isReset = true;
+    public void DecreaseBulletBar() {
+        this._bulletsText.text = $"({GameManager.instance.weaponManager.GetCurrentMagazineCount()}/" +
+                                 $"{GameManager.instance.weaponManager.GetMaxMagazineCount()})";
+        this._bulletBars[GameManager.instance.weaponManager.GetCurrentMagazineCount()].enabled = false;
+    }
+    
+    public void DisplayFinishText() {
+        if (LevelManager.CanAdvanceLevel()) this._topTextTMP.text = loadingNextLevel;
+        else {
+            Player.hasResetLevel = true;
             this._topTextTMP.text = "<color=#FF0000>*Translation Mismatch*</color>";
             this._topTextBGTransform.sizeDelta = new Vector2(this._failedTextBGWidth, this._topTextBGTransform.sizeDelta.y);
             this._restartButton.gameObject.SetActive(true);
-            rv = false;
         }
-        return rv;
     }
     
     public void DisplayLevelText(float level) {
@@ -111,7 +124,7 @@ public class UIManager : MonoBehaviour {
     public IEnumerator DisplayTimeToComplete() {
         //Adjust topText size based on the timeToComplete text
         this._topTextBGTransform.sizeDelta = new Vector2(this._completeTextBGWidth, this._topTextBGTransform.sizeDelta.y);
-        while (!GameManager.instance.player.isEnded && GameManager.instance.timeToComplete > 0f) {
+        while (!GameManager.instance.player.hasEnded && GameManager.instance.timeToComplete > 0f) {
             // float.ToString("F2") or $"{float:F2}" converts the float value to 2 decimal places
             this._topTextTMP.text = $"{{Complete In: [{GameManager.instance.timeToComplete:F2}s]!}}";
             GameManager.instance.SetTimeToComplete(GameManager.instance.timeToComplete - Time.deltaTime);
@@ -119,7 +132,7 @@ public class UIManager : MonoBehaviour {
         }
         this._topTextTMP.text = $"{{Complete In: [{0f:F2}s]!}}";
         // After timeToComplete is done or the submit button was clicked, set player.isEnded to true 
-        GameManager.instance.player.isEnded = true; 
+        GameManager.instance.player.hasEnded = true; 
     }
     
     public void SetButtons(bool b) {

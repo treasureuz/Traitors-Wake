@@ -5,16 +5,18 @@ using UnityEngine;
 using Vector3 = UnityEngine.Vector3;
 
 public class Player : MonoBehaviour {
-    [SerializeField] private float _playerTimeToMove = 0.5f;
+    [SerializeField] private float _timeToMove = 0.4f;
     private static readonly Vector2Int spawnPos = Vector2Int.zero;
     
-    public float PlayerTimeToMove => this._playerTimeToMove;
+    public void SetTimeToMove(float time) => this._timeToMove = time;
+    public float TimeToMove => this._timeToMove;
+    
     public static Vector3 SpawnPosV3() => new (spawnPos.x, spawnPos.y, 0);
     public static bool isMemorizing;
-    public static bool isReset;
+    public static bool hasResetLevel;
     
     public bool isMoving { get; private set; }
-    public bool isEnded { get; set; }
+    public bool hasEnded { get; set; }
     
     [SerializeField] private List<Vector2Int> _moves;
     private List<Vector2Int> _directions;
@@ -26,14 +28,15 @@ public class Player : MonoBehaviour {
     }
 
     public IEnumerator MovePlayer(Vector2Int direction, float timeToMove) {
-        if (this.isEnded || this.isMoving) yield break;
+        if (this.hasEnded || this.isMoving) yield break;
         this.isMoving = true;
         
         Vector2Int startPos = new ((int)this.transform.position.x, (int)this.transform.position.y);
         Vector2Int targetPos = startPos + direction;
         
         if (targetPos.x < 0 || targetPos.x > GridManager.instance.Width - 1 || targetPos.y < 0 
-            || targetPos.y > GridManager.instance.Height - 1) {
+            || targetPos.y > GridManager.instance.Height - 1 || GridManager.instance.GetGridTileWithPosition
+                (targetPos).GetCurrentTileType() == Tile.TileType.Obstacle) {
             this.isMoving = false;
             yield break;
         } 
@@ -51,16 +54,7 @@ public class Player : MonoBehaviour {
         this.isMoving = false;
         
         if (this != GameManager.instance.player) yield break;
-        Tile.TileType tileType = GridManager.instance.GetGridTileWithPosition(currentPos).GetCurrentTileType();
-        switch (tileType) {
-            // Check if current tile position is a TileType.Obstacle or a TileType.Chest
-            case Tile.TileType.Obstacle:
-                GridManager.instance.TryActivateObstacleTile(currentPos);
-                break;
-            case Tile.TileType.Chest:
-                GridManager.instance.TryOpenChestTile(currentPos); // this calls ActivatePowerUp()
-                break;
-        }
+        GridManager.instance.TryOpenChestTile(currentPos); // this calls ActivatePowerUp()
     }
 
     public bool MovesEquals(Player otherPlayer) {
@@ -109,7 +103,7 @@ public class Player : MonoBehaviour {
     public void ResetSettings() {
         this._moves.Clear();
         this.transform.position = SpawnPosV3();
-        this.isEnded = false;
+        this.hasEnded = false;
     }
     
     public int GetMovesCount() {
