@@ -12,7 +12,6 @@ public class Player : MonoBehaviour {
     public float TimeToMove => this._timeToMove;
     
     public static Vector3 SpawnPosV3() => new (spawnPos.x, spawnPos.y, 0);
-    public static bool isMemorizing;
     public static bool hasResetLevel;
     
     public bool isMoving { get; private set; }

@@ -77,17 +77,17 @@ public class UIManager : MonoBehaviour {
     }
 
     public void IncreaseBulletBar(int startBar) {
-        this._bulletsText.text = $"({GameManager.instance.weaponManager.GetCurrentMagazineCount()}/" +
-                                 $"{GameManager.instance.weaponManager.GetMaxMagazineCount()})";
-        for (var i = startBar; i < GameManager.instance.weaponManager.GetCurrentMagazineCount(); i++) {
+        this._bulletsText.text = $"({GameManager.instance.PWeaponManager.GetCurrentMagazineCount()}/" +
+                                 $"{GameManager.instance.PWeaponManager.GetMaxMagazineCount()})";
+        for (var i = startBar; i < GameManager.instance.PWeaponManager.GetCurrentMagazineCount(); i++) {
             this._bulletBars[i].enabled = true;
         }
     }
     
     public void DecreaseBulletBar() {
-        this._bulletsText.text = $"({GameManager.instance.weaponManager.GetCurrentMagazineCount()}/" +
-                                 $"{GameManager.instance.weaponManager.GetMaxMagazineCount()})";
-        this._bulletBars[GameManager.instance.weaponManager.GetCurrentMagazineCount()].enabled = false;
+        this._bulletsText.text = $"({GameManager.instance.PWeaponManager.GetCurrentMagazineCount()}/" +
+                                 $"{GameManager.instance.PWeaponManager.GetMaxMagazineCount()})";
+        this._bulletBars[GameManager.instance.PWeaponManager.GetCurrentMagazineCount()].enabled = false;
     }
     
     public void DisplayFinishText() {
@@ -112,7 +112,6 @@ public class UIManager : MonoBehaviour {
         //Adjust topText size based on the timeToMemorize text
         this._topTextBGTransform.sizeDelta = new Vector2(this._memorizeTextBGWidth, this._topTextBGTransform.sizeDelta.y);
         while (time > 0f) {
-            Player.isMemorizing = true;
             // float.ToString("F2") or $"{float:F2}" converts the float value to 2 decimal places
             this._topTextTMP.text = $"{{Memorize The Path: [{time:F2}s]}}";
             time -= Time.deltaTime;

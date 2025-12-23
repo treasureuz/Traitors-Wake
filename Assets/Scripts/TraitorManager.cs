@@ -47,7 +47,6 @@ public class TraitorManager : MonoBehaviour {
             validDirs.Remove(-this._randomDir);
             this._randomDir = NextDir();
         }
-        this._traitor.hasEnded = true;
         GridManager.instance.MakeObstacleTile(7);
     }
 

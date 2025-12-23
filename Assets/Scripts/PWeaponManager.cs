@@ -1,13 +1,13 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class WeaponManager : MonoBehaviour {
+public class PWeaponManager : MonoBehaviour {
     [SerializeField] private GameObject _bulletPrefab;
     [SerializeField] private Transform _bulletSpawnPoint;
     [SerializeField] private float _timeBetweenShots = 3f;
     [SerializeField] private int _bulletMagazineCount = 10;
 
-    private const float rotationDuration = 0.072f; //How long to rotate towards mouse position
+    private const float rotationDuration = 0.085f; //How long to rotate towards mouse position
 
     private GameObject _spawnedBullet;
     private Player _player;
@@ -23,9 +23,9 @@ public class WeaponManager : MonoBehaviour {
     }
 
     void Update() {
-        Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
         // Check if direction is positive (mouse position is to the right) or negative (mouse position is to the left)
-        Vector2 direction = (mousePosition - (Vector2)this.transform.position).normalized;
+        Vector3 direction = (mousePosition - this.transform.position).normalized;
         var angle = Vector3.SignedAngle(this.transform.right, direction, Vector3.forward);
         // Rotate smoothly
         var t = Time.deltaTime / rotationDuration; // a fraction of the total angle/rotation (THIS frame)
@@ -34,7 +34,7 @@ public class WeaponManager : MonoBehaviour {
     }
 
     private void HandlePlayerShoot() {
-        if (GameManager.instance.traitor.isMoving || Player.isMemorizing || this._player.hasEnded ||
+        if (!GameManager.instance.traitor.hasEnded || Player.hasResetLevel || this._player.hasEnded ||
             !Mouse.current.leftButton.isPressed || !HasBullets() || !(Time.time >= this._nextShootTime)) return;
         this._spawnedBullet = Instantiate(this._bulletPrefab, this._bulletSpawnPoint.position, this._bulletSpawnPoint.rotation);
         this._currentMagazineCount -= 1; // Decrement mag count
@@ -50,6 +50,7 @@ public class WeaponManager : MonoBehaviour {
         if (this._currentMagazineCount + num > this._bulletMagazineCount) return;
         this._currentMagazineCount += num;
     }
+    
     public int GetCurrentMagazineCount() => this._currentMagazineCount;
     public int GetMaxMagazineCount() => this._bulletMagazineCount;
 }

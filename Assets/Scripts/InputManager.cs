@@ -23,7 +23,7 @@ public class InputManager : MonoBehaviour {
     }
 
     void Update() {
-        if (GameManager.instance.traitor.isMoving || Player.isMemorizing || this._player.hasEnded) return;
+        if (!GameManager.instance.traitor.hasEnded || this._player.hasEnded) return;
         if (this._up.IsPressed()) StartCoroutine(this._player.MovePlayer(Vector2Int.up, this._player.TimeToMove));
         if (this._down.IsPressed()) StartCoroutine(this._player.MovePlayer(Vector2Int.down, this._player.TimeToMove));
         if (this._left.IsPressed()) StartCoroutine(this._player.MovePlayer(Vector2Int.left, this._player.TimeToMove));

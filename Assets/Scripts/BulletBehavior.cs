@@ -22,6 +22,7 @@ public class BulletBehavior : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision) {
         if (collision.gameObject.CompareTag("ObstacleTile")) Destroy(gameObject);
+        if (collision.gameObject.CompareTag("Player")) Destroy(gameObject);
     }
 
     private void DestroyAfter(float time) {

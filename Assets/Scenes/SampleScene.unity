@@ -590,7 +590,7 @@ MonoBehaviour:
   - {fileID: 1654375443}
   - {fileID: 2075771002}
   - {fileID: 709520517}
-  _bulletsText: {fileID: 0}
+  _bulletsText: {fileID: 584652496}
 --- !u!4 &383298189
 Transform:
   m_ObjectHideFlags: 0

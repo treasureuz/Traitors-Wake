@@ -22,11 +22,11 @@ public class PowerUpManager : MonoBehaviour {
     private void HandlePowerUps() {
         switch (this._powerUp) {
             case PowerUp.GiveAmmo: {
-                var maxNum = GameManager.instance.weaponManager.GetMaxMagazineCount() -
-                             GameManager.instance.weaponManager.GetCurrentMagazineCount();
+                var maxNum = GameManager.instance.PWeaponManager.GetMaxMagazineCount() -
+                             GameManager.instance.PWeaponManager.GetCurrentMagazineCount();
                 var randomNum = Random.Range(0, maxNum + 1); // Amount of ammo to give the player (between 0 - maxNum) 
-                GameManager.instance.weaponManager.SetCurrentMagazineCount(randomNum);
-                UIManager.instance.IncreaseBulletBar(GameManager.instance.weaponManager.GetCurrentMagazineCount() - randomNum);
+                GameManager.instance.PWeaponManager.SetCurrentMagazineCount(randomNum);
+                UIManager.instance.IncreaseBulletBar(GameManager.instance.PWeaponManager.GetCurrentMagazineCount() - randomNum);
                 Debug.Log($"Gave {randomNum} ammo");
                 break;
             }

@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4850974551412739588
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5726951650290765925}
+  m_Layer: 0
+  m_Name: BulletSpawnPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 1206586993520771344, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5726951650290765925
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4850974551412739588}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.67, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1847205618558211860}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6451837511686230194
 GameObject:
   m_ObjectHideFlags: 0
@@ -12,6 +43,7 @@ GameObject:
   - component: {fileID: 3753911904273438797}
   - component: {fileID: 8860221829043882386}
   - component: {fileID: 363989662899450924}
+  - component: {fileID: 4784977899782052931}
   - component: {fileID: 8932715277332121152}
   m_Layer: 0
   m_Name: Traitor
@@ -28,13 +60,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6451837511686230194}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 1, w: 0}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 5726951650290765925}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 180}
 --- !u!212 &3753911904273438797
 SpriteRenderer:
   serializedVersion: 2
@@ -106,7 +139,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 680a5a2a4a8662a44bb77261b8402837, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player
-  _playerTimeToMove: 0.5
+  _timeToMove: 0.4
   _moves: []
 --- !u!114 &363989662899450924
 MonoBehaviour:
@@ -122,6 +155,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AIMovement
   _playerPrefab: {fileID: 8392707146380620319, guid: 2ec11d17ab26e4040b0f6d0eb96e404c, type: 3}
   _lineRenderer: {fileID: 8932715277332121152}
+--- !u!114 &4784977899782052931
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6451837511686230194}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bfc84f30f44b94478f77701d3baf2d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TWeaponManager
+  _bulletPrefab: {fileID: 7032699058568776344, guid: a627d7ef3dadd4b4eba5a6c1dd3a4059, type: 3}
+  _bulletSpawnPoint: {fileID: 5726951650290765925}
+  _minTimeBetweenShots: 3.5
+  _maxTimeBetweenShots: 8
+  _timeBetweenShots: 3
+  _bulletMagazineCount: 10
 --- !u!120 &8932715277332121152
 LineRenderer:
   serializedVersion: 3

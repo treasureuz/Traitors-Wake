@@ -46,7 +46,7 @@ public class GameManager : MonoBehaviour {
     public Player player { get; private set; }
     public Player traitor { get; private set; }
     public TraitorManager traitorManager { get; private set; }
-    public WeaponManager weaponManager { get; private set; }
+    public PWeaponManager PWeaponManager { get; private set; }
     
     public int numOfDirs {get; private set;}
     public int levelsPerDiff { get; private set; }
@@ -65,7 +65,7 @@ public class GameManager : MonoBehaviour {
         this.traitor = Instantiate(this._traitorPrefab, Player.SpawnPosV3(), Quaternion.identity);
         this.player = Instantiate(this._playerPrefab, Player.SpawnPosV3(), Quaternion.identity);
         this.traitorManager = this.traitor.GetComponent<TraitorManager>();
-        this.weaponManager = this.player.GetComponent<WeaponManager>();
+        this.PWeaponManager = this.player.GetComponent<PWeaponManager>();
     }
     
     void Start() {

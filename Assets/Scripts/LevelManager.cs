@@ -14,6 +14,9 @@ public class LevelManager : MonoBehaviour {
     }
     
     public IEnumerator GenerateLevel() {
+        // Set buttons to false and wait X amount of time before generating level
+        UIManager.instance.SetButtons(false);
+        yield return new WaitForSeconds(this._timeBeforeLevelStart);
         if (Player.hasResetLevel) {
             this._currentLevel = 0;
             this._levelDiff = 0;
@@ -29,10 +32,6 @@ public class LevelManager : MonoBehaviour {
             this._levelDiff = 0; // Reset level per difficulty
             GameManager.instance.IncrementDifficulty();
         } else GameManager.instance.SetDifficulty(GameManager.instance.difficulty);
-        
-        // Set buttons to false and wait X amount of time before generating level
-        UIManager.instance.SetButtons(false);
-        yield return new WaitForSeconds(this._timeBeforeLevelStart);
             
         // Reset all "Player" related settings before re-generating a level
         GameManager.instance.traitor.ResetSettings();
@@ -52,12 +51,12 @@ public class LevelManager : MonoBehaviour {
         // After move sequence, remove AI path trace, and enable player button actions
         yield return StartCoroutine(GameManager.instance.traitorManager.MoveSequence());
         yield return StartCoroutine(UIManager.instance.DisplayTimeToMemorize(GameManager.instance.timeToMemorize));
-            
-        // After timeToMemorize is done, wait an additional 0.5 seconds and sets Player.isMemorizing to false so player can move
+
+        // After timeToMemorize is done, wait an additional 0.5 seconds
         yield return new WaitForSeconds(0.5f); 
         
         GameManager.instance.traitorManager.SetLineRendererStatus(false); // Disable LineRenderer
-        Player.isMemorizing = false;
+        GameManager.instance.traitor.hasEnded = true;
         UIManager.instance.SetButtons(true);
             
         yield return StartCoroutine(UIManager.instance.DisplayTimeToComplete());
