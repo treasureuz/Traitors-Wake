@@ -1,9 +1,12 @@
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class GridManager : MonoBehaviour {
     [SerializeField] private Tile _tilePrefab; 
+    [SerializeField] private LayerMask _gridAreaMask;
     [SerializeField] private Transform _cam;
     [SerializeField] private int _width, _height;
     
@@ -32,12 +35,20 @@ public class GridManager : MonoBehaviour {
             }
         }
         MakeChestTiles(6); // Make X amount of chest tiles
-        // Position the cam position at the center of the grid (based on the width and height)
+        
+        // Position the cam at the center of the grid (based on the width and height)
         var centerWidth = (float) this._width / 2 - 0.5f;
         var centerHeight = (float) this._height / 2 - 0.5f;
+        this.transform.localScale = new Vector3(this._width + 0.1f, this._height + 0.1f, 1); // creates a border
+        this.transform.position = new Vector3(centerWidth, centerHeight);
         this._cam.position = new Vector3(centerWidth, centerHeight, -10); 
     }
 
+    public bool IsWithinGridArea() {
+        Vector2 worldPos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+        return Physics2D.OverlapPoint(worldPos, _gridAreaMask);
+    }
+    
     // ReSharper disable Unity.PerformanceAnalysis
     private void MakeChestTiles(int number) {
         for (var i = 0; i < number; i++) {

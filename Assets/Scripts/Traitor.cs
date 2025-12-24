@@ -4,19 +4,18 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 using Vector3 = UnityEngine.Vector3;
 
-public class TraitorManager : MonoBehaviour {
-    [SerializeField] private Player _playerPrefab;
+public class Traitor : PlayerManager {
     [SerializeField] private LineRenderer _lineRenderer;
     
     private static readonly Vector2Int[] directions = { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
     private static readonly List<Vector2Int> validDirs = new();
     
-    private Player _traitor;
     private Vector2Int _randomDir;
+    private float _timeToMove;
     private int _lineIndex;
 
-    void Awake() {
-        this._traitor = this.GetComponent<Player>();
+    protected override void Awake() {
+        base.Awake();
         this._lineRenderer.positionCount = 1;
     }
     
@@ -31,8 +30,8 @@ public class TraitorManager : MonoBehaviour {
         this._lineIndex = 0;
         Vector3 finishPos = new (GameManager.instance.FinishPos.x, GameManager.instance.FinishPos.y);
         while (this.transform.position != finishPos) {
-            StartCoroutine(LerpLineRenderer(this._traitor.TimeToMove));
-            yield return StartCoroutine(this._traitor.MovePlayer(this._randomDir, this._traitor.TimeToMove));
+            StartCoroutine(LerpLineRenderer(this._timeToMove));
+            yield return StartCoroutine(this.HandleMovement(this._randomDir, this._timeToMove));
             
             Vector2Int gridPos = Vector2Int.RoundToInt(transform.position);
             
@@ -80,6 +79,7 @@ public class TraitorManager : MonoBehaviour {
         return weightedDirs[Random.Range(0, weightedDirs.Count)];
     }
 
+    public void SetTimeToMove(float time) => this._timeToMove = time;
     public void SetLRPosition(int val, Vector3 pos) => this._lineRenderer.SetPosition(val, pos);
     public void SetLRPosCount(int val) => this._lineRenderer.positionCount = val;
     public void SetLineRendererStatus(bool b) => this._lineRenderer.enabled = b;

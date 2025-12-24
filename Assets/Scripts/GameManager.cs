@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour {
     [SerializeField] private Player _playerPrefab;
-    [SerializeField] private Player _traitorPrefab;
+    [SerializeField] private Traitor _traitorPrefab;
 
     [SerializeField] private Vector2Int _finishPos;
     [SerializeField] private Difficulty _startDifficulty = Difficulty.Easy;
@@ -44,15 +44,15 @@ public class GameManager : MonoBehaviour {
     public static GameManager instance;
         
     public Player player { get; private set; }
-    public Player traitor { get; private set; }
-    public TraitorManager traitorManager { get; private set; }
-    public PWeaponManager PWeaponManager { get; private set; }
+    public Traitor traitor { get; private set; }
+    public PWeaponManager pWeaponManager { get; private set; }
+    public TWeaponManager tWeaponManager { get; private set; }
     
     public int numOfDirs {get; private set;}
     public int levelsPerDiff { get; private set; }
     public float timeToMemorize { get; private set; }
     public float timeToComplete { get; private set; }
-
+    
     public enum Difficulty {
         Easy,
         Normal,
@@ -62,14 +62,14 @@ public class GameManager : MonoBehaviour {
 
     void Awake() {
         instance = this;
-        this.traitor = Instantiate(this._traitorPrefab, Player.SpawnPosV3(), Quaternion.identity);
-        this.player = Instantiate(this._playerPrefab, Player.SpawnPosV3(), Quaternion.identity);
-        this.traitorManager = this.traitor.GetComponent<TraitorManager>();
-        this.PWeaponManager = this.player.GetComponent<PWeaponManager>();
+        this.traitor = Instantiate(this._traitorPrefab, PlayerManager.SpawnPosV3(), Quaternion.identity);
+        this.player = Instantiate(this._playerPrefab, PlayerManager.SpawnPosV3(), Quaternion.identity);
+        this.pWeaponManager = this.player.GetComponent<PWeaponManager>();
+        this.tWeaponManager = this.traitor.GetComponent<TWeaponManager>();
     }
     
     void Start() {
-        StartCoroutine(LevelManager.instance.GenerateLevel());
+        LevelManager.instance.SetLevelCoroutine(StartCoroutine(LevelManager.instance.GenerateLevel()));
     }
     
     private void HandleDifficultySettings() {

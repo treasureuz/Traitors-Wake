@@ -11,11 +11,11 @@ GameObject:
   - component: {fileID: 6722335875962831474}
   - component: {fileID: 6191359256673906359}
   - component: {fileID: 5475187675339485211}
-  - component: {fileID: 8392707146380620319}
+  - component: {fileID: 4350757728321397138}
   - component: {fileID: 6660561901922124701}
   - component: {fileID: 3795036767035478747}
   - component: {fileID: 6189003184355162730}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -133,7 +133,7 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 0.5
---- !u!114 &8392707146380620319
+--- !u!114 &4350757728321397138
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -142,11 +142,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1626672531512504474}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 680a5a2a4a8662a44bb77261b8402837, type: 3}
+  m_Script: {fileID: 11500000, guid: a274dba926c8bd740be8809bca32a6a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player
-  _timeToMove: 0.3
   _moves: []
+  _timeToMove: 0.3
 --- !u!114 &6660561901922124701
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -161,8 +161,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WeaponManager
   _bulletPrefab: {fileID: 7032699058568776344, guid: 4bdc0eb3fb43d9c49b24572390054c44, type: 3}
   _bulletSpawnPoint: {fileID: 377072283485563087}
-  _timeBetweenShots: 3
   _bulletMagazineCount: 10
+  _timeBetweenShots: 3
 --- !u!114 &3795036767035478747
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -214,7 +214,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 377072283485563087}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: BulletSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: -5397416234189338067, guid: 0000000000000000d000000000000000, type: 0}

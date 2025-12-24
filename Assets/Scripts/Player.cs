@@ -1,63 +1,45 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using Vector3 = UnityEngine.Vector3;
 
-public class Player : MonoBehaviour {
+public class Player : PlayerManager {
     [SerializeField] private float _timeToMove = 0.4f;
-    private static readonly Vector2Int spawnPos = Vector2Int.zero;
+    [SerializeField] private int _maxHealth = 100;
     
-    public void SetTimeToMove(float time) => this._timeToMove = time;
-    public float TimeToMove => this._timeToMove;
-    
-    public static Vector3 SpawnPosV3() => new (spawnPos.x, spawnPos.y, 0);
     public static bool hasResetLevel;
     
-    public bool isMoving { get; private set; }
-    public bool hasEnded { get; set; }
-    
-    [SerializeField] private List<Vector2Int> _moves;
+    public float TimeToMove => this._timeToMove;
+    private int _currentHealth;
+
+    private InputManager _inputManager;
     private List<Vector2Int> _directions;
-    
-    void Awake() {
-        this._moves = new List<Vector2Int>();
+
+    protected override void Awake() {
+        base.Awake();
         this._directions = new List<Vector2Int>();
-        ResetSettings();
+        this._inputManager = this.GetComponent<InputManager>();
     }
-
-    public IEnumerator MovePlayer(Vector2Int direction, float timeToMove) {
-        if (this.hasEnded || this.isMoving) yield break;
-        this.isMoving = true;
-        
-        Vector2Int startPos = new ((int)this.transform.position.x, (int)this.transform.position.y);
-        Vector2Int targetPos = startPos + direction;
-        
-        if (targetPos.x < 0 || targetPos.x > GridManager.instance.Width - 1 || targetPos.y < 0 
-            || targetPos.y > GridManager.instance.Height - 1 || GridManager.instance.GetGridTileWithPosition
-                (targetPos).GetCurrentTileType() == Tile.TileType.Obstacle) {
-            this.isMoving = false;
-            yield break;
-        } 
-        var elapsedTime = 0f;
-        while (elapsedTime < timeToMove) {
-            this.transform.position = Vector2.Lerp(startPos, targetPos, elapsedTime / timeToMove);
-            elapsedTime += Time.deltaTime;
-            yield return null;
-        }
-        this.transform.position = new Vector3(targetPos.x, targetPos.y);
-        Vector2Int currentPos = new ((int) this.transform.position.x, (int) this.transform.position.y);
-        
-        this._moves.Add(currentPos); // Add current player position to the moves list
+    
+    void Start() {
+        this._currentHealth = this._maxHealth;
+        UIManager.instance.UpdateHealthText();
+    }
+    
+    void Update() {
+        if (!GameManager.instance.traitor.hasEnded || this.hasEnded) return;
+        if (this._inputManager.UpIsPressed()) StartCoroutine(HandleMovement(Vector2Int.up, this._timeToMove));
+        if (this._inputManager.DownIsPressed()) StartCoroutine(HandleMovement(Vector2Int.down, this._timeToMove));
+        if (this._inputManager.LeftIsPressed()) StartCoroutine(HandleMovement(Vector2Int.left, this._timeToMove));
+        if (this._inputManager.RightIsPressed()) StartCoroutine(HandleMovement(Vector2Int.right, this._timeToMove));
+    }
+    
+    protected override IEnumerator HandleMovement(Vector2Int direction, float timeToMove) {
+        yield return StartCoroutine(base.HandleMovement(direction, timeToMove));
         this._directions.Add(direction); // Add the direction the player moved to the directions list
-        this.isMoving = false;
-        
-        if (this != GameManager.instance.player) yield break;
+        // Check if tile at currentPos after move is a TileType.ChestTile
+        Vector2Int currentPos = new ((int) this.transform.position.x, (int) this.transform.position.y);
         GridManager.instance.TryOpenChestTile(currentPos); // this calls ActivatePowerUp()
-    }
-
-    public bool MovesEquals(Player otherPlayer) {
-        return this._moves.SequenceEqual(otherPlayer._moves);
     }
     
     public IEnumerator UndoMove(float timeToMove) {
@@ -99,19 +81,24 @@ public class Player : MonoBehaviour {
         this.isMoving = false;
     }
     
-    public void ResetSettings() {
-        this._moves.Clear();
-        this.transform.position = SpawnPosV3();
-        this.hasEnded = false;
+    public void HealPlayer(int healAmount) {
+        if (this._currentHealth >= this._maxHealth) return;
+        this._currentHealth += healAmount;
+        UIManager.instance.UpdateHealthText();
     }
     
-    public int GetMovesCount() {
-        return this._moves.Count;
+    private void DamagePlayer(float damageAmount) {
+        var damage = Mathf.RoundToInt(damageAmount);
+        this._currentHealth = Mathf.Clamp(this._currentHealth - damage, 0, this._maxHealth);
+        UIManager.instance.UpdateHealthText();
+        if (this._currentHealth == 0) LevelManager.instance.EndLevel();
     }
 
-    public Vector2Int GetMovesPosByIndex(int index) {
-        return this._moves[index];
+    private void OnCollisionEnter2D(Collision2D collision) {
+        if (!collision.gameObject.CompareTag("TraitorBullet")) return;
+        DamagePlayer(GameManager.instance.tWeaponManager.GetBulletDamage());
     }
+
+    public int GetCurrentHealth() => this._currentHealth;
+    public int GetMaxHealth() => this._maxHealth;
 }
-    
-    

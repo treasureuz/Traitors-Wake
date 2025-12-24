@@ -5,8 +5,11 @@ public class LevelManager : MonoBehaviour {
     [SerializeField] private float _timeBeforeLevelStart = 3f;
     
     public static LevelManager instance;
+
+    private Coroutine _levelCoroutine;
     private int _currentLevel;
     private int _levelDiff;
+    public bool _isLevelEnded { get; private set; }
     
     void Awake() {
         instance = this;
@@ -14,14 +17,10 @@ public class LevelManager : MonoBehaviour {
     }
     
     public IEnumerator GenerateLevel() {
-        // Set buttons to false and wait X amount of time before generating level
-        UIManager.instance.SetButtons(false);
-        yield return new WaitForSeconds(this._timeBeforeLevelStart);
         if (Player.hasResetLevel) {
             this._currentLevel = 0;
             this._levelDiff = 0;
             GameManager.instance.SetDifficulty(GameManager.instance.StartDifficulty);
-            Player.hasResetLevel = false;
         } 
         this._currentLevel++; // Increment current level
         this._levelDiff++; // Increment level per difficulty
@@ -32,30 +31,35 @@ public class LevelManager : MonoBehaviour {
             this._levelDiff = 0; // Reset level per difficulty
             GameManager.instance.IncrementDifficulty();
         } else GameManager.instance.SetDifficulty(GameManager.instance.difficulty);
-            
+        
+        // Set buttons to false and wait X amount of time before generating level
+        UIManager.instance.SetButtons(false);
+        yield return new WaitForSeconds(this._timeBeforeLevelStart);
+        Player.hasResetLevel = false;
+        
         // Reset all "Player" related settings before re-generating a level
         GameManager.instance.traitor.ResetSettings();
-        GameManager.instance.traitorManager.SetLRPosCount(0); // Reset LineRenderer position count
+        GameManager.instance.traitor.SetLRPosCount(0); // Reset LineRenderer position count
         GameManager.instance.player.ResetSettings();
         GridManager.instance.ClearAllTiles();
         
-        GameManager.instance.traitorManager.SetLRPosCount(1); // Set LineRenderer position count to 1
-        GameManager.instance.traitorManager.SetLineRendererStatus(true); // Enable LineRenderer
+        GameManager.instance.traitor.SetLRPosCount(1); // Set LineRenderer position count to 1
+        GameManager.instance.traitor.SetLineRendererStatus(true); // Enable LineRenderer
         
         UIManager.instance.DisplayLevelText(this._currentLevel); // Display current level
         GridManager.instance.GenerateGrid(); // Generates grid based on difficulty
             
         // Set lineRenderer to the AI's spawn position
-        GameManager.instance.traitorManager.SetLRPosition(0, Player.SpawnPosV3());
+        GameManager.instance.traitor.SetLRPosition(0, PlayerManager.SpawnPosV3());
         
         // After move sequence, remove AI path trace, and enable player button actions
-        yield return StartCoroutine(GameManager.instance.traitorManager.MoveSequence());
+        yield return StartCoroutine(GameManager.instance.traitor.MoveSequence());
         yield return StartCoroutine(UIManager.instance.DisplayTimeToMemorize(GameManager.instance.timeToMemorize));
 
         // After timeToMemorize is done, wait an additional 0.5 seconds
         yield return new WaitForSeconds(0.5f); 
         
-        GameManager.instance.traitorManager.SetLineRendererStatus(false); // Disable LineRenderer
+        GameManager.instance.traitor.SetLineRendererStatus(false); // Disable LineRenderer
         GameManager.instance.traitor.hasEnded = true;
         UIManager.instance.SetButtons(true);
             
@@ -68,10 +72,18 @@ public class LevelManager : MonoBehaviour {
         if (!CanAdvanceLevel()) yield break;
         
         // Recursively generate new randomized levels
-        StartCoroutine(GenerateLevel());
+        this._levelCoroutine = StartCoroutine(GenerateLevel());
     }
 
     public static bool CanAdvanceLevel() {
         return GameManager.instance.player.MovesEquals(GameManager.instance.traitor);
+    }
+
+    public void SetLevelCoroutine(Coroutine coroutine) => this._levelCoroutine = coroutine;
+    public void EndLevel() {
+        if (this._levelCoroutine == null) return;
+        StopCoroutine(this._levelCoroutine);
+        this._isLevelEnded = true;
+        UIManager.instance.DisplayFinishText();
     }
 }

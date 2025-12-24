@@ -16,10 +16,10 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
-  - 
-  - 
+  - Player
+  - PlayerBullet
+  - GridArea
+  - TraitorBullet
   - 
   - 
   - 

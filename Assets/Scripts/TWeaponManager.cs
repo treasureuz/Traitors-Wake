@@ -1,54 +1,36 @@
 using UnityEngine;
 
-public class TWeaponManager : MonoBehaviour
-{
-    [SerializeField] private GameObject _bulletPrefab;
-    [SerializeField] private Transform _bulletSpawnPoint;
-    [SerializeField] private float _minTimeBetweenShots = 3.5f;
-    [SerializeField] private float _maxTimeBetweenShots = 8f;
-    [SerializeField] private float _timeBetweenShots;
-    [SerializeField] private int _bulletMagazineCount = 10;
+public class TWeaponManager : WeaponManager {
+    [SerializeField] private float minTimeBetweenShots = 3.5f;
+    [SerializeField] private float maxTimeBetweenShots = 8f;
+    [SerializeField] private float _bulletDamage = 13.5f;
 
-    private const float rotationDuration = 0.085f; //How long to rotate towards mouse position
-
-    private GameObject _spawnedBullet;
-    private Player _traitor;
-    private float _nextShootTime;
-    private int _currentMagazineCount;
+    private float timeBetweenShots;
 
     void Awake() {
-        this._traitor = this.GetComponent<Player>();
+        this._owner = this.GetComponent<Traitor>();
     }
     
-    void Start() {
-        this._currentMagazineCount = this._bulletMagazineCount;
+    protected override void Start() {
+        base.Start(); // base = super
         // Set start timeBetweenShots
-        this._timeBetweenShots = Random.Range(this._minTimeBetweenShots, this._maxTimeBetweenShots); 
+        timeBetweenShots = Random.Range(minTimeBetweenShots, maxTimeBetweenShots);
     }
 
-    void Update() {
-        // Check if direction is positive (player position is to the right) or negative (player position is to the left)
-        Vector3 direction = (GameManager.instance.player.transform.position - this.transform.position).normalized;
-        var angle = Vector3.SignedAngle(this.transform.right, direction, Vector3.forward);
-        // Rotate smoothly
-        var t = Time.deltaTime / rotationDuration; // a fraction of the total angle/rotation (THIS frame)
-        this.transform.Rotate(Vector3.forward, angle * t);
-        HandleTraitorShoot();
+    protected override Vector3 GetTargetPosition() {
+        return GameManager.instance.player.transform.position;
     }
 
-    private void HandleTraitorShoot() {
-        if (!this._traitor.hasEnded || !HasBullets()) return;
-        if (this._timeBetweenShots > this._nextShootTime) {
-            this._nextShootTime += Time.deltaTime; return;
-        }
-        this._spawnedBullet = Instantiate(this._bulletPrefab, this._bulletSpawnPoint.position, this._bulletSpawnPoint.rotation);
-        this._currentMagazineCount -= 1; // Decrement mag count
+    protected override void HandleShoot() {
+        if (!this._owner.hasEnded || GameManager.instance.player.hasEnded || LevelManager.instance._isLevelEnded 
+            || !HasBullets()) return;
+        this._nextShootTime += Time.deltaTime;
+        if (this._nextShootTime < timeBetweenShots) return;
+        Shoot();
         // Randomize new timeBetweenShots
-        this._timeBetweenShots = Random.Range(this._minTimeBetweenShots, this._maxTimeBetweenShots);
-        this._nextShootTime = 0f; // Reset nextShootTime
+        timeBetweenShots = Random.Range(minTimeBetweenShots, maxTimeBetweenShots);
+        this._nextShootTime = 0f;
     }
-    
-    private bool HasBullets() {
-        return this._currentMagazineCount > 0;
-    }
+
+    public float GetBulletDamage() => this._bulletDamage;
 }

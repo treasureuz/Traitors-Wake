@@ -41,7 +41,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1847205618558211860}
   - component: {fileID: 3753911904273438797}
-  - component: {fileID: 8860221829043882386}
   - component: {fileID: 363989662899450924}
   - component: {fileID: 4784977899782052931}
   - component: {fileID: 8932715277332121152}
@@ -127,20 +126,6 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
---- !u!114 &8860221829043882386
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6451837511686230194}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 680a5a2a4a8662a44bb77261b8402837, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Player
-  _timeToMove: 0.4
-  _moves: []
 --- !u!114 &363989662899450924
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -153,7 +138,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8e938ddd9237cd41960e00a3377afad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AIMovement
-  _playerPrefab: {fileID: 8392707146380620319, guid: 2ec11d17ab26e4040b0f6d0eb96e404c, type: 3}
+  _moves: []
   _lineRenderer: {fileID: 8932715277332121152}
 --- !u!114 &4784977899782052931
 MonoBehaviour:
@@ -169,10 +154,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TWeaponManager
   _bulletPrefab: {fileID: 7032699058568776344, guid: a627d7ef3dadd4b4eba5a6c1dd3a4059, type: 3}
   _bulletSpawnPoint: {fileID: 5726951650290765925}
-  _minTimeBetweenShots: 3.5
-  _maxTimeBetweenShots: 8
-  _timeBetweenShots: 3
-  _bulletMagazineCount: 10
+  _bulletMagazineCount: 30
+  minTimeBetweenShots: 3.5
+  maxTimeBetweenShots: 8
+  _bulletDamage: 13.5
 --- !u!120 &8932715277332121152
 LineRenderer:
   serializedVersion: 3
@@ -232,8 +217,8 @@ LineRenderer:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
-        time: 0.15472966
-        value: 0.15584323
+        time: 0.12391454
+        value: 0.1241965
         inSlope: 0
         outSlope: 0
         tangentMode: 0

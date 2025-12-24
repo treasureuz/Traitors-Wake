@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 3667829386215414322}
   - component: {fileID: 1496964385923513304}
   - component: {fileID: 5795523679938688775}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: TraitorBullet
   m_TagString: TraitorBullet
   m_Icon: {fileID: 0}
