@@ -21,11 +21,10 @@ public class BulletBehavior : MonoBehaviour
     }
 
     private void OnCollisionEnter2D(Collision2D collision) {
-        if (collision.gameObject.CompareTag("ObstacleTile")) Destroy(gameObject);
-        if (collision.gameObject.CompareTag("Player")) Destroy(gameObject);
+        Destroy(this.gameObject); // Destroy on any collision (except the restricted ones in Edit -> Project Settings)
     }
 
     private void DestroyAfter(float time) {
-        if (this.gameObject) Destroy(gameObject, time);
+        if (this.gameObject) Destroy(this.gameObject, time);
     }
 }

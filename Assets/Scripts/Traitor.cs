@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting.Antlr3.Runtime.Tree;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using Vector3 = UnityEngine.Vector3;
@@ -11,6 +12,7 @@ public class Traitor : PlayerManager {
     private static readonly List<Vector2Int> validDirs = new();
     
     private Vector2Int _randomDir;
+    
     private float _timeToMove;
     private int _lineIndex;
 
@@ -79,6 +81,25 @@ public class Traitor : PlayerManager {
         return weightedDirs[Random.Range(0, weightedDirs.Count)];
     }
 
+    public override void ResetPlayerSettings() {
+        this._currentHealth = this._maxHealth;
+        this._weaponManager.SetCurrentMagazineCount(this._weaponManager.GetMaxMagazineCount());
+        UIManager.instance.UpdateTraitorHealth();
+    }
+    
+    protected override void OnDamaged(float damageAmount) {
+        base.OnDamaged(damageAmount);
+        UIManager.instance.UpdateTraitorHealth();
+        if (this._currentHealth != 0) return;
+        Player.hasWon = true; // Player wins if traitor is killed
+        LevelManager.instance.EndGame();
+    }
+
+    protected override void OnCollisionEnter2D(Collision2D collision) {
+        if (!collision.gameObject.CompareTag("PlayerBullet")) return;
+        OnDamaged(GameManager.instance.pWeaponManager.GetBulletDamage());
+    }
+    
     public void SetTimeToMove(float time) => this._timeToMove = time;
     public void SetLRPosition(int val, Vector3 pos) => this._lineRenderer.SetPosition(val, pos);
     public void SetLRPosCount(int val) => this._lineRenderer.positionCount = val;

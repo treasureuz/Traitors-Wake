@@ -121,4 +121,8 @@ public class GameManager : MonoBehaviour {
     public void SetTimeToComplete(float time) {
         this.timeToComplete = time;
     }
+    
+    public int GetTotalLevels() {
+        return this._easyLevels + this._normalLevels + this._hardLevels;
+    }
 }

@@ -56,7 +56,6 @@
     <Compile Include="Assets\Scripts\TWeaponManager.cs" />
     <Compile Include="Assets\Scripts\BulletBehavior.cs" />
     <Compile Include="Assets\Scripts\Traitor.cs" />
-    <Compile Include="Assets\Scripts\HealthManager.cs" />
     <Compile Include="Assets\Scripts\PowerUpManager.cs" />
     <Compile Include="Assets\Scripts\LevelManager.cs" />
     <Compile Include="Assets\Scripts\WeaponManager.cs" />

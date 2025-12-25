@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -13,44 +14,45 @@ public class UIManager : MonoBehaviour {
     [SerializeField] private Button _restartButton;
     [SerializeField] private RectTransform _actionButtons;
     [SerializeField] private TextMeshProUGUI _topText;
-    [SerializeField] private TextMeshProUGUI _healthText;
-    [SerializeField] private Image _healthBar;
+    [SerializeField] private TextMeshProUGUI _playerHealthText;
+    [SerializeField] private TextMeshProUGUI _traitorHealthText;
+    [SerializeField] private Image _playerHealthBar;
+    [SerializeField] private Image _traitorHealthBar;
 
     [SerializeField] private float _baseLevelTextBGWidth = 480f;
     [SerializeField] private float _normalLevelTextBGWidth = 550f;
     [SerializeField] private float _memorizeTextBGWidth = 800f;
     [SerializeField] private float _completeTextBGWidth = 650f;
-    [SerializeField] private float _failedTextBGWidth = 720f;
+    [SerializeField] private float _endTextBGWidth = 720f;
 
     [SerializeField] private List<Image> _bulletBars;
     [SerializeField] private TextMeshProUGUI _bulletsText;
     
-    [SerializeField] private float _healthBarSpeed = 3f;
+    [SerializeField] private float _playerHealthBarSpeed = 3f;
     
     public static UIManager instance;
     
-    private RectTransform _topTextBGTransform;
+    private RectTransform _topTextBG;
     private const string loadingNextLevel = "Loading Next Level...";
 
     void Awake() {
         instance = this;
-        this._topTextBGTransform = this._topText.GetComponentInParent<Image>().rectTransform;
+        this._topTextBG = this._topText.GetComponentInParent<Image>().rectTransform;
         this._restartButton.gameObject.SetActive(false);
     }
 
     void Update() {
-        // Update Health Bar
+        // Update Player Health Bar
         var healthPercent = (float)GameManager.instance.player.GetCurrentHealth() / GameManager.instance.player.GetMaxHealth();
-        this._healthBar.fillAmount = Mathf.Lerp(this._healthBar.fillAmount, healthPercent, this._healthBarSpeed * Time.deltaTime);
-        this._healthBar.color = Color.Lerp(Color.red, Color.green, healthPercent);
+        this._playerHealthBar.fillAmount = Mathf.Lerp(this._playerHealthBar.fillAmount, healthPercent, 
+            this._playerHealthBarSpeed * Time.deltaTime);
+        this._playerHealthBar.color = Color.Lerp(Color.red, Color.green, healthPercent);
     }
     
     public void OnSubmit() {
         Debug.Log($"Submit: {GameManager.instance.player.hasEnded}");
         EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
-        
         GameManager.instance.player.hasEnded = true;
-        
         // Disable undo and reset after submission
         this._undoButton.interactable = false;
         this._resetButton.interactable = false;
@@ -74,58 +76,60 @@ public class UIManager : MonoBehaviour {
         this._restartButton.gameObject.SetActive(false);
         this._topText.text = loadingNextLevel;
         OnRestartExit(); // change Restart text color back to original color;
-        StartCoroutine(LevelManager.instance.GenerateLevel());
+        LevelManager.instance.SetLevelCoroutine(StartCoroutine(LevelManager.instance.GenerateLevel()));
     }
 
     public void OnRestartEnter() {
         TextMeshProUGUI restartText = this._restartButton.GetComponentInChildren<TextMeshProUGUI>();
         restartText.text = "<color=#FF0000>[RESTART]</color>";
     }
-    
     public void OnRestartExit() {
         TextMeshProUGUI restartText = this._restartButton.GetComponentInChildren<TextMeshProUGUI>();
         restartText.text = "<color=#FFB90D>[RESTART]</color>";
     }
 
-    public void IncreaseBulletBar(int startBar) {
-        this._bulletsText.text = $"({GameManager.instance.pWeaponManager.GetCurrentMagazineCount()}/" +
+    public void UpdateBulletBar (bool enable) {
+        this._bulletsText.text = $"({GameManager.instance.pWeaponManager.GetCurrentMagazineCount()}/" + 
                                  $"{GameManager.instance.pWeaponManager.GetMaxMagazineCount()})";
-        for (var i = startBar; i < GameManager.instance.pWeaponManager.GetCurrentMagazineCount(); i++) {
-            this._bulletBars[i].enabled = true;
-        }
+        if (enable) {
+            for (var i = 0; i < GameManager.instance.pWeaponManager.GetCurrentMagazineCount(); i++) {
+                this._bulletBars[i].enabled = true;
+            }
+        } else this._bulletBars[GameManager.instance.pWeaponManager.GetCurrentMagazineCount()].enabled = false;
     }
     
-    public void DecreaseBulletBar() {
-        this._bulletsText.text = $"({GameManager.instance.pWeaponManager.GetCurrentMagazineCount()}/" +
-                                 $"{GameManager.instance.pWeaponManager.GetMaxMagazineCount()})";
-        this._bulletBars[GameManager.instance.pWeaponManager.GetCurrentMagazineCount()].enabled = false;
+    public void UpdatePlayerHealthText() {
+        this._playerHealthText.text = $"{GameManager.instance.player.GetCurrentHealth()}%";
     }
     
-    public void UpdateHealthText() {
-        this._healthText.text = $"{GameManager.instance.player.GetCurrentHealth()}%";
+    public void UpdateTraitorHealth() {
+        this._traitorHealthText.text = $"{GameManager.instance.traitor.GetCurrentHealth()}%";
+        var healthPercent = (float)GameManager.instance.traitor.GetCurrentHealth() / GameManager.instance.traitor.GetMaxHealth();
+        this._traitorHealthBar.fillAmount = healthPercent;
     }
-    
-    public void DisplayFinishText() {
-        if (LevelManager.CanAdvanceLevel() && !LevelManager.instance._isLevelEnded) this._topText.text = loadingNextLevel;
-        else {
-            Player.hasResetLevel = true;
-            this._topText.text = "<color=#FF0000>*Translation Mismatch*</color>";
-            this._topTextBGTransform.sizeDelta = new Vector2(this._failedTextBGWidth, this._topTextBGTransform.sizeDelta.y);
-            this._restartButton.gameObject.SetActive(true);
-        }
+
+    public void DisplayEndScreen() {
+        this._topText.text = Player.hasWon ? "<color=#00FF00>YOU WON!</color>" : "<color=#FF0000>*Translation Mismatch*</color>";
+        this._topTextBG.sizeDelta = new Vector2(this._endTextBGWidth, this._topTextBG.sizeDelta.y);
+        this._restartButton.gameObject.SetActive(true);
+        SetActionButtons(false);
+    }
+
+    public void DisplayLoadingText() {
+        this._topText.text = loadingNextLevel;
     }
     
     public void DisplayLevelText(float level) {
         //Adjust topText size based on the level text
-        this._topTextBGTransform.sizeDelta = GameManager.instance.difficulty == GameManager.Difficulty.Normal 
-            ? new Vector2(this._normalLevelTextBGWidth, this._topTextBGTransform.sizeDelta.y) 
-            : new Vector2(this._baseLevelTextBGWidth, this._topTextBGTransform.sizeDelta.y);
+        this._topTextBG.sizeDelta = GameManager.instance.difficulty == GameManager.Difficulty.Normal 
+            ? new Vector2(this._normalLevelTextBGWidth, this._topTextBG.sizeDelta.y) 
+            : new Vector2(this._baseLevelTextBGWidth, this._topTextBG.sizeDelta.y);
         this._topText.text = $"{{Level {level}: {GameManager.instance.difficulty}}}";
     }
 
     public IEnumerator DisplayTimeToMemorize(float time) {
         //Adjust topText size based on the timeToMemorize text
-        this._topTextBGTransform.sizeDelta = new Vector2(this._memorizeTextBGWidth, this._topTextBGTransform.sizeDelta.y);
+        this._topTextBG.sizeDelta = new Vector2(this._memorizeTextBGWidth, this._topTextBG.sizeDelta.y);
         while (time > 0f) {
             // float.ToString("F2") or $"{float:F2}" converts the float value to 2 decimal places
             this._topText.text = $"{{Memorize The Path: [{time:F2}s]}}";
@@ -137,7 +141,7 @@ public class UIManager : MonoBehaviour {
     
     public IEnumerator DisplayTimeToComplete() {
         //Adjust topText size based on the timeToComplete text
-        this._topTextBGTransform.sizeDelta = new Vector2(this._completeTextBGWidth, this._topTextBGTransform.sizeDelta.y);
+        this._topTextBG.sizeDelta = new Vector2(this._completeTextBGWidth, this._topTextBG.sizeDelta.y);
         while (!GameManager.instance.player.hasEnded && GameManager.instance.timeToComplete > 0f) {
             // float.ToString("F2") or $"{float:F2}" converts the float value to 2 decimal places
             this._topText.text = $"{{Complete In: [{GameManager.instance.timeToComplete:F2}s]!}}";
@@ -149,10 +153,10 @@ public class UIManager : MonoBehaviour {
         GameManager.instance.player.hasEnded = true; 
     }
     
-    public void SetButtons(bool b) {
-        this._submitButton.interactable = b;
-        this._resetButton.interactable = b;
-        this._undoButton.interactable = b;
+    public void SetActionButtons(bool enable) {
+        this._submitButton.interactable = enable;
+        this._resetButton.interactable = enable;
+        this._undoButton.interactable = enable;
     }
 }
 

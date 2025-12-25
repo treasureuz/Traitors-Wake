@@ -9,23 +9,15 @@ public class PWeaponManager : WeaponManager {
     }
     
     protected override void HandleShoot() {
-        if (!GameManager.instance.traitor.hasEnded || Player.hasResetLevel || LevelManager.instance._isLevelEnded || 
+        if (!GameManager.instance.traitor.hasEnded || LevelManager.isGameEnded || 
             this._owner.hasEnded || !Mouse.current.leftButton.isPressed || !GridManager.instance.IsWithinGridArea() || 
             !HasBullets() || Time.time < this._nextShootTime) return;
         Shoot();
-        UIManager.instance.DecreaseBulletBar();
+        UIManager.instance.UpdateBulletBar(false);
         this._nextShootTime = Time.time + this._timeBetweenShots;
     }
 
     protected override Vector3 GetTargetPosition() {
         return Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
     }
-    
-    public void SetCurrentMagazineCount(int num) {
-        if (this._currentMagazineCount + num > this._bulletMagazineCount) return;
-        this._currentMagazineCount += num;
-    }
-    
-    public int GetCurrentMagazineCount() => this._currentMagazineCount;
-    public int GetMaxMagazineCount() => this._bulletMagazineCount;
 }

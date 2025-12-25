@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class GridManager : MonoBehaviour {
+    [SerializeField] private Transform _backgroundSprite;
     [SerializeField] private Tile _tilePrefab; 
     [SerializeField] private LayerMask _gridAreaMask;
     [SerializeField] private Transform _cam;
@@ -36,11 +37,12 @@ public class GridManager : MonoBehaviour {
         }
         MakeChestTiles(6); // Make X amount of chest tiles
         
-        // Position the cam at the center of the grid (based on the width and height)
+        // Position the every relevant GameObject at the center of the grid (based on the width and height)
         var centerWidth = (float) this._width / 2 - 0.5f;
         var centerHeight = (float) this._height / 2 - 0.5f;
-        this.transform.localScale = new Vector3(this._width + 0.1f, this._height + 0.1f, 1); // creates a border
+        this.transform.localScale = new Vector3(this._width + 0.09f, this._height + 0.09f, 1); // creates a border
         this.transform.position = new Vector3(centerWidth, centerHeight);
+        this._backgroundSprite.position = this.transform.position;
         this._cam.position = new Vector3(centerWidth, centerHeight, -10); 
     }
 

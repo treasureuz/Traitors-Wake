@@ -145,6 +145,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a274dba926c8bd740be8809bca32a6a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player
+  _weaponManager: {fileID: 6660561901922124701}
+  _maxHealth: 100
   _moves: []
   _timeToMove: 0.3
 --- !u!114 &6660561901922124701
@@ -162,6 +164,7 @@ MonoBehaviour:
   _bulletPrefab: {fileID: 7032699058568776344, guid: 4bdc0eb3fb43d9c49b24572390054c44, type: 3}
   _bulletSpawnPoint: {fileID: 377072283485563087}
   _bulletMagazineCount: 10
+  _bulletDamage: 13.5
   _timeBetweenShots: 3
 --- !u!114 &3795036767035478747
 MonoBehaviour:

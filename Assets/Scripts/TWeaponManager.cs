@@ -3,7 +3,6 @@ using UnityEngine;
 public class TWeaponManager : WeaponManager {
     [SerializeField] private float minTimeBetweenShots = 3.5f;
     [SerializeField] private float maxTimeBetweenShots = 8f;
-    [SerializeField] private float _bulletDamage = 13.5f;
 
     private float timeBetweenShots;
 
@@ -11,8 +10,7 @@ public class TWeaponManager : WeaponManager {
         this._owner = this.GetComponent<Traitor>();
     }
     
-    protected override void Start() {
-        base.Start(); // base = super
+    void Start() {
         // Set start timeBetweenShots
         timeBetweenShots = Random.Range(minTimeBetweenShots, maxTimeBetweenShots);
     }
@@ -22,7 +20,7 @@ public class TWeaponManager : WeaponManager {
     }
 
     protected override void HandleShoot() {
-        if (!this._owner.hasEnded || GameManager.instance.player.hasEnded || LevelManager.instance._isLevelEnded 
+        if (!this._owner.hasEnded || GameManager.instance.player.hasEnded || LevelManager.isGameEnded 
             || !HasBullets()) return;
         this._nextShootTime += Time.deltaTime;
         if (this._nextShootTime < timeBetweenShots) return;
@@ -31,6 +29,4 @@ public class TWeaponManager : WeaponManager {
         timeBetweenShots = Random.Range(minTimeBetweenShots, maxTimeBetweenShots);
         this._nextShootTime = 0f;
     }
-
-    public float GetBulletDamage() => this._bulletDamage;
 }

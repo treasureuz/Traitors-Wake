@@ -5,12 +5,10 @@ using UnityEngine;
 
 public class Player : PlayerManager {
     [SerializeField] private float _timeToMove = 0.4f;
-    [SerializeField] private int _maxHealth = 100;
     
-    public static bool hasResetLevel;
+    public static bool hasWon;
     
     public float TimeToMove => this._timeToMove;
-    private int _currentHealth;
 
     private InputManager _inputManager;
     private List<Vector2Int> _directions;
@@ -21,13 +19,8 @@ public class Player : PlayerManager {
         this._inputManager = this.GetComponent<InputManager>();
     }
     
-    void Start() {
-        this._currentHealth = this._maxHealth;
-        UIManager.instance.UpdateHealthText();
-    }
-    
     void Update() {
-        if (!GameManager.instance.traitor.hasEnded || this.hasEnded) return;
+        if (!GameManager.instance.traitor.hasEnded || this.hasEnded || LevelManager.isGameEnded) return;
         if (this._inputManager.UpIsPressed()) StartCoroutine(HandleMovement(Vector2Int.up, this._timeToMove));
         if (this._inputManager.DownIsPressed()) StartCoroutine(HandleMovement(Vector2Int.down, this._timeToMove));
         if (this._inputManager.LeftIsPressed()) StartCoroutine(HandleMovement(Vector2Int.left, this._timeToMove));
@@ -80,25 +73,30 @@ public class Player : PlayerManager {
         this.transform.position = new Vector3(targetPos.x, targetPos.y);
         this.isMoving = false;
     }
+
+    public override void ResetPlayerSettings() {
+        this._currentHealth = this._maxHealth;
+        UIManager.instance.UpdatePlayerHealthText();
+        this._weaponManager.SetCurrentMagazineCount(this._weaponManager.GetMaxMagazineCount());
+        UIManager.instance.UpdateBulletBar(true); // Enables all bullet bars
+    }
     
     public void HealPlayer(int healAmount) {
         if (this._currentHealth >= this._maxHealth) return;
-        this._currentHealth += healAmount;
-        UIManager.instance.UpdateHealthText();
+        this._currentHealth = Mathf.Clamp(this._currentHealth += healAmount, 0, this._maxHealth);
+        UIManager.instance.UpdatePlayerHealthText();
     }
     
-    private void DamagePlayer(float damageAmount) {
-        var damage = Mathf.RoundToInt(damageAmount);
-        this._currentHealth = Mathf.Clamp(this._currentHealth - damage, 0, this._maxHealth);
-        UIManager.instance.UpdateHealthText();
-        if (this._currentHealth == 0) LevelManager.instance.EndLevel();
+    protected override void OnDamaged(float damageAmount) {
+        base.OnDamaged(damageAmount);
+        UIManager.instance.UpdatePlayerHealthText();
+        if (this._currentHealth != 0) return;
+        hasWon = false;
+        LevelManager.instance.EndGame();
     }
 
-    private void OnCollisionEnter2D(Collision2D collision) {
+    protected override void OnCollisionEnter2D(Collision2D collision) {
         if (!collision.gameObject.CompareTag("TraitorBullet")) return;
-        DamagePlayer(GameManager.instance.tWeaponManager.GetBulletDamage());
+        OnDamaged(GameManager.instance.tWeaponManager.GetBulletDamage());
     }
-
-    public int GetCurrentHealth() => this._currentHealth;
-    public int GetMaxHealth() => this._maxHealth;
 }

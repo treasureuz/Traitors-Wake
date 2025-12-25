@@ -9,6 +9,7 @@ TagManager:
   - RegularTile
   - ChestTile
   - ObstacleTile
+  - Traitor
   layers:
   - Default
   - TransparentFX
@@ -17,10 +18,10 @@ TagManager:
   - Water
   - UI
   - Player
+  - Traitor
   - PlayerBullet
-  - GridArea
   - TraitorBullet
-  - 
+  - GridArea
   - 
   - 
   - 
