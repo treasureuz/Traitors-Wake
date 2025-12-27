@@ -7,7 +7,7 @@ public class TWeaponManager : WeaponManager {
     private float timeBetweenShots;
 
     void Awake() {
-        this._owner = this.GetComponent<Traitor>();
+        this._owner = this.GetComponentInParent<Traitor>();
     }
     
     void Start() {

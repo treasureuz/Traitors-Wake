@@ -5,7 +5,7 @@ public class PWeaponManager : WeaponManager {
     [SerializeField] private float _timeBetweenShots = 3f;
 
     void Awake() {
-        this._owner = this.GetComponent<Player>();
+        this._owner = this.GetComponentInParent<Player>();
     }
     
     protected override void HandleShoot() {

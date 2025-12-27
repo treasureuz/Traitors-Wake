@@ -51,6 +51,21 @@ public class Traitor : PlayerManager {
         GridManager.instance.MakeObstacleTile(7);
     }
 
+    protected override IEnumerator HandleMovement(Vector2Int direction, float timeToMove) {
+        Vector2Int startPos = new((int) this.transform.position.x, (int) this.transform.position.y);
+        Vector2Int targetPos = startPos + direction;
+        
+        var elapsedTime = 0f;
+        while (elapsedTime < timeToMove) {
+            this.transform.position = Vector2.Lerp(startPos, targetPos, elapsedTime / timeToMove);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        this.transform.position = new Vector3(targetPos.x, targetPos.y);
+        Vector2Int currentPos = new((int)this.transform.position.x, (int)this.transform.position.y);
+        this._moves.Add(currentPos); // Add current player position to the moves list
+    }
+
     private IEnumerator LerpLineRenderer(float timeToMove) {
         Vector2Int startPos = new ((int)this.transform.position.x, (int)this.transform.position.y);
         Vector2Int targetPos = startPos + this._randomDir;
@@ -70,7 +85,7 @@ public class Traitor : PlayerManager {
     private static Vector2Int NextDir() {
         var weight = GameManager.instance.numOfDirs;
         
-        // Build weightedDirs by adding 'weight' amount of Vector3.up or Vector3.right to the list if they exist
+        // Build weightedDirs by adding 'weight' amount of Vector3.up or Vector3.right to the list if they exist in validDirs
         var weightedDirs = new List<Vector2Int>();
         foreach (Vector2Int dir in validDirs)
             if (dir == Vector2Int.up || dir == Vector2Int.right) {

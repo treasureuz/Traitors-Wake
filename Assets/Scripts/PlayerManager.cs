@@ -22,36 +22,12 @@ public abstract class PlayerManager : MonoBehaviour {
     }
 
     protected virtual void Start() {
+      
         ResetLevelSettings();
         ResetPlayerSettings(); // Sets currentHealth = maxHealth
     }
 
-    protected virtual IEnumerator HandleMovement(Vector2Int direction, float timeToMove) {
-        if (this.hasEnded || this.isMoving) yield break;
-        this.isMoving = true;
-
-        Vector2Int startPos = new((int)this.transform.position.x, (int)this.transform.position.y);
-        Vector2Int targetPos = startPos + direction;
-
-        if (targetPos.x < 0 || targetPos.x > GridManager.instance.Width - 1 || targetPos.y < 0
-            || targetPos.y > GridManager.instance.Height - 1 || GridManager.instance.GetGridTileWithPosition
-                (targetPos).GetCurrentTileType() == Tile.TileType.Obstacle) {
-            this.isMoving = false;
-            yield break;
-        }
-
-        var elapsedTime = 0f;
-        while (elapsedTime < timeToMove) {
-            this.transform.position = Vector2.Lerp(startPos, targetPos, elapsedTime / timeToMove);
-            elapsedTime += Time.deltaTime;
-            yield return null;
-        }
-
-        this.transform.position = new Vector3(targetPos.x, targetPos.y);
-        Vector2Int currentPos = new((int)this.transform.position.x, (int)this.transform.position.y);
-        this._moves.Add(currentPos); // Add current player position to the moves list
-        this.isMoving = false;
-    }
+    protected abstract IEnumerator HandleMovement(Vector2Int direction, float timeToMove);
 
     protected virtual void OnDamaged(float damageAmount) {
         var damage = Mathf.RoundToInt(damageAmount);
@@ -64,7 +40,7 @@ public abstract class PlayerManager : MonoBehaviour {
 
     public abstract void ResetPlayerSettings();
     
-    public void ResetLevelSettings() {
+    public virtual void ResetLevelSettings() {
         this._moves.Clear();
         this.transform.position = SpawnPosV3();
         this.hasEnded = false;
