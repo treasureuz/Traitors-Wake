@@ -18,8 +18,7 @@ public class LevelManager : MonoBehaviour {
     
     public IEnumerator GenerateLevel() {
         if (isGameEnded) {
-            this._currentLevel = 0;
-            this._levelDiff = 0;
+            isGameEnded = false; this._currentLevel = 0; this._levelDiff = 0;
             GameManager.instance.player.ResetPlayerSettings();
             GameManager.instance.traitor.ResetPlayerSettings();
             GameManager.instance.SetDifficulty(GameManager.instance.StartDifficulty);
@@ -30,7 +29,7 @@ public class LevelManager : MonoBehaviour {
         // Increment difficulty if current level is greater than levelEndPerDiff
         // Else continue with same difficulty from previous level
         if (this._levelDiff > GameManager.instance.levelsPerDiff) {
-            this._levelDiff = 0; // Reset level per difficulty
+            this._levelDiff = 1; // Reset levelDiff per difficulty to 1
             GameManager.instance.IncrementDifficulty();
         } else GameManager.instance.SetDifficulty(GameManager.instance.difficulty);
         
@@ -50,6 +49,9 @@ public class LevelManager : MonoBehaviour {
         
         UIManager.instance.DisplayLevelText(this._currentLevel); // Display current level
         GridManager.instance.GenerateGrid(); // Generates grid based on difficulty
+        // Enables player and traitor after grid is generated
+        GameManager.instance.player.gameObject.SetActive(true);
+        GameManager.instance.traitor.gameObject.SetActive(true);
             
         // Set lineRenderer to the AI's spawn position
         GameManager.instance.traitor.SetLRPosition(0, PlayerManager.SpawnPosV3());
@@ -58,12 +60,12 @@ public class LevelManager : MonoBehaviour {
         yield return StartCoroutine(GameManager.instance.traitor.MoveSequence());
         yield return StartCoroutine(UIManager.instance.DisplayTimeToMemorize(GameManager.instance.timeToMemorize));
 
-        // After timeToMemorize is done, wait an additional 0.5 seconds
+        // After timeToMemorize, wait an additional 0.5 seconds
         yield return new WaitForSeconds(0.5f); 
         
         UIManager.instance.SetActionButtons(true);
         GameManager.instance.traitor.SetLineRendererStatus(false); // Disable LineRenderer
-        GameManager.instance.traitor.hasEnded = true;
+        GameManager.instance.traitor.hasEnded = true; // Sets traitor.hasEnded to true after timeToMemorize is complete
             
         yield return StartCoroutine(UIManager.instance.DisplayTimeToComplete());
         UIManager.instance.SetActionButtons(false); // Disable buttons so player position isn't overwritten

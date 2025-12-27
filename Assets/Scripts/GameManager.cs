@@ -13,10 +13,12 @@ public class GameManager : MonoBehaviour {
     [SerializeField] private int _hardNumOfDirs = 2;
     
     [Header("Min/Max Grid Numbers")]
-    [SerializeField] private int _minWidth = 7;
-    [SerializeField] private int _maxWidth = 9;
-    [SerializeField] private int _minHeight = 6;
-    [SerializeField] private int _maxHeight = 7;
+    [SerializeField] private int _easyWidth = 7;
+    [SerializeField] private int _easyHeight = 5;
+    [SerializeField] private int _normalWidth = 8;
+    [SerializeField] private int _normalHeight = 6;
+    [SerializeField] private int _hardWidth = 9;
+    [SerializeField] private int _hardHeight = 7;
     
     [Header("Levels Per Difficulty")] 
     [SerializeField] private int _easyLevels = 4;
@@ -62,10 +64,12 @@ public class GameManager : MonoBehaviour {
 
     void Awake() {
         instance = this;
-        this.traitor = Instantiate(this._traitorPrefab, PlayerManager.SpawnPosV3(), Quaternion.identity);
         this.player = Instantiate(this._playerPrefab, PlayerManager.SpawnPosV3(), Quaternion.identity);
-        this.pWeaponManager = this.player.GetComponent<PWeaponManager>();
-        this.tWeaponManager = this.traitor.GetComponent<TWeaponManager>();
+        this.player.gameObject.SetActive(false);
+        this.traitor = Instantiate(this._traitorPrefab, PlayerManager.SpawnPosV3(), Quaternion.identity);
+        this.traitor.gameObject.SetActive(false);
+        this.pWeaponManager = this.player.GetComponentInChildren<PWeaponManager>();
+        this.tWeaponManager = this.traitor.GetComponentInChildren<TWeaponManager>();
     }
     
     void Start() {
@@ -76,6 +80,8 @@ public class GameManager : MonoBehaviour {
         switch (this.difficulty) {
             case Difficulty.Easy: {
                 this.numOfDirs = this._easyNumOfDirs; 
+                GridManager.instance.SetWidth(this._easyWidth);
+                GridManager.instance.SetHeight(this._easyHeight);
                 this.levelsPerDiff = this._easyLevels;
                 this.timeToMemorize = this._easyTimeToMemorize;
                 this.timeToComplete = this._easyTimeToComplete;
@@ -84,6 +90,8 @@ public class GameManager : MonoBehaviour {
             }
             case Difficulty.Normal: {
                 this.numOfDirs = this._normalNumOfDirs; 
+                GridManager.instance.SetWidth(this._normalWidth);
+                GridManager.instance.SetHeight(this._normalHeight);
                 this.levelsPerDiff = this._normalLevels;
                 this.timeToMemorize = this._normalTimeToMemorize;
                 this.timeToComplete = this._normalTimeToComplete;
@@ -92,6 +100,8 @@ public class GameManager : MonoBehaviour {
             }
             case Difficulty.Hard: {
                 this.numOfDirs = this._hardNumOfDirs; 
+                GridManager.instance.SetWidth(this._hardWidth);
+                GridManager.instance.SetHeight(this._hardHeight);
                 this.levelsPerDiff = this._hardLevels;
                 this.timeToMemorize = this._hardTimeToMemorize;
                 this.timeToComplete = this._hardTimeToComplete;
@@ -100,10 +110,8 @@ public class GameManager : MonoBehaviour {
             }
         }
         // Randomize width and height (not based on difficulty) 
-        GridManager.instance.SetWidth(Random.Range(this._minWidth, this._maxWidth + 1));
-        GridManager.instance.SetHeight(Random.Range(this._minHeight, this._maxHeight + 1));
-        // GridManager.instance.SetWidth(3);
-        // GridManager.instance.SetHeight(3);
+        // GridManager.instance.SetWidth(Random.Range(this._minWidth, this._maxWidth + 1));
+        // GridManager.instance.SetHeight(this._minHeight);
         // Set finishPos based on the above set width and height
         this._finishPos = new Vector2Int(GridManager.instance.Width - 1, GridManager.instance.Height - 1);
     }

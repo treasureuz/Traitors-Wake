@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public abstract class WeaponManager : MonoBehaviour {
@@ -33,7 +34,11 @@ public abstract class WeaponManager : MonoBehaviour {
     protected abstract Vector3 GetTargetPosition();
     
     protected bool HasBullets() => this._currentMagazineCount > 0;
-    public void SetCurrentMagazineCount(int num) => this._currentMagazineCount = num;
+
+    public void SetCurrentMagazineCount(int num) {
+        this._currentMagazineCount = Mathf.Clamp(num, 0, this._bulletMagazineCount);
+    }
+
     public int GetCurrentMagazineCount() => this._currentMagazineCount;
     public int GetMaxMagazineCount() => this._bulletMagazineCount;
     public float GetBulletDamage() => this._bulletDamage;

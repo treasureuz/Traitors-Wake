@@ -5,8 +5,9 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class GridManager : MonoBehaviour {
-    [SerializeField] private Transform _backgroundSprite;
-    [SerializeField] private Tile _tilePrefab; 
+    [SerializeField] private Transform _background;
+    [SerializeField] private SpriteRenderer _gridBorder;
+    [SerializeField] private Tile _tilePrefab;
     [SerializeField] private LayerMask _gridAreaMask;
     [SerializeField] private Transform _cam;
     [SerializeField] private int _width, _height;
@@ -24,6 +25,11 @@ public class GridManager : MonoBehaviour {
 
     void Awake() {
         instance = this;
+        this._gridBorder.enabled = false;
+        var s = this._tilePrefab.GetComponentsInChildren<SpriteRenderer>(true);
+        for (var i = 1; i < s.Length; i++) { // Skips the parent gameObject
+            s[i].gameObject.SetActive(false);
+        }
     }
     
     public void GenerateGrid() {
@@ -35,15 +41,16 @@ public class GridManager : MonoBehaviour {
                 this._tiles.Add(new Vector2Int(x, y), this._spawnedTile);
             }
         }
+        this._gridBorder.enabled = true;
         MakeChestTiles(6); // Make X amount of chest tiles
         
         // Position the every relevant GameObject at the center of the grid (based on the width and height)
         var centerWidth = (float) this._width / 2 - 0.5f;
         var centerHeight = (float) this._height / 2 - 0.5f;
+        this._cam.position = new Vector3(centerWidth, centerHeight, -10); 
         this.transform.localScale = new Vector3(this._width + 0.09f, this._height + 0.09f, 1); // creates a border
         this.transform.position = new Vector3(centerWidth, centerHeight);
-        this._backgroundSprite.position = this.transform.position;
-        this._cam.position = new Vector3(centerWidth, centerHeight, -10); 
+        this._background.position = this.transform.position;
     }
 
     public bool IsWithinGridArea() {
@@ -62,8 +69,11 @@ public class GridManager : MonoBehaviour {
 
             Tile chestTile = GetGridTileWithPosition(randomPos);
             chestTile.name = $"Chest Tile {randomPos.x}, {randomPos.y}";
-            chestTile.AddComponent<PowerUpManager>();
             chestTile.AddToTileTypes(Tile.TileType.Chest); // this calls Init()
+            // Enables the chest sprite
+            // foreach (SpriteRenderer tile in chestTile.GetComponentsInChildren<SpriteRenderer>()) {
+            //     if (tile.CompareTag("ChestTile")) chestTile.GetComponent<SpriteRenderer>().gameObject.SetActive(true);
+            // }
             this._chestTiles.Add(new Vector2Int(randomPos.x, randomPos.y), chestTile);
         }
     }
@@ -74,7 +84,7 @@ public class GridManager : MonoBehaviour {
         if (!chestTile || chestTile.isOpened) return;
         // If chestTile is not opened and the player's position is on it, open the chest and activate its PowerUp
         chestTile.isOpened = true; 
-        chestTile.GetComponent<PowerUpManager>().ActivatePowerUp();
+        PowerUpManager.instance.ActivatePowerUp();
         chestTile.PopTileType(); // this calls Init();
         this._chestTiles.Remove(position);
     }
@@ -94,15 +104,25 @@ public class GridManager : MonoBehaviour {
             while (this._obstacleTiles.ContainsValue(GetGridTileWithPosition(randomPos)));
 
             Tile obstacleTile = GetGridTileWithPosition(randomPos);
-            obstacleTile.AddComponent<BoxCollider2D>();
+            // Setup obstacle tile
             obstacleTile.name = $"Obstacle Tile {randomPos.x}, {randomPos.y}";
+            obstacleTile.AddComponent<BoxCollider2D>();
             obstacleTile.AddToTileTypes(Tile.TileType.Obstacle); // this calls Init()
+            // Enables the obstacle (rock) sprite
+            foreach (SpriteRenderer tile in obstacleTile.GetComponentsInChildren<SpriteRenderer>(true)) {
+                if (tile.CompareTag("ObstacleTile")) tile.gameObject.SetActive(true);
+            }
             this._obstacleTiles.Add(new Vector2Int(randomPos.x, randomPos.y), obstacleTile);
         }
     }
     
     public void RemoveObstacleTile(Vector2Int position) {
-        Destroy(this._obstacleTiles[position].GetComponent<BoxCollider2D>());
+        Tile tileToRemove = this._obstacleTiles[position];
+        // Disables the obstacle (rock) sprite
+        foreach (SpriteRenderer tile in tileToRemove.GetComponentsInChildren<SpriteRenderer>()) {
+            if (tile.CompareTag("ObstacleTile")) tile.gameObject.SetActive(false);
+        }
+        Destroy(tileToRemove.GetComponent<BoxCollider2D>());
         this._obstacleTiles.Remove(position);
     }
     
@@ -113,8 +133,15 @@ public class GridManager : MonoBehaviour {
         return this._tiles.GetValueOrDefault(position);
     }
     
+    // ReSharper disable Unity.PerformanceAnalysis
     private void ClearChestTiles() {
-        foreach (Tile tile in this._chestTiles.Values) tile.PopTileType(); // this calls Init()
+        foreach (Tile tile in this._chestTiles.Values) {
+            tile.PopTileType(); // this calls Init()
+            // Disables the chest sprite
+            // foreach (SpriteRenderer s in tile.GetComponentsInChildren<SpriteRenderer>()) {
+            //     if (s.CompareTag("ChestTile")) tile.GetComponent<SpriteRenderer>().gameObject.SetActive(fa);se
+            // }
+        }
         this._chestTiles.Clear();
     }
 
@@ -122,6 +149,10 @@ public class GridManager : MonoBehaviour {
     public void ClearObstacleTiles() {
         foreach (Tile tile in this._obstacleTiles.Values) {
             tile.PopTileType(); // this calls Init()
+            // Disables the obstacle (rock) sprite
+            foreach (SpriteRenderer s in tile.GetComponentsInChildren<SpriteRenderer>()) {
+                if (s.CompareTag("ObstacleTile")) s.gameObject.SetActive(false);
+            }
             Destroy(tile.GetComponent<BoxCollider2D>());
         }
         this._obstacleTiles.Clear();

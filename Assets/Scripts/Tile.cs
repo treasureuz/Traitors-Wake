@@ -5,7 +5,7 @@ using UnityEngine;
 public class Tile : MonoBehaviour {
     [SerializeField] private Color _offsetColor, _baseColor;
     [SerializeField] private Color _chestColor = Color.gold;
-    [SerializeField] private Color _obstacleColor = Color.grey;
+    [SerializeField] private Color _obstacleColor = Color.black;
     [SerializeField] private SpriteRenderer _spriteRenderer;
 
     private Stack<TileType> _tileTypesList;
@@ -69,6 +69,6 @@ public class Tile : MonoBehaviour {
         Debug.Log("Collision!");
         PopTileType(); // Removes TileType.Obstacle
         Vector2Int tilePos = new ((int)this.transform.position.x, (int)this.transform.position.y);
-        GridManager.instance.RemoveObstacleTile(tilePos); // Removes the tile from obstacle tiles list56
+        GridManager.instance.RemoveObstacleTile(tilePos); // Removes the tile from obstacle tiles list
     }
 }

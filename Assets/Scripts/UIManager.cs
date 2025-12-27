@@ -16,6 +16,15 @@ public class UIManager : MonoBehaviour {
     [SerializeField] private TextMeshProUGUI _topText;
     [SerializeField] private TextMeshProUGUI _playerHealthText;
     [SerializeField] private TextMeshProUGUI _traitorHealthText;
+    [SerializeField] private TextMeshProUGUI _ammoPowerUpText;
+    [SerializeField] private GameObject _cannonBallSprite;
+    [SerializeField] private GameObject _traitorsLineSprite;
+    [SerializeField] private TextMeshProUGUI _timePowerUpText;
+    [SerializeField] private GameObject _hourglassIcon;
+    [SerializeField] private GameObject _rockSprite;
+    [SerializeField] private TextMeshProUGUI _healthPowerUpText;
+    [SerializeField] private GameObject _heartIcon;
+    [SerializeField] private TextMeshProUGUI _hotbarFeedText;
     [SerializeField] private Image _playerHealthBar;
     [SerializeField] private Image _traitorHealthBar;
 
@@ -39,6 +48,7 @@ public class UIManager : MonoBehaviour {
         instance = this;
         this._topTextBG = this._topText.GetComponentInParent<Image>().rectTransform;
         this._restartButton.gameObject.SetActive(false);
+        DisableAllPowerUpSprites();
     }
 
     void Update() {
@@ -50,7 +60,7 @@ public class UIManager : MonoBehaviour {
     }
     
     public void OnSubmit() {
-        Debug.Log($"Submit: {GameManager.instance.player.hasEnded}");
+        Debug.Log("Submit");
         EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
         GameManager.instance.player.hasEnded = true;
         // Disable undo and reset after submission
@@ -107,6 +117,40 @@ public class UIManager : MonoBehaviour {
         var healthPercent = (float)GameManager.instance.traitor.GetCurrentHealth() / GameManager.instance.traitor.GetMaxHealth();
         this._traitorHealthBar.fillAmount = healthPercent;
     }
+    
+    public void UpdateGiveAmmoText() {
+        this._cannonBallSprite.SetActive(true);
+        this._ammoPowerUpText.text = $"{PowerUpManager.instance.totalAmmo}";
+    }
+    
+    public void EnableTraitorsLineSprite() => this._traitorsLineSprite.SetActive(true);
+    
+    public void UpdateTimeIncreaseText() {
+        this._hourglassIcon.SetActive(true);
+        this._timePowerUpText.text = $"{PowerUpManager.instance.totalAddedTime:F1}s";
+    }
+
+    public void EnableRockSprite() => this._rockSprite.SetActive(true);
+    
+    public void UpdateHealthBoostText() {
+        this._heartIcon.SetActive(true);
+        this._healthPowerUpText.text = $"{PowerUpManager.instance.totalHealPoints}";
+    }
+    
+    public void UpdateHotBarFeedText() {
+        this._hotbarFeedText.enabled = true;
+        switch (PowerUpManager.instance.powerUp) {
+            case PowerUpManager.PowerUp.LineTrace: this._hotbarFeedText.text = "•  Restored Traitor's Wake"; break;
+            case PowerUpManager.PowerUp.ClearObstacles: this._hotbarFeedText.text = "•  Cleared all obstacles"; break;
+            case PowerUpManager.PowerUp.GiveAmmo: {
+                this._hotbarFeedText.text = $"•  Gave {PowerUpManager.instance.ammo} ammo"; break; }
+            case PowerUpManager.PowerUp.IncreaseCompleteTime: {
+                this._hotbarFeedText.text = $"•  Added {PowerUpManager.instance.addedTime:F2}s"; break; }
+            case PowerUpManager.PowerUp.HealthBoost: {
+                this._hotbarFeedText.text = $"•  Granted {PowerUpManager.instance.healPoints} health"; break;
+            }
+        }
+    }
 
     public void DisplayEndScreen() {
         this._topText.text = Player.hasWon ? "<color=#00FF00>YOU WON!</color>" : "<color=#FF0000>*Translation Mismatch*</color>";
@@ -157,6 +201,15 @@ public class UIManager : MonoBehaviour {
         this._submitButton.interactable = enable;
         this._resetButton.interactable = enable;
         this._undoButton.interactable = enable;
+    }
+
+    private void DisableAllPowerUpSprites() {
+        this._cannonBallSprite.SetActive(false); 
+        this._traitorsLineSprite.SetActive(false); 
+        this._hourglassIcon.SetActive(false); 
+        this._rockSprite.SetActive(false); 
+        this._heartIcon.SetActive(false);
+        this._hotbarFeedText.enabled = false;
     }
 }
 
