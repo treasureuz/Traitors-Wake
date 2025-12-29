@@ -116,13 +116,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4241864259852843945}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: -0.08715578, w: 0.9961947}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 4.03, y: 4.03, z: 4.03}
+  m_LocalScale: {x: 3.7999997, y: 3.7999997, z: 3.7999997}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 4201312780710337753}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -10}
 --- !u!212 &195056276010803242
 SpriteRenderer:
   serializedVersion: 2
@@ -177,7 +177,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.22, y: 0.25}
+  m_Size: {x: 0.17, y: 0.18}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -291,5 +291,8 @@ MonoBehaviour:
   _offsetColor: {r: 0, g: 0.5764706, b: 0.8509804, a: 1}
   _baseColor: {r: 0, g: 0.8235294, b: 1, a: 1}
   _chestColor: {r: 1, g: 0.8431373, b: 0, a: 1}
-  _obstacleColor: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
+  _baseObstacleColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  _offsetObstacleColor: {r: 0.3584906, g: 0.3584906, b: 0.3584906, a: 1}
+  _rockSprite1: {fileID: 6022224346326338935, guid: f7484e96fadf7d5458a22cbf7dc10ff9, type: 3}
+  _rockSprite2: {fileID: 1433821338664651233, guid: f7484e96fadf7d5458a22cbf7dc10ff9, type: 3}
   _spriteRenderer: {fileID: 8496734474472047767}

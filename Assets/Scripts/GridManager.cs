@@ -42,7 +42,7 @@ public class GridManager : MonoBehaviour {
             }
         }
         this._gridBorder.enabled = true;
-        MakeChestTiles(6); // Make X amount of chest tiles
+        MakeChestTiles(GameManager.instance.numOfChests); // Make X amount of chest tiles
         
         // Position the every relevant GameObject at the center of the grid (based on the width and height)
         var centerWidth = (float) this._width / 2 - 0.5f;

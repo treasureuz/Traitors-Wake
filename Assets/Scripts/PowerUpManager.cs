@@ -17,6 +17,9 @@ public class PowerUpManager : MonoBehaviour {
     public int totalHealPoints { get; private set; }
     public int totalAmmo { get; private set; }
     public float totalAddedTime { get; private set; }
+
+    public bool hasClearedObstacles { get; private set; }
+    public bool isLineTrace { get; private set; }
     
     public enum PowerUp {
         GiveAmmo = 0, 
@@ -54,6 +57,7 @@ public class PowerUpManager : MonoBehaviour {
             }
             case PowerUp.LineTrace: {
                 // Enable the AIManager.LineRenderer after timeToMemorize is done
+                this.isLineTrace = true;
                 GameManager.instance.traitor.SetLineRendererStatus(true);
                 UIManager.instance.EnableTraitorsLineSprite();
                 break;
@@ -67,6 +71,7 @@ public class PowerUpManager : MonoBehaviour {
                 break;
             }
             case PowerUp.ClearObstacles: {
+                this.hasClearedObstacles = true;
                 GridManager.instance.ClearObstacleTiles();
                 UIManager.instance.EnableRockSprite();
                 break;
@@ -80,5 +85,14 @@ public class PowerUpManager : MonoBehaviour {
                 break;
             }
         }
+    }
+
+    public void ResetPowerUps() {
+        UIManager.instance.DisableAllPowerUpSprites(); // Disable hotbar sprites
+        this.totalAddedTime = 0;
+        this.totalAmmo = 0;
+        this.totalHealPoints = 0;
+        this.hasClearedObstacles = false;
+        this.isLineTrace = false;
     }
 }

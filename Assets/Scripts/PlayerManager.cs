@@ -16,13 +16,14 @@ public abstract class PlayerManager : MonoBehaviour {
     public bool hasEnded { get; set; }
 
     protected int _currentHealth;
+    protected float _timeToMove;
+    public void SetTimeToMove(float time) => this._timeToMove = time;
 
     protected virtual void Awake() {
         this._moves = new List<Vector2Int>();
     }
 
     protected virtual void Start() {
-      
         ResetLevelSettings();
         ResetPlayerSettings(); // Sets currentHealth = maxHealth
     }

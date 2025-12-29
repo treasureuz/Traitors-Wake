@@ -48,9 +48,8 @@ public class UIManager : MonoBehaviour {
         instance = this;
         this._topTextBG = this._topText.GetComponentInParent<Image>().rectTransform;
         this._restartButton.gameObject.SetActive(false);
-        DisableAllPowerUpSprites();
     }
-
+    
     void Update() {
         // Update Player Health Bar
         var healthPercent = (float)GameManager.instance.player.GetCurrentHealth() / GameManager.instance.player.GetMaxHealth();
@@ -127,7 +126,7 @@ public class UIManager : MonoBehaviour {
     
     public void UpdateTimeIncreaseText() {
         this._hourglassIcon.SetActive(true);
-        this._timePowerUpText.text = $"{PowerUpManager.instance.totalAddedTime:F1}s";
+        this._timePowerUpText.text = $"{PowerUpManager.instance.totalAddedTime:F2}s";
     }
 
     public void EnableRockSprite() => this._rockSprite.SetActive(true);
@@ -171,13 +170,13 @@ public class UIManager : MonoBehaviour {
         this._topText.text = $"{{Level {level}: {GameManager.instance.difficulty}}}";
     }
 
-    public IEnumerator DisplayTimeToMemorize(float time) {
+    public IEnumerator DisplayTimeToMemorize() {
         //Adjust topText size based on the timeToMemorize text
         this._topTextBG.sizeDelta = new Vector2(this._memorizeTextBGWidth, this._topTextBG.sizeDelta.y);
-        while (time > 0f) {
+        while (GameManager.instance.timeToMemorize > 0f) {
             // float.ToString("F2") or $"{float:F2}" converts the float value to 2 decimal places
-            this._topText.text = $"{{Memorize The Path: [{time:F2}s]}}";
-            time -= Time.deltaTime;
+            this._topText.text = $"{{Memorize The Path: [{GameManager.instance.timeToMemorize:F2}s]}}";
+            GameManager.instance.SetTimeToMemorize(GameManager.instance.timeToMemorize - Time.deltaTime);
             yield return null;
         }
         this._topText.text = $"{{Memorize The Path: [{0f:F2}s]}}";
@@ -188,7 +187,7 @@ public class UIManager : MonoBehaviour {
         this._topTextBG.sizeDelta = new Vector2(this._completeTextBGWidth, this._topTextBG.sizeDelta.y);
         while (!GameManager.instance.player.hasEnded && GameManager.instance.timeToComplete > 0f) {
             // float.ToString("F2") or $"{float:F2}" converts the float value to 2 decimal places
-            this._topText.text = $"{{Complete In: [{GameManager.instance.timeToComplete:F2}s]!}}";
+            this._topText.text = $"{{Complete in: [{GameManager.instance.timeToComplete:F2}s]!}}";
             GameManager.instance.SetTimeToComplete(GameManager.instance.timeToComplete - Time.deltaTime);
             yield return null;
         }
@@ -203,11 +202,11 @@ public class UIManager : MonoBehaviour {
         this._undoButton.interactable = enable;
     }
 
-    private void DisableAllPowerUpSprites() {
-        this._cannonBallSprite.SetActive(false); 
+    public void DisableAllPowerUpSprites() {
+        this._rockSprite.SetActive(false); 
         this._traitorsLineSprite.SetActive(false); 
         this._hourglassIcon.SetActive(false); 
-        this._rockSprite.SetActive(false); 
+        this._cannonBallSprite.SetActive(false); 
         this._heartIcon.SetActive(false);
         this._hotbarFeedText.enabled = false;
     }

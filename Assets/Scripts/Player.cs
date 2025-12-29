@@ -5,13 +5,11 @@ using UnityEngine;
 
 public class Player : PlayerManager {
     [SerializeField] private List<Vector2Int> _directions;
-    [SerializeField] private float _timeToMove = 0.4f;
     
     public static bool hasWon;
     
-    public float TimeToMove => this._timeToMove;
-
     private InputManager _inputManager;
+    public float TimeToMove => this._timeToMove;
 
     protected override void Awake() {
         base.Awake();

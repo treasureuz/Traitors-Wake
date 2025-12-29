@@ -12,8 +12,6 @@ public class Traitor : PlayerManager {
     private static readonly List<Vector2Int> validDirs = new();
     
     private Vector2Int _randomDir;
-    
-    private float _timeToMove;
     private int _lineIndex;
 
     protected override void Awake() {
@@ -48,7 +46,8 @@ public class Traitor : PlayerManager {
             validDirs.Remove(-this._randomDir);
             this._randomDir = NextDir();
         }
-        GridManager.instance.MakeObstacleTile(7);
+        if (PowerUpManager.instance.hasClearedObstacles) yield break;
+        GridManager.instance.MakeObstacleTile(GameManager.instance.numOfObstacles);
     }
 
     protected override IEnumerator HandleMovement(Vector2Int direction, float timeToMove) {
@@ -115,7 +114,6 @@ public class Traitor : PlayerManager {
         OnDamaged(GameManager.instance.pWeaponManager.GetBulletDamage());
     }
     
-    public void SetTimeToMove(float time) => this._timeToMove = time;
     public void SetLRPosition(int val, Vector3 pos) => this._lineRenderer.SetPosition(val, pos);
     public void SetLRPosCount(int val) => this._lineRenderer.positionCount = val;
     public void SetLineRendererStatus(bool b) => this._lineRenderer.enabled = b;

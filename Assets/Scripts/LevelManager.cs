@@ -2,41 +2,43 @@ using System.Collections;
 using UnityEngine;
 
 public class LevelManager : MonoBehaviour {
-    [SerializeField] private float _timeBeforeLevelStart = 3f;
+    [SerializeField] private float _timeBeforeLevelStart = 1.35f;
     
     public static LevelManager instance;
 
     private Coroutine _levelCoroutine;
     private int _currentLevel;
     private int _levelDiff;
-    public static bool isGameEnded { get; private set; }
-    
+    public static bool isGameEnded { get; set; }
+
     void Awake() {
         instance = this;
         isGameEnded = true;
     }
-    
+
     public IEnumerator GenerateLevel() {
         if (isGameEnded) {
             isGameEnded = false; this._currentLevel = 0; this._levelDiff = 0;
             GameManager.instance.player.ResetPlayerSettings();
             GameManager.instance.traitor.ResetPlayerSettings();
+            PowerUpManager.instance.ResetPowerUps(); // calls UIManager.DisablePowerUpSprites()
             GameManager.instance.SetDifficulty(GameManager.instance.StartDifficulty);
-        } 
+        }
         this._currentLevel++; // Increment current level
         this._levelDiff++; // Increment level per difficulty
-        
+
         // Increment difficulty if current level is greater than levelEndPerDiff
         // Else continue with same difficulty from previous level
         if (this._levelDiff > GameManager.instance.levelsPerDiff) {
             this._levelDiff = 1; // Reset levelDiff per difficulty to 1
+            PowerUpManager.instance.ResetPowerUps(); // Reset power up stats to 0 and disables hotbar sprites
             GameManager.instance.IncrementDifficulty();
-        } else GameManager.instance.SetDifficulty(GameManager.instance.difficulty);
-        
-        // Set buttons to false and wait X amount of time before generating level
+        }
+        else GameManager.instance.SetDifficulty(GameManager.instance.difficulty);
+
+        // Disable UI elements and wait X amount of time before generating level
         UIManager.instance.SetActionButtons(false);
         yield return new WaitForSeconds(this._timeBeforeLevelStart);
-        isGameEnded = false;
         
         // Reset all "Player" related settings before re-generating a level
         GameManager.instance.traitor.ResetLevelSettings();
@@ -49,6 +51,7 @@ public class LevelManager : MonoBehaviour {
         
         UIManager.instance.DisplayLevelText(this._currentLevel); // Display current level
         GridManager.instance.GenerateGrid(); // Generates grid based on difficulty
+
         // Enables player and traitor after grid is generated
         GameManager.instance.player.gameObject.SetActive(true);
         GameManager.instance.traitor.gameObject.SetActive(true);
@@ -58,13 +61,16 @@ public class LevelManager : MonoBehaviour {
         
         // After move sequence, remove AI path trace, and enable player button actions
         yield return StartCoroutine(GameManager.instance.traitor.MoveSequence());
-        yield return StartCoroutine(UIManager.instance.DisplayTimeToMemorize(GameManager.instance.timeToMemorize));
+        yield return StartCoroutine(UIManager.instance.DisplayTimeToMemorize());
 
         // After timeToMemorize, wait an additional 0.5 seconds
         yield return new WaitForSeconds(0.5f); 
         
         UIManager.instance.SetActionButtons(true);
-        GameManager.instance.traitor.SetLineRendererStatus(false); // Disable LineRenderer
+        // Disable LineRenderer if player doesn't have the power up (based on levels per difficulty)
+        if (!PowerUpManager.instance.isLineTrace) {
+            GameManager.instance.traitor.SetLineRendererStatus(false);
+        }
         GameManager.instance.traitor.hasEnded = true; // Sets traitor.hasEnded to true after timeToMemorize is complete
             
         yield return StartCoroutine(UIManager.instance.DisplayTimeToComplete());
