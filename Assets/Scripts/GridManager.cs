@@ -6,10 +6,11 @@ using UnityEngine.InputSystem;
 
 public class GridManager : MonoBehaviour {
     [SerializeField] private Transform _background;
+    [SerializeField] private Transform _cam;
     [SerializeField] private SpriteRenderer _gridBorder;
     [SerializeField] private Tile _tilePrefab;
+    [SerializeField] private Sprite _openedChestSprite;
     [SerializeField] private LayerMask _gridAreaMask;
-    [SerializeField] private Transform _cam;
     [SerializeField] private int _width, _height;
     
     public static GridManager instance;
@@ -26,10 +27,9 @@ public class GridManager : MonoBehaviour {
     void Awake() {
         instance = this;
         this._gridBorder.enabled = false;
-        var s = this._tilePrefab.GetComponentsInChildren<SpriteRenderer>(true);
-        for (var i = 1; i < s.Length; i++) { // Skips the parent gameObject
-            s[i].gameObject.SetActive(false);
-        }
+        // Deactivate obstacle and chest tile sprites
+        this._tilePrefab.transform.Find("Obstacle").gameObject.SetActive(false);
+        this._tilePrefab.transform.Find("Chest").gameObject.SetActive(false);
     }
     
     public void GenerateGrid() {
@@ -65,15 +65,12 @@ public class GridManager : MonoBehaviour {
             // Generate a random tile position that is not in the chest tile list already (no duplicates)
             // Uses the positions of the grid tiles
             do randomPos = new Vector2Int(Random.Range(1, this._width), Random.Range(1, this._height));
-            while (this._chestTiles.ContainsValue(GetGridTileWithPosition(randomPos)));
-
-            Tile chestTile = GetGridTileWithPosition(randomPos);
+            while (this._chestTiles.ContainsValue(GetGridTileWithPos(randomPos)));
+            
+            Tile chestTile = GetGridTileWithPos(randomPos);
+            // Setup chest tile
             chestTile.name = $"Chest Tile {randomPos.x}, {randomPos.y}";
             chestTile.AddToTileTypes(Tile.TileType.Chest); // this calls Init()
-            // Enables the chest sprite
-            // foreach (SpriteRenderer tile in chestTile.GetComponentsInChildren<SpriteRenderer>()) {
-            //     if (tile.CompareTag("ChestTile")) chestTile.GetComponent<SpriteRenderer>().gameObject.SetActive(true);
-            // }
             this._chestTiles.Add(new Vector2Int(randomPos.x, randomPos.y), chestTile);
         }
     }
@@ -83,7 +80,9 @@ public class GridManager : MonoBehaviour {
         Tile chestTile = this._chestTiles.GetValueOrDefault(position);
         if (!chestTile || chestTile.isOpened) return;
         // If chestTile is not opened and the player's position is on it, open the chest and activate its PowerUp
+        // Also changes the chestTile sprite to the opened version
         chestTile.isOpened = true; 
+        chestTile.transform.Find("Chest").GetComponent<SpriteRenderer>().sprite = this._openedChestSprite;
         PowerUpManager.instance.ActivatePowerUp();
         chestTile.PopTileType(); // this calls Init();
         this._chestTiles.Remove(position);
@@ -101,17 +100,13 @@ public class GridManager : MonoBehaviour {
                         (Random.Range(0, GameManager.instance.traitor.GetMovesCount() - 1)) 
                     : new Vector2Int(Random.Range(1, this._width), Random.Range(1, this._height));
             }
-            while (this._obstacleTiles.ContainsValue(GetGridTileWithPosition(randomPos)));
+            while (this._obstacleTiles.ContainsValue(GetGridTileWithPos(randomPos)));
 
-            Tile obstacleTile = GetGridTileWithPosition(randomPos);
+            Tile obstacleTile = GetGridTileWithPos(randomPos);
             // Setup obstacle tile
             obstacleTile.name = $"Obstacle Tile {randomPos.x}, {randomPos.y}";
             obstacleTile.AddComponent<BoxCollider2D>();
             obstacleTile.AddToTileTypes(Tile.TileType.Obstacle); // this calls Init()
-            // Enables the obstacle (rock) sprite
-            foreach (SpriteRenderer tile in obstacleTile.GetComponentsInChildren<SpriteRenderer>(true)) {
-                if (tile.CompareTag("ObstacleTile")) tile.gameObject.SetActive(true);
-            }
             this._obstacleTiles.Add(new Vector2Int(randomPos.x, randomPos.y), obstacleTile);
         }
     }
@@ -119,17 +114,16 @@ public class GridManager : MonoBehaviour {
     public void RemoveObstacleTile(Vector2Int position) {
         Tile tileToRemove = this._obstacleTiles[position];
         // Disables the obstacle (rock) sprite
-        foreach (SpriteRenderer tile in tileToRemove.GetComponentsInChildren<SpriteRenderer>()) {
-            if (tile.CompareTag("ObstacleTile")) tile.gameObject.SetActive(false);
-        }
+        tileToRemove.transform.Find("Obstacle").gameObject.SetActive(false);
         Destroy(tileToRemove.GetComponent<BoxCollider2D>());
+        tileToRemove.PopTileType(); // Removes TileType.Obstacle
         this._obstacleTiles.Remove(position);
     }
     
     public void SetWidth(int width) => this._width = width;
     public void SetHeight(int height) => this._height = height;
     
-    public Tile GetGridTileWithPosition(Vector2Int position) {
+    public Tile GetGridTileWithPos(Vector2Int position) {
         return this._tiles.GetValueOrDefault(position);
     }
     
@@ -137,10 +131,7 @@ public class GridManager : MonoBehaviour {
     private void ClearChestTiles() {
         foreach (Tile tile in this._chestTiles.Values) {
             tile.PopTileType(); // this calls Init()
-            // Disables the chest sprite
-            // foreach (SpriteRenderer s in tile.GetComponentsInChildren<SpriteRenderer>()) {
-            //     if (s.CompareTag("ChestTile")) tile.GetComponent<SpriteRenderer>().gameObject.SetActive(fa);se
-            // }
+            tile.transform.Find("Obstacle").gameObject.SetActive(false); // Disables the chest sprite
         }
         this._chestTiles.Clear();
     }
@@ -149,10 +140,7 @@ public class GridManager : MonoBehaviour {
     public void ClearObstacleTiles() {
         foreach (Tile tile in this._obstacleTiles.Values) {
             tile.PopTileType(); // this calls Init()
-            // Disables the obstacle (rock) sprite
-            foreach (SpriteRenderer s in tile.GetComponentsInChildren<SpriteRenderer>()) {
-                if (s.CompareTag("ObstacleTile")) s.gameObject.SetActive(false);
-            }
+            tile.transform.Find("Obstacle").gameObject.SetActive(false); // Disables the obstacle (rock) sprite
             Destroy(tile.GetComponent<BoxCollider2D>());
         }
         this._obstacleTiles.Clear();

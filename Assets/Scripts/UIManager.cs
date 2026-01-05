@@ -12,7 +12,6 @@ public class UIManager : MonoBehaviour {
     [SerializeField] private Button _resetButton;
     [SerializeField] private Button _submitButton;
     [SerializeField] private Button _restartButton;
-    [SerializeField] private RectTransform _actionButtons;
     [SerializeField] private TextMeshProUGUI _topText;
     [SerializeField] private TextMeshProUGUI _playerHealthText;
     [SerializeField] private TextMeshProUGUI _traitorHealthText;

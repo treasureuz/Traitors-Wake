@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: e5537d1ca163f564aab3914e7a97e5a5
+guid: 882840e009a4ba24e80b5764a6d609f9
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 6783086047013853648
-    second: pirate map bg_0
+      213: -5281422124547630143
+    second: Chest_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: pirate map bg_0
+      name: Chest_0
       rect:
         serializedVersion: 2
-        x: 9
-        y: 17
-        width: 560
-        height: 406
+        x: 13
+        y: 9
+        width: 37
+        height: 30
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 0d95b2942dc522e50800000000000000
-      internalID: 6783086047013853648
+      spriteID: 1cb13755f8e94b6b0800000000000000
+      internalID: -5281422124547630143
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      pirate map bg_0: 6783086047013853648
+      Chest_0: -5281422124547630143
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

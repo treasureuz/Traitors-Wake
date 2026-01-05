@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: e5537d1ca163f564aab3914e7a97e5a5
+guid: 2f820e9bb5b8cbd4d8a3adbe3ea46124
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 6783086047013853648
-    second: pirate map bg_0
+      213: -3925967752146392052
+    second: FinishLine_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: pirate map bg_0
+      name: FinishLine_0
       rect:
         serializedVersion: 2
-        x: 9
-        y: 17
-        width: 560
-        height: 406
+        x: 0
+        y: 0
+        width: 100
+        height: 100
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 0d95b2942dc522e50800000000000000
-      internalID: 6783086047013853648
+      spriteID: c0cecad41292489c0800000000000000
+      internalID: -3925967752146392052
       vertices: []
       indices: 
       edges: []
@@ -125,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      pirate map bg_0: 6783086047013853648
+      FinishLine_0: -3925967752146392052
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

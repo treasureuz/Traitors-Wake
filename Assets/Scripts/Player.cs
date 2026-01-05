@@ -33,8 +33,8 @@ public class Player : PlayerManager {
         Vector2Int targetPos = startPos + direction;
         
         if (targetPos.x < 0 || targetPos.x > GridManager.instance.Width - 1 || targetPos.y < 0
-            || targetPos.y > GridManager.instance.Height - 1 || GridManager.instance.GetGridTileWithPosition(targetPos).
-                GetCurrentTileType() == Tile.TileType.Obstacle) {
+            || targetPos.y > GridManager.instance.Height - 1 || GridManager.instance.
+            GetGridTileWithPos(targetPos).GetCurrentTileType() == Tile.TileType.Obstacle) {
             this.isMoving = false; yield break;
         }
         

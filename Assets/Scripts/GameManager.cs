@@ -7,7 +7,12 @@ public class GameManager : MonoBehaviour {
     [SerializeField] private Vector2Int _finishPos;
     [SerializeField] private Difficulty _startDifficulty = Difficulty.Easy;
     
-    [Header("Number of Directions")]
+    [Header("Levels Per Difficulty")] 
+    [SerializeField] private int _easyLevels = 4;
+    [SerializeField] private int _normalLevels = 3;
+    [SerializeField] private int _hardLevels = 2;
+    
+    [Header("Number of Up/Right Directions")]
     [SerializeField] private int _easyNumOfDirs = 5;
     [SerializeField] private int _normalNumOfDirs = 3;
     [SerializeField] private int _hardNumOfDirs = 2;
@@ -55,11 +60,6 @@ public class GameManager : MonoBehaviour {
     [SerializeField] private float _normalMaxTimeBetweenShots = 7f;
     [SerializeField] private float _hardMinTimeBetweenShots = 2.5f;
     [SerializeField] private float _hardMaxTimeBetweenShots = 6f;
-    
-    [Header("Levels Per Difficulty")] 
-    [SerializeField] private int _easyLevels = 4;
-    [SerializeField] private int _normalLevels = 3;
-    [SerializeField] private int _hardLevels = 2;
     
     public Vector2Int FinishPos => this._finishPos;
     public Difficulty StartDifficulty => this._startDifficulty;
