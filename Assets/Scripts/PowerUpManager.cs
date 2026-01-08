@@ -22,9 +22,9 @@ public class PowerUpManager : MonoBehaviour {
     public bool isLineTrace { get; private set; }
     
     public enum PowerUp {
-        GiveAmmo = 0, 
+        AmmoSurplus = 0, 
         LineTrace = 1, 
-        IncreaseCompleteTime = 2, 
+        BonusTime = 2, 
         ClearObstacles = 3,
         HealthBoost = 4
     }
@@ -44,7 +44,7 @@ public class PowerUpManager : MonoBehaviour {
 
     private void HandlePowerUps() {
         switch (this.powerUp) {
-            case PowerUp.GiveAmmo: {
+            case PowerUp.AmmoSurplus: {
                 var maxNum = GameManager.instance.pWeaponManager.GetMaxMagazineCount() -
                              GameManager.instance.pWeaponManager.GetCurrentMagazineCount();
                 this.ammo = Random.Range(1, maxNum + 1); // Amount of ammo to give the player (between 1 - maxNum) 
@@ -62,7 +62,7 @@ public class PowerUpManager : MonoBehaviour {
                 UIManager.instance.EnableTraitorsLineSprite();
                 break;
             }
-            case PowerUp.IncreaseCompleteTime: {
+            case PowerUp.BonusTime: {
                 // Amount to increase the timeToComplete by (between minCompleteTime(3) - maxCompleteTime(8))
                 this.addedTime = Random.Range(this._minCompleteTime, this._maxCompleteTime); 
                 this.totalAddedTime += this.addedTime;

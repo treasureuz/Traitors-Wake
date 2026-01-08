@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering.VirtualTexturing;
 
 public class Tile : MonoBehaviour {
     [SerializeField] private Color _offsetColor, _baseColor;
@@ -16,30 +17,24 @@ public class Tile : MonoBehaviour {
     private bool _isOffset;
     public bool isOpened { get; set; }
     
+    // Can just utilize OOP by making ChestTile and ObstacleTile classes extending Tile (instead of this enum)
     public enum TileType {
         Regular, 
         Chest, 
         Obstacle
     }
-    private TileType _tileType;
-    public TileType GetTileType() => this._tileType;
 
     void Awake() {
         this._tileTypesList = new Stack<TileType>();
     }
     
-    private void Init() {
-        this._tileType = this._tileTypesList.Peek(); // Make last added TileType the current tileType of this instance
-        HandleTileType();
-    }
-    
     // ReSharper disable Unity.PerformanceAnalysis
     private void HandleTileType() {
         ColorTile(); // Colors this tile
-        switch (this._tileType) {
+        switch (this._tileTypesList.Peek()) { // Current tile type
             case TileType.Regular: {
                 this.tag = "RegularTile"; break;
-            }
+            } 
             case TileType.Chest: {
                 // Assigns the unopened chestSprite and enables it
                 this.transform.Find("Chest").GetComponent<SpriteRenderer>().sprite = this._chestSprite;
@@ -67,11 +62,11 @@ public class Tile : MonoBehaviour {
     }
 
     public void AddToTileTypes(TileType tileType) {
-        this._tileTypesList.Push(tileType); Init();
+        this._tileTypesList.Push(tileType); HandleTileType();
     }
     
     public void PopTileType() {
-        this._tileTypesList.Pop(); Init();
+        this._tileTypesList.Pop(); HandleTileType();
     }
     
     public TileType GetCurrentTileType() {
@@ -81,7 +76,7 @@ public class Tile : MonoBehaviour {
     private void ColorTile() {
         var x = Mathf.RoundToInt(this.transform.position.x); var y = Mathf.RoundToInt(this.transform.position.y);
         this._isOffset = (x % 2 == 0 && y % 2 != 0) || (x % 2 != 0 && y % 2 == 0);
-        switch (this._tileType) {
+        switch (this._tileTypesList.Peek()) { // Current tile type
             case TileType.Regular:
             case TileType.Chest: 
                 // Changes sprite to finishLineSprite if this tile is the finish position tile

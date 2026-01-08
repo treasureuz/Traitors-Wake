@@ -37,7 +37,7 @@ public class GridManager : MonoBehaviour {
         for (var x = 0; x < this._width; x++) {
             for (var y = 0; y < this._height; y++) {
                 this._spawnedTile = Instantiate(this._tilePrefab, new Vector3(x, y), Quaternion.identity);
-                this._spawnedTile.AddToTileTypes(Tile.TileType.Regular); // this calls Init()
+                this._spawnedTile.AddToTileTypes(Tile.TileType.Regular); // this calls HandleTileType()
                 this._tiles.Add(new Vector2Int(x, y), this._spawnedTile);
             }
         }
@@ -70,7 +70,7 @@ public class GridManager : MonoBehaviour {
             Tile chestTile = GetGridTileWithPos(randomPos);
             // Setup chest tile
             chestTile.name = $"Chest Tile {randomPos.x}, {randomPos.y}";
-            chestTile.AddToTileTypes(Tile.TileType.Chest); // this calls Init()
+            chestTile.AddToTileTypes(Tile.TileType.Chest); // this calls HandleTileType()
             this._chestTiles.Add(new Vector2Int(randomPos.x, randomPos.y), chestTile);
         }
     }
@@ -84,7 +84,7 @@ public class GridManager : MonoBehaviour {
         chestTile.isOpened = true; 
         chestTile.transform.Find("Chest").GetComponent<SpriteRenderer>().sprite = this._openedChestSprite;
         PowerUpManager.instance.ActivatePowerUp();
-        chestTile.PopTileType(); // this calls Init();
+        chestTile.PopTileType(); // this calls HandleTileType();
         this._chestTiles.Remove(position);
     }
 
@@ -106,7 +106,7 @@ public class GridManager : MonoBehaviour {
             // Setup obstacle tile
             obstacleTile.name = $"Obstacle Tile {randomPos.x}, {randomPos.y}";
             obstacleTile.AddComponent<BoxCollider2D>();
-            obstacleTile.AddToTileTypes(Tile.TileType.Obstacle); // this calls Init()
+            obstacleTile.AddToTileTypes(Tile.TileType.Obstacle); // this calls HandleTileType()
             this._obstacleTiles.Add(new Vector2Int(randomPos.x, randomPos.y), obstacleTile);
         }
     }
@@ -130,7 +130,7 @@ public class GridManager : MonoBehaviour {
     // ReSharper disable Unity.PerformanceAnalysis
     private void ClearChestTiles() {
         foreach (Tile tile in this._chestTiles.Values) {
-            tile.PopTileType(); // this calls Init()
+            tile.PopTileType(); // this calls HandleTileType()
             tile.transform.Find("Obstacle").gameObject.SetActive(false); // Disables the chest sprite
         }
         this._chestTiles.Clear();
@@ -139,14 +139,14 @@ public class GridManager : MonoBehaviour {
     // ReSharper disable Unity.PerformanceAnalysis
     public void ClearObstacleTiles() {
         foreach (Tile tile in this._obstacleTiles.Values) {
-            tile.PopTileType(); // this calls Init()
+            tile.PopTileType(); // this calls HandleTileType()
             tile.transform.Find("Obstacle").gameObject.SetActive(false); // Disables the obstacle (rock) sprite
             Destroy(tile.GetComponent<BoxCollider2D>());
         }
         this._obstacleTiles.Clear();
     }
 
-    public void ClearAllTiles() {
+    public void ClearAllTileTypes() {
         ClearChestTiles();
         ClearObstacleTiles();
     }

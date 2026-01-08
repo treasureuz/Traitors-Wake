@@ -9,7 +9,7 @@ public class LevelManager : MonoBehaviour {
     private Coroutine _levelCoroutine;
     private int _currentLevel;
     private int _levelDiff;
-    public static bool isGameEnded { get; set; }
+    public static bool isGameEnded { get; private set; }
 
     void Awake() {
         instance = this;
@@ -44,7 +44,7 @@ public class LevelManager : MonoBehaviour {
         GameManager.instance.traitor.ResetLevelSettings();
         GameManager.instance.traitor.SetLRPosCount(0); // Reset LineRenderer position count
         GameManager.instance.player.ResetLevelSettings();
-        GridManager.instance.ClearAllTiles();
+        GridManager.instance.ClearAllTileTypes();
         
         GameManager.instance.traitor.SetLRPosCount(1); // Set LineRenderer position count to 1
         GameManager.instance.traitor.SetLineRendererStatus(true); // Enable LineRenderer
