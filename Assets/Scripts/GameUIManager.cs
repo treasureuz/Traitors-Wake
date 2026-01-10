@@ -5,48 +5,74 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour {
+    [Header("Button References")]
     [SerializeField] private Button _undoButton;
     [SerializeField] private Button _resetButton;
     [SerializeField] private Button _submitButton;
-    [SerializeField] private Button _restartButton;
+    [SerializeField] private Button _pauseRestartButton;
+    [SerializeField] private Button _resumeButton;
+    [SerializeField] private Button _pauseButton;
+    [SerializeField] private Button _pauseHomeButton;
+    [SerializeField] private Button _endRestartButton;
+    [SerializeField] private Button _endHomeButton;
+    
+    [Header("TMP References")]
     [SerializeField] private TextMeshProUGUI _topText;
     [SerializeField] private TextMeshProUGUI _playerHealthText;
     [SerializeField] private TextMeshProUGUI _traitorHealthText;
     [SerializeField] private TextMeshProUGUI _ammoPowerUpText;
-    [SerializeField] private GameObject _cannonBallSprite;
-    [SerializeField] private GameObject _traitorsLineSprite;
     [SerializeField] private TextMeshProUGUI _timePowerUpText;
-    [SerializeField] private GameObject _hourglassIcon;
-    [SerializeField] private GameObject _rockSprite;
     [SerializeField] private TextMeshProUGUI _healthPowerUpText;
-    [SerializeField] private GameObject _heartIcon;
     [SerializeField] private TextMeshProUGUI _hotbarFeedText;
-    [SerializeField] private Image _playerHealthBar;
-    [SerializeField] private Image _traitorHealthBar;
-
+    [SerializeField] private TextMeshProUGUI _bulletsText;
+    [SerializeField] private TextMeshProUGUI _currentScoreText;
+    //[SerializeField] private TextMeshProUGUI _highScoreText;
+    
+    [Header("Top Text Settings")]
     [SerializeField] private float _baseLevelTextBGWidth = 480f;
-    [SerializeField] private float _normalLevelTextBGWidth = 550f;
+    [SerializeField] private float _mediumLevelTextBGWidth = 550f;
     [SerializeField] private float _memorizeTextBGWidth = 800f;
     [SerializeField] private float _completeTextBGWidth = 650f;
     [SerializeField] private float _endTextBGWidth = 720f;
 
-    [SerializeField] private List<Image> _bulletBars;
-    [SerializeField] private TextMeshProUGUI _bulletsText;
+    [Header("GameObject References")]
+    [SerializeField] private GameObject _cannonBallSprite;
+    [SerializeField] private GameObject _traitorsLineSprite;
+    [SerializeField] private GameObject _hourglassIcon;
+    [SerializeField] private GameObject _rockSprite;
+    [SerializeField] private GameObject _heartIcon;
     
+    [Header("Image References")]
+    [SerializeField] private List<Image> _bulletBars;
+    [SerializeField] private Image _playerHealthBar;
+    [SerializeField] private Image _traitorHealthBar;
+    
+    [Header("Other Settings")]
     [SerializeField] private float _playerHealthBarSpeed = 3f;
     
     public static UIManager instance;
-    
     private RectTransform _topTextBG;
-    private const string loadingNextLevel = "Loading Next Level...";
+
+    private Coroutine _timeToMemorizeCoroutine;
+    private Coroutine _timeToCompleteCoroutine;
+    
+    public bool isMemorizing { get; private set; }
+    public bool isCompleting { get; private set; }
+    
+    private const string homeSceneName = "HomeScene";
+    private const string loadingLevel = "{Loading Level...}";
+    private const string currentScoreText = "Current Score";
+    private const string highScoreText = "High Score";
+    private const string winText = "<color=#00FF00>Traitor Captured!</color>";
+    private const string loseText = "<color=#FF0000>*Translation Mismatch*</color>";
 
     void Awake() {
         instance = this;
         this._topTextBG = this._topText.GetComponentInParent<Image>().rectTransform;
-        this._restartButton.gameObject.SetActive(false);
     }
     
     void Update() {
@@ -60,10 +86,9 @@ public class UIManager : MonoBehaviour {
     public void OnSubmit() {
         Debug.Log("Submit");
         EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
+        // Disable action buttons
+        SetActionButtons(false);
         GameManager.instance.player.hasEnded = true;
-        // Disable undo and reset after submission
-        this._undoButton.interactable = false;
-        this._resetButton.interactable = false;
     }
 
     public void OnUndo() {
@@ -77,33 +102,73 @@ public class UIManager : MonoBehaviour {
         EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
         StartCoroutine(GameManager.instance.player.ResetMoves(GameManager.instance.player.TimeToMove));
     }
+
+    public void OnPause() {
+        GameManager.isPaused = true;
+        this._pauseButton.interactable = false;
+        SetActionButtons(false); // Disable action buttons
+        SetOnPauseButtons(true); // Activate Resume, Restart, Home
+    }
+    
+    public void OnResume() {
+        StartCoroutine(OnResumeCoroutine());
+    }
+
+    private IEnumerator OnResumeCoroutine() {
+        SetOnPauseButtons(false); // Disable Resume, Restart, Home
+        yield return new WaitForSeconds(0.5f); // Wait before resuming game
+        GameManager.isPaused = false;
+        SetPauseButton(true); // Reenable the pause button
+        if (this.isCompleting) SetActionButtons(true); // Reactivate action buttons
+    }
     
     public void OnRestart() {
         Debug.Log("Restart");
         EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
-        this._restartButton.gameObject.SetActive(false);
-        this._topText.text = loadingNextLevel;
-        OnRestartExit(); // change Restart text color back to original color;
-        LevelManager.instance.SetLevelCoroutine(StartCoroutine(LevelManager.instance.GenerateLevel()));
+        if (GameManager.isPaused) {
+            LevelManager.isGameEnded = true;
+            SetOnPauseButtons(false);
+            this._pauseRestartButton.gameObject.SetActive(false);
+        } else this._endRestartButton.gameObject.SetActive(false);
+        DisplayLoadingText(); OnRestartExit(); // change Restart text color back to original color;
+        GameManager.instance.traitor.StopMoveSequenceCoroutine();
+        StopTimeToMemorizeCoroutine();
+        StopTimeToCompleteCoroutine();
+        LevelManager.instance.StartLevelCoroutine(StartCoroutine(LevelManager.instance.GenerateLevel()));
     }
 
     public void OnRestartEnter() {
-        TextMeshProUGUI restartText = this._restartButton.GetComponentInChildren<TextMeshProUGUI>();
-        restartText.text = "<color=#FF0000>[RESTART]</color>";
+        TextMeshProUGUI restartText = this._pauseRestartButton.GetComponentInChildren<TextMeshProUGUI>();
+        restartText.text = "<color=#FF0000>[Restart]</color>";
     }
 
     public void OnRestartExit() {
-        TextMeshProUGUI restartText = this._restartButton.GetComponentInChildren<TextMeshProUGUI>();
-        restartText.text = "<color=#FFB90D>[RESTART]</color>";
+        TextMeshProUGUI restartText = this._pauseRestartButton.GetComponentInChildren<TextMeshProUGUI>();
+        restartText.text = "<color=#FFB90D>[Restart]</color>";
     }
 
+    public void OnHome() {
+        SceneManager.LoadScene(homeSceneName);
+        if (GameManager.isPaused) {
+            GameManager.isPaused = false; 
+            this._pauseHomeButton.gameObject.SetActive(false);
+        } else this._endHomeButton.gameObject.SetActive(false);
+    }
+
+    public void UpdateScoreText() {
+        ScoreManager.instance.UpdateScore();
+        var currentScore = ScoreManager.instance.GetCurrentScore();
+        var highScore = ScoreManager.instance.GetHighScore();
+        this._currentScoreText.text = $"{currentScoreText}: {currentScore:F2}\n" +
+                                      $"{highScoreText}: {highScore:F2}";
+    }
+    
     public void UpdateBulletBar (bool enable) {
         this._bulletsText.text = $"({GameManager.instance.pWeaponManager.GetCurrentMagazineCount()}/" + 
                                  $"{GameManager.instance.pWeaponManager.GetMaxMagazineCount()})";
         if (enable) {
             for (var i = 0; i < GameManager.instance.pWeaponManager.GetCurrentMagazineCount(); i++) {
-                this._bulletBars[i].enabled = true;
-            }
+                this._bulletBars[i].enabled = true; }
         } else this._bulletBars[GameManager.instance.pWeaponManager.GetCurrentMagazineCount()].enabled = false;
     }
     
@@ -113,7 +178,7 @@ public class UIManager : MonoBehaviour {
     
     public void UpdateTraitorHealth() {
         this._traitorHealthText.text = $"{GameManager.instance.traitor.GetCurrentHealth()}%";
-        var healthPercent = (float)GameManager.instance.traitor.GetCurrentHealth() / GameManager.instance.traitor.GetMaxHealth();
+        var healthPercent = (float) GameManager.instance.traitor.GetCurrentHealth()/GameManager.instance.traitor.GetMaxHealth();
         this._traitorHealthBar.fillAmount = healthPercent;
     }
     
@@ -123,13 +188,12 @@ public class UIManager : MonoBehaviour {
     }
     
     public void EnableTraitorsLineSprite() => this._traitorsLineSprite.SetActive(true);
+    public void EnableRockSprite() => this._rockSprite.SetActive(true);
     
     public void UpdateTimeIncreaseText() {
         this._hourglassIcon.SetActive(true);
         this._timePowerUpText.text = $"{PowerUpManager.instance.totalAddedTime:F2}s";
     }
-
-    public void EnableRockSprite() => this._rockSprite.SetActive(true);
     
     public void UpdateHealthBoostText() {
         this._heartIcon.SetActive(true);
@@ -152,48 +216,82 @@ public class UIManager : MonoBehaviour {
     }
 
     public void DisplayEndScreen() {
-        this._topText.text = Player.hasWon ? "<color=#00FF00>YOU WON!</color>" : "<color=#FF0000>*Translation Mismatch*</color>";
+        this._topText.text = Player.hasWon ? winText : loseText;
         this._topTextBG.sizeDelta = new Vector2(this._endTextBGWidth, this._topTextBG.sizeDelta.y);
-        this._restartButton.gameObject.SetActive(true);
+        SetEndScreenButtons(true);
         SetActionButtons(false);
     }
 
     public void DisplayLoadingText() {
-        this._topText.text = loadingNextLevel;
+        this._topTextBG.sizeDelta = new Vector2(this._mediumLevelTextBGWidth, this._topTextBG.sizeDelta.y);
+        this._topText.text = loadingLevel;
     }
     
     public void DisplayLevelText(float level) {
-        //Adjust topText size based on the level text
-        this._topTextBG.sizeDelta = GameManager.instance.difficulty == GameManager.Difficulty.Normal 
-            ? new Vector2(this._normalLevelTextBGWidth, this._topTextBG.sizeDelta.y) 
+        // Adjust topText size based on the level text
+        this._topTextBG.sizeDelta = GameManager.instance.difficulty == GameManager.Difficulty.Medium 
+            ? new Vector2(this._mediumLevelTextBGWidth, this._topTextBG.sizeDelta.y) 
             : new Vector2(this._baseLevelTextBGWidth, this._topTextBG.sizeDelta.y);
         this._topText.text = $"{{Level {level}: {GameManager.instance.difficulty}}}";
     }
 
-    public IEnumerator DisplayTimeToMemorize() {
-        //Adjust topText size based on the timeToMemorize text
+    private IEnumerator DisplayTimeToMemorize() {
+        if (this.isMemorizing) yield break;
+        this.isMemorizing = true;
+        // Adjust topText size based on the timeToMemorize text
         this._topTextBG.sizeDelta = new Vector2(this._memorizeTextBGWidth, this._topTextBG.sizeDelta.y);
         while (GameManager.instance.timeToMemorize > 0f) {
+            if (GameManager.isPaused) yield return new WaitUntil(() => !GameManager.isPaused);
             // float.ToString("F2") or $"{float:F2}" converts the float value to 2 decimal places
             this._topText.text = $"{{Memorize The Path: [{GameManager.instance.timeToMemorize:F2}s]}}";
             GameManager.instance.SetTimeToMemorize(GameManager.instance.timeToMemorize - Time.deltaTime);
             yield return null;
         }
+        this.isMemorizing = false;
         this._topText.text = $"{{Memorize The Path: [{0f:F2}s]}}";
     }
+
+    public void StartTimeToMemorizeCoroutine() {
+        if (this._timeToMemorizeCoroutine != null) StopCoroutine(this._timeToMemorizeCoroutine);
+        this._timeToMemorizeCoroutine = StartCoroutine(DisplayTimeToMemorize());
+    }
+
+    public void StopTimeToMemorizeCoroutine() {
+        if (this._timeToMemorizeCoroutine == null) return;
+        StopCoroutine(this._timeToMemorizeCoroutine);
+        this._timeToMemorizeCoroutine = null;
+        this.isMemorizing = false;
+    }
     
-    public IEnumerator DisplayTimeToComplete() {
-        //Adjust topText size based on the timeToComplete text
+    private IEnumerator DisplayTimeToComplete() {
+        if (this.isCompleting) yield break;
+        this.isCompleting = true;
+        // Adjust topText size based on the timeToComplete text
         this._topTextBG.sizeDelta = new Vector2(this._completeTextBGWidth, this._topTextBG.sizeDelta.y);
         while (!GameManager.instance.player.hasEnded && GameManager.instance.timeToComplete > 0f) {
+            if (GameManager.isPaused) yield return new WaitUntil(() => !GameManager.isPaused);
             // float.ToString("F2") or $"{float:F2}" converts the float value to 2 decimal places
             this._topText.text = $"{{Complete in: [{GameManager.instance.timeToComplete:F2}s]!}}";
             GameManager.instance.SetTimeToComplete(GameManager.instance.timeToComplete - Time.deltaTime);
             yield return null;
         }
+        this.isCompleting = false;
         this._topText.text = $"{{Complete In: [{0f:F2}s]!}}";
-        // After timeToComplete is done or the submit button was clicked, set player.isEnded to true 
-        GameManager.instance.player.hasEnded = true; 
+        // After timeToComplete is done, set player.isEnded to true and update score
+        if (GameManager.instance.player.hasEnded) yield break;
+        GameManager.instance.player.hasEnded = true; UpdateScoreText();
+    }
+    
+    public void StartTimeToCompleteCoroutine() {
+        if (this._timeToCompleteCoroutine != null) StopCoroutine(this._timeToCompleteCoroutine);
+        this._timeToCompleteCoroutine = StartCoroutine(DisplayTimeToComplete());
+    }
+    
+    public void StopTimeToCompleteCoroutine() {
+        if (this._timeToCompleteCoroutine == null) return;
+        StopCoroutine(this._timeToCompleteCoroutine);
+        this._timeToCompleteCoroutine = null;
+        this.isCompleting = false;
     }
     
     public void SetActionButtons(bool enable) {
@@ -202,6 +300,17 @@ public class UIManager : MonoBehaviour {
         this._undoButton.interactable = enable;
     }
 
+    public void SetPauseButton(bool enable) => this._pauseButton.interactable = enable;
+    public void SetOnPauseButtons(bool enable) {
+        this._resumeButton.gameObject.SetActive(enable);
+        this._pauseRestartButton.gameObject.SetActive(enable);
+        this._pauseHomeButton.gameObject.SetActive(enable);
+    }
+    public void SetEndScreenButtons(bool enable) {
+        this._endRestartButton.gameObject.SetActive(enable);
+        this._endHomeButton.gameObject.SetActive(enable);
+    }
+    
     public void DisableAllPowerUpSprites() {
         this._rockSprite.SetActive(false); 
         this._traitorsLineSprite.SetActive(false); 

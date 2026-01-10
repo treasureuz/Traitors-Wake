@@ -18,7 +18,7 @@ public class Player : PlayerManager {
     }
     
     void Update() {
-        if (!GameManager.instance.traitor.hasEnded || this.hasEnded || LevelManager.isGameEnded) return;
+        if (GameManager.isPaused || !GameManager.instance.traitor.hasEnded || this.hasEnded || LevelManager.isGameEnded) return;
         if (this._inputManager.UpIsPressed()) StartCoroutine(HandleMovement(Vector2Int.up, this._timeToMove));
         else if (this._inputManager.DownIsPressed()) StartCoroutine(HandleMovement(Vector2Int.down, this._timeToMove));
         else if (this._inputManager.LeftIsPressed()) StartCoroutine(HandleMovement(Vector2Int.left, this._timeToMove));
@@ -95,9 +95,8 @@ public class Player : PlayerManager {
     }
 
     public override void ResetPlayerSettings() {
-        this._currentHealth = this._maxHealth;
+        base.ResetPlayerSettings();
         UIManager.instance.UpdatePlayerHealthText();
-        this._weaponManager.SetCurrentMagazineCount(this._weaponManager.GetMaxMagazineCount());
         UIManager.instance.UpdateBulletBar(true); // Enables all bullet bars
     }
 

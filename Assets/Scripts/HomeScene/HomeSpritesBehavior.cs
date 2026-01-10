@@ -7,7 +7,6 @@ using UnityEngine;
 
 public partial class HomeSpritesBehavior : MonoBehaviour {
     [SerializeField] private GameObject [] _spritePrefabs;
-    [SerializeField] private Transform _homeSpritesManagerParent;
     [SerializeField] private float _rotationSpeed = -75f;
     [SerializeField] private float _launchSpeed = 5.3f;
     [SerializeField] private float _minWaitTime = 2.1f;
@@ -17,7 +16,7 @@ public partial class HomeSpritesBehavior : MonoBehaviour {
     [SerializeField] private float _minY = -5.5f;
     [SerializeField] private float _maxY = 5.5f;
 
-    private List<GameObject> _spawnedSprites = new ();
+    private readonly List<GameObject> _spawnedSprites = new ();
     private GameObject _spawnedSprite;
     
     void Start() {
@@ -36,7 +35,7 @@ public partial class HomeSpritesBehavior : MonoBehaviour {
     private IEnumerator LaunchSprites() {
         GameObject randomSprite = GetRandomSprite();
         this._spawnedSprite = Instantiate(randomSprite, ResetPosition(), Quaternion.identity);
-        this._spawnedSprite.transform.SetParent(this._homeSpritesManagerParent);
+        this._spawnedSprite.transform.SetParent(this.transform);
         this._spawnedSprites.Add(this._spawnedSprite);
         Rigidbody2D spriteRB2D = this._spawnedSprite.GetComponent<Rigidbody2D>();
         spriteRB2D.linearVelocity = this._spawnedSprite.transform.right * this._launchSpeed;

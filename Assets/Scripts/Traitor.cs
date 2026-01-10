@@ -10,7 +10,8 @@ public class Traitor : PlayerManager {
     
     private static readonly Vector2Int[] directions = { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
     private static readonly List<Vector2Int> validDirs = new();
-    
+
+    private Coroutine _moveSequenceCoroutine;
     private Vector2Int _randomDir;
     private int _lineIndex;
 
@@ -19,7 +20,9 @@ public class Traitor : PlayerManager {
         this._lineRenderer.positionCount = 1;
     }
     
-    public IEnumerator MoveSequence() {
+    private IEnumerator MoveSequence() {
+        if (this.isMoving) yield break;
+        this.isMoving = true;
         int num;
         // Pick random direction that isn't left or down.
         // **Only runs at the start**
@@ -30,6 +33,7 @@ public class Traitor : PlayerManager {
         this._lineIndex = 0;
         Vector3 finishPos = new (GameManager.instance.FinishPos.x, GameManager.instance.FinishPos.y);
         while (this.transform.position != finishPos) {
+            if (GameManager.isPaused) yield return new WaitUntil(() => !GameManager.isPaused);
             StartCoroutine(LerpLineRenderer(this._timeToMove));
             yield return StartCoroutine(this.HandleMovement(this._randomDir, this._timeToMove));
             
@@ -46,6 +50,7 @@ public class Traitor : PlayerManager {
             validDirs.Remove(-this._randomDir);
             this._randomDir = NextDir();
         }
+        this.isMoving = false;
         if (PowerUpManager.instance.hasClearedObstacles) yield break;
         GridManager.instance.MakeObstacleTile(GameManager.instance.numOfObstacles);
     }
@@ -70,8 +75,7 @@ public class Traitor : PlayerManager {
         Vector2Int targetPos = startPos + this._randomDir;
         
         var elapsedTime = 0f;
-        this._lineIndex++;
-        this._lineRenderer.positionCount = this._lineIndex + 1;
+        this._lineIndex++; this._lineRenderer.positionCount = this._lineIndex + 1;
         while (elapsedTime < timeToMove) {
             this._lineRenderer.SetPosition(this._lineRenderer.positionCount - 1, 
                 Vector2.Lerp(startPos, targetPos, elapsedTime / timeToMove));
@@ -94,13 +98,24 @@ public class Traitor : PlayerManager {
         // Pick next valid direction
         return weightedDirs[Random.Range(0, weightedDirs.Count)];
     }
+    
+    public void StartMoveSequenceCoroutine() {
+        if (this._moveSequenceCoroutine != null) StopCoroutine(this._moveSequenceCoroutine);
+        this._moveSequenceCoroutine = StartCoroutine(MoveSequence());
+    }
 
-    public override void ResetPlayerSettings() {
-        this._currentHealth = this._maxHealth;
-        this._weaponManager.SetCurrentMagazineCount(this._weaponManager.GetMaxMagazineCount());
-        UIManager.instance.UpdateTraitorHealth();
+    public void StopMoveSequenceCoroutine() {
+        if (this._moveSequenceCoroutine == null) return;
+        StopCoroutine(this._moveSequenceCoroutine);
+        this._moveSequenceCoroutine = null;
+        this.isMoving = false;
     }
     
+    public override void ResetPlayerSettings() {
+        base.ResetPlayerSettings();
+        UIManager.instance.UpdateTraitorHealth();
+    }
+
     protected override void OnDamaged(float damageAmount) {
         base.OnDamaged(damageAmount);
         UIManager.instance.UpdateTraitorHealth();

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour {
@@ -9,55 +10,55 @@ public class GameManager : MonoBehaviour {
     
     [Header("Levels Per Difficulty")] 
     [SerializeField] private int _easyLevels = 4;
-    [SerializeField] private int _normalLevels = 3;
+    [SerializeField] private int _mediumLevels = 3;
     [SerializeField] private int _hardLevels = 2;
     
     [Header("Number of Up/Right Directions")]
     [SerializeField] private int _easyNumOfDirs = 5;
-    [SerializeField] private int _normalNumOfDirs = 3;
+    [SerializeField] private int _mediumNumOfDirs = 3;
     [SerializeField] private int _hardNumOfDirs = 2;
     
     [Header("Min/Max Grid Numbers")]
     [SerializeField] private int _easyWidth = 7;
     [SerializeField] private int _easyHeight = 5;
-    [SerializeField] private int _normalWidth = 8;
-    [SerializeField] private int _normalHeight = 6;
+    [SerializeField] private int _mediumWidth = 8;
+    [SerializeField] private int _mediumHeight = 6;
     [SerializeField] private int _hardWidth = 9;
     [SerializeField] private int _hardHeight = 7;
     
     [Header("Number of Chests/Obstacles")]
     [SerializeField] private int _easyNumOfChests = 3;
     [SerializeField] private int _easyNumOfObstacles = 4;
-    [SerializeField] private int _normalNumOfChests = 4;
-    [SerializeField] private int _normalNumOfObstacles = 5;
+    [SerializeField] private int _mediumNumOfChests = 4;
+    [SerializeField] private int _mediumNumOfObstacles = 5;
     [SerializeField] private int _hardNumOfChests = 5;
     [SerializeField] private int _hardNumOfObstacles = 6;
     
     [Header("Time To Memorize")]
     [SerializeField] private float _easyTimeToMemorize = 3.5f;
-    [SerializeField] private float _normalTimeToMemorize = 3f;
+    [SerializeField] private float _mediumTimeToMemorize = 3f;
     [SerializeField] private float _hardTimeToMemorize = 2.3f;
     
     [Header("Time To Complete")]
     [SerializeField] private float _easyTimeToComplete = 11.8f;
-    [SerializeField] private float _normalTimeToComplete = 12.5f;
+    [SerializeField] private float _mediumTimeToComplete = 12.5f;
     [SerializeField] private float _hardTimeToComplete = 13.2f;
     
     [Header("Player Time To Move")]
     [SerializeField] private float _easyPlayerTimeToMove = 0.3f;
-    [SerializeField] private float _normalPlayerTimeToMove = 0.28f;
+    [SerializeField] private float _mediumPlayerTimeToMove = 0.28f;
     [SerializeField] private float _hardPlayerTimeToMove = 0.25f;
     
     [Header("Traitor Time To Move")]
     [SerializeField] private float _easyTraitorTimeToMove = 0.42f;
-    [SerializeField] private float _normalTraitorTimeToMove = 0.35f;
+    [SerializeField] private float _mediumTraitorTimeToMove = 0.35f;
     [SerializeField] private float _hardTraitorTimeToMove = 0.3f;
 
     [Header("Traitor Min/Max Time Between Shots")] 
     [SerializeField] private float _easyMinTimeBetweenShots = 3.5f;
     [SerializeField] private float _easyMaxTimeBetweenShots = 8f;
-    [SerializeField] private float _normalMinTimeBetweenShots = 3f;
-    [SerializeField] private float _normalMaxTimeBetweenShots = 7f;
+    [SerializeField] private float _mediumMinTimeBetweenShots = 3f;
+    [SerializeField] private float _mediumMaxTimeBetweenShots = 7f;
     [SerializeField] private float _hardMinTimeBetweenShots = 2.5f;
     [SerializeField] private float _hardMaxTimeBetweenShots = 6f;
     
@@ -77,13 +78,16 @@ public class GameManager : MonoBehaviour {
     public int levelsPerDiff { get; private set; }
     public float timeToMemorize { get; private set; }
     public float timeToComplete { get; private set; }
+
+    public static bool isPaused;
     
     public enum Difficulty {
-        Easy,
-        Normal,
-        Hard
+        Easy = 0,
+        Medium = 1,
+        Hard = 2
     }
-    public Difficulty difficulty { get; private set; }
+
+    public Difficulty difficulty { get; private set; } 
 
     void Awake() {
         instance = this;
@@ -96,7 +100,7 @@ public class GameManager : MonoBehaviour {
     }
     
     void Start() {
-        LevelManager.instance.SetLevelCoroutine(StartCoroutine(LevelManager.instance.GenerateLevel()));
+        LevelManager.instance.StartLevelCoroutine(StartCoroutine(LevelManager.instance.GenerateLevel()));
     }
     
     private void HandleDifficultySettings() {
@@ -116,19 +120,19 @@ public class GameManager : MonoBehaviour {
                 this.tWeaponManager.SetMaxTimeBetweenShots(this._easyMaxTimeBetweenShots);
                 break;
             }
-            case Difficulty.Normal: {
-                this.numOfDirs = this._normalNumOfDirs; 
-                this.numOfChests = this._normalNumOfChests;
-                this.numOfObstacles = this._normalNumOfObstacles;
-                GridManager.instance.SetWidth(this._normalWidth);
-                GridManager.instance.SetHeight(this._normalHeight);
-                this.levelsPerDiff = this._normalLevels;
-                this.timeToMemorize = this._normalTimeToMemorize;
-                this.timeToComplete = this._normalTimeToComplete;
-                this.player.SetTimeToMove(this._normalPlayerTimeToMove);
-                this.traitor.SetTimeToMove(this._normalTraitorTimeToMove);
-                this.tWeaponManager.SetMinTimeBetweenShots(this._normalMinTimeBetweenShots);
-                this.tWeaponManager.SetMaxTimeBetweenShots(this._normalMaxTimeBetweenShots);
+            case Difficulty.Medium: {
+                this.numOfDirs = this._mediumNumOfDirs; 
+                this.numOfChests = this._mediumNumOfChests;
+                this.numOfObstacles = this._mediumNumOfObstacles;
+                GridManager.instance.SetWidth(this._mediumWidth);
+                GridManager.instance.SetHeight(this._mediumHeight);
+                this.levelsPerDiff = this._mediumLevels;
+                this.timeToMemorize = this._mediumTimeToMemorize;
+                this.timeToComplete = this._mediumTimeToComplete;
+                this.player.SetTimeToMove(this._mediumPlayerTimeToMove);
+                this.traitor.SetTimeToMove(this._mediumTraitorTimeToMove);
+                this.tWeaponManager.SetMinTimeBetweenShots(this._mediumMinTimeBetweenShots);
+                this.tWeaponManager.SetMaxTimeBetweenShots(this._mediumMaxTimeBetweenShots);
                 break;
             }
             case Difficulty.Hard: {
@@ -160,16 +164,20 @@ public class GameManager : MonoBehaviour {
         this.difficulty = diff;
         HandleDifficultySettings();
     }
-
-    public void SetTimeToComplete(float time) {
-        this.timeToComplete = time;
-    }
     
-    public void SetTimeToMemorize(float time) {
-        this.timeToMemorize = time;
+    public void SetTimeToComplete(float time) => this.timeToComplete = time;
+    public void SetTimeToMemorize(float time) => this.timeToMemorize = time;
+
+    public float GetTimeToComplete() {
+        return this.difficulty switch {
+            Difficulty.Easy => this._easyTimeToComplete,
+            Difficulty.Medium => this._mediumTimeToComplete,
+            Difficulty.Hard => this._hardTimeToComplete,
+            _ => 0f
+        };
     }
     
     public int GetTotalLevels() {
-        return this._easyLevels + this._normalLevels + this._hardLevels;
+        return this._easyLevels + this._mediumLevels + this._hardLevels;
     }
 }

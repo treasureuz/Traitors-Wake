@@ -12,7 +12,7 @@ public abstract class PlayerManager : MonoBehaviour {
     protected static readonly Vector2Int spawnPos = Vector2Int.zero;
     public static Vector3 SpawnPosV3() => new(spawnPos.x, spawnPos.y, 0);
 
-    protected bool isMoving;
+    public bool isMoving { get; protected set; }
     public bool hasEnded { get; set; }
 
     protected int _currentHealth;
@@ -39,7 +39,10 @@ public abstract class PlayerManager : MonoBehaviour {
         return this._moves.SequenceEqual(otherPlayer._moves);
     }
 
-    public abstract void ResetPlayerSettings();
+    public virtual void ResetPlayerSettings() {
+        this._currentHealth = this._maxHealth;
+        this._weaponManager.SetCurrentMagazineCount(this._weaponManager.GetMaxMagazineCount());
+    }
     
     public virtual void ResetLevelSettings() {
         this._moves.Clear();

@@ -9,9 +9,9 @@ public class PWeaponManager : WeaponManager {
     }
     
     protected override void HandleShoot() {
-        if (!GameManager.instance.traitor.hasEnded || LevelManager.isGameEnded || 
-            this._owner.hasEnded || !Mouse.current.leftButton.isPressed || !GridManager.instance.IsWithinGridArea() || 
-            !HasBullets() || Time.time < this._nextShootTime) return;
+        if (GameManager.isPaused || !GameManager.instance.traitor.hasEnded || LevelManager.isGameEnded || 
+            this._owner.hasEnded || !Mouse.current.leftButton.isPressed || !GridManager.instance.IsWithinGridArea() 
+            || !HasBullets() || Time.time < this._nextShootTime) return;
         Shoot();
         UIManager.instance.UpdateBulletBar(false);
         this._nextShootTime = Time.time + this._timeBetweenShots;

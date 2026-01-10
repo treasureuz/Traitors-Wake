@@ -2,14 +2,14 @@ using System.Collections;
 using UnityEngine;
 
 public class LevelManager : MonoBehaviour {
-    [SerializeField] private float _timeBeforeLevelStart = 1.35f;
+    [SerializeField] private float _timeBeforeLevelStart = 1f;
     
     public static LevelManager instance;
 
     private Coroutine _levelCoroutine;
     private int _currentLevel;
     private int _levelDiff;
-    public static bool isGameEnded { get; private set; }
+    public static bool isGameEnded;
 
     void Awake() {
         instance = this;
@@ -18,7 +18,9 @@ public class LevelManager : MonoBehaviour {
 
     public IEnumerator GenerateLevel() {
         if (isGameEnded) {
-            isGameEnded = false; this._currentLevel = 0; this._levelDiff = 0;
+            ScoreManager.instance.SetCurrentScore(0f); UIManager.instance.UpdateScoreText();
+            isGameEnded = false; GameManager.isPaused = false;
+            this._currentLevel = 0; this._levelDiff = 0;
             GameManager.instance.player.ResetPlayerSettings();
             GameManager.instance.traitor.ResetPlayerSettings();
             PowerUpManager.instance.ResetPowerUps(); // calls UIManager.DisablePowerUpSprites()
@@ -33,21 +35,19 @@ public class LevelManager : MonoBehaviour {
             this._levelDiff = 1; // Reset levelDiff per difficulty to 1
             PowerUpManager.instance.ResetPowerUps(); // Reset power up stats to 0 and disables hotbar sprites
             GameManager.instance.IncrementDifficulty();
-        }
-        else GameManager.instance.SetDifficulty(GameManager.instance.difficulty);
+        } else GameManager.instance.SetDifficulty(GameManager.instance.difficulty);
 
         // Disable UI elements and wait X amount of time before generating level
         UIManager.instance.SetActionButtons(false);
+        UIManager.instance.SetPauseButton(false);
+        UIManager.instance.SetOnPauseButtons(false); // Disable Resume, Restart, Home on start
+        UIManager.instance.SetEndScreenButtons(false);
         yield return new WaitForSeconds(this._timeBeforeLevelStart);
         
         // Reset all "Player" related settings before re-generating a level
         GameManager.instance.traitor.ResetLevelSettings();
-        GameManager.instance.traitor.SetLRPosCount(0); // Reset LineRenderer position count
         GameManager.instance.player.ResetLevelSettings();
         GridManager.instance.ClearAllTileTypes();
-        
-        GameManager.instance.traitor.SetLRPosCount(1); // Set LineRenderer position count to 1
-        GameManager.instance.traitor.SetLineRendererStatus(true); // Enable LineRenderer
         
         UIManager.instance.DisplayLevelText(this._currentLevel); // Display current level
         GridManager.instance.GenerateGrid(); // Generates grid based on difficulty
@@ -57,12 +57,17 @@ public class LevelManager : MonoBehaviour {
         GameManager.instance.traitor.gameObject.SetActive(true);
             
         // Set lineRenderer to the AI's spawn position
+        GameManager.instance.traitor.SetLRPosCount(1); // Set LineRenderer position count to 1
+        GameManager.instance.traitor.SetLineRendererStatus(true); // Enable LineRenderer
         GameManager.instance.traitor.SetLRPosition(0, PlayerManager.SpawnPosV3());
         
         // After move sequence, remove AI path trace, and enable player button actions
-        yield return StartCoroutine(GameManager.instance.traitor.MoveSequence());
-        yield return StartCoroutine(UIManager.instance.DisplayTimeToMemorize());
-
+        UIManager.instance.SetPauseButton(true);
+        GameManager.instance.traitor.StartMoveSequenceCoroutine();
+        yield return new WaitUntil(() => !GameManager.instance.traitor.isMoving);
+        UIManager.instance.StartTimeToMemorizeCoroutine();
+        yield return new WaitUntil(() => !UIManager.instance.isMemorizing);
+        
         // After timeToMemorize, wait an additional 0.5 seconds
         yield return new WaitForSeconds(0.5f); 
         
@@ -73,11 +78,12 @@ public class LevelManager : MonoBehaviour {
         }
         GameManager.instance.traitor.hasEnded = true; // Sets traitor.hasEnded to true after timeToMemorize is complete
             
-        yield return StartCoroutine(UIManager.instance.DisplayTimeToComplete());
+        UIManager.instance.StartTimeToCompleteCoroutine();
+        yield return new WaitUntil(() => !UIManager.instance.isCompleting);
         UIManager.instance.SetActionButtons(false); // Disable buttons so player position isn't overwritten
         
-        // After level completed, determine the next event
-        DetermineNextEvent();
+        // After level completed, disable UI elements and determine the next event
+        UIManager.instance.SetPauseButton(false); DetermineNextEvent();
     }
 
     private void DetermineNextEvent() {
@@ -86,13 +92,16 @@ public class LevelManager : MonoBehaviour {
             // Else, send the player to the next level
             if (this._currentLevel == GameManager.instance.GetTotalLevels()) {
                 Player.hasWon = true;
-                EndGame();
+                EndGame(); // -> Win Screen
             } else {
+                // Continue levels
+                UIManager.instance.UpdateScoreText();
                 UIManager.instance.DisplayLoadingText();
                 this._levelCoroutine = StartCoroutine(GenerateLevel());
             }
         } else {
             Player.hasWon = false;
+            isGameEnded = true;
             EndGame(); // -> Lose Screen
         }
     }
@@ -100,9 +109,21 @@ public class LevelManager : MonoBehaviour {
     public void EndGame() {
         if (this._levelCoroutine == null) return;
         StopAllCoroutines();
-        this._levelCoroutine = null;
-        isGameEnded = true;
         UIManager.instance.DisplayEndScreen();
     }
-    public void SetLevelCoroutine(Coroutine coroutine) => this._levelCoroutine = coroutine;
+
+    private new void StopAllCoroutines() {
+        GameManager.instance.traitor.StopMoveSequenceCoroutine();
+        UIManager.instance.StopTimeToMemorizeCoroutine();
+        UIManager.instance.StopTimeToCompleteCoroutine();
+        StopCoroutine(this._levelCoroutine); this._levelCoroutine = null;
+        isGameEnded = true;
+    }
+    
+    public void StartLevelCoroutine(Coroutine coroutine) {
+        if (this._levelCoroutine != null) StopCoroutine(this._levelCoroutine);
+        this._levelCoroutine = coroutine;
+    }
+
+    public void ResetLevelDifficulty() => this._levelDiff = 1;
 }
