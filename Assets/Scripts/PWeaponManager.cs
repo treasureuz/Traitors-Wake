@@ -9,7 +9,7 @@ public class PWeaponManager : WeaponManager {
     }
     
     protected override void HandleShoot() {
-        if (GameManager.isPaused || !GameManager.instance.traitor.hasEnded || LevelManager.isGameEnded || 
+        if (GameManager.isPaused || !GameManager.instance.traitor.hasEnded || LevelManager.hasResetRun || 
             this._owner.hasEnded || !Mouse.current.leftButton.isPressed || !GridManager.instance.IsWithinGridArea() 
             || !HasBullets() || Time.time < this._nextShootTime) return;
         Shoot();

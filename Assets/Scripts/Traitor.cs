@@ -104,7 +104,7 @@ public class Traitor : PlayerManager {
         this._moveSequenceCoroutine = StartCoroutine(MoveSequence());
     }
 
-    public void StopMoveSequenceCoroutine() {
+    public void TryStopMoveSequenceCoroutine() {
         if (this._moveSequenceCoroutine == null) return;
         StopCoroutine(this._moveSequenceCoroutine);
         this._moveSequenceCoroutine = null;

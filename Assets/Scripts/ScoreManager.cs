@@ -15,14 +15,14 @@ public class ScoreManager : MonoBehaviour {
         instance = this;
     }
 
-    public void UpdateScore() {
-        if (LevelManager.isGameEnded) return;
+    public void CalculateScores() {
+        if (LevelManager.hasResetRun) return; // Don't calculate on start of every level
         var currentTimeToComplete = GameManager.instance.timeToComplete;
         // LowTimeToComplete range = [0, CalculateLowTimeComplete)
         // MidTimeToComplete range = [CalculateLowTimeToComplete, CalculateHighTimeToComplete]
         // HighTimeToComplete range = (CalculateHighTimeToComplete, GetTimeToComplete]
         if (currentTimeToComplete >= 0f && currentTimeToComplete < CalculateLowTimeToComplete()) {
-            this._currentScore += lowTimePoints *  currentTimeToComplete;
+            this._currentScore += lowTimePoints * currentTimeToComplete;
         } else if (currentTimeToComplete >= CalculateLowTimeToComplete() &&
                    currentTimeToComplete <= CalculateHighTimeToComplete()) {
             this._currentScore += middleTimePoints * currentTimeToComplete;

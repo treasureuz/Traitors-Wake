@@ -88,8 +88,8 @@ public class UIManager : MonoBehaviour {
         EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
         // Disable action buttons
         SetActionButtons(false);
-        GameManager.instance.player.hasEnded = true;
-    }
+        GameManager.instance.player.OnPlayerEnded(); // Sets hasEnded to true and updates score
+     }
 
     public void OnUndo() {
         Debug.Log("Undo");
@@ -125,38 +125,35 @@ public class UIManager : MonoBehaviour {
     public void OnRestart() {
         Debug.Log("Restart");
         EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
+        DisplayLoadingText();
+        LevelManager.hasResetRun = true;
         if (GameManager.isPaused) {
-            LevelManager.isGameEnded = true;
             SetOnPauseButtons(false);
-            this._pauseRestartButton.gameObject.SetActive(false);
-        } else this._endRestartButton.gameObject.SetActive(false);
-        DisplayLoadingText(); OnRestartExit(); // change Restart text color back to original color;
-        GameManager.instance.traitor.StopMoveSequenceCoroutine();
-        StopTimeToMemorizeCoroutine();
-        StopTimeToCompleteCoroutine();
-        LevelManager.instance.StartLevelCoroutine(StartCoroutine(LevelManager.instance.GenerateLevel()));
-    }
-
-    public void OnRestartEnter() {
-        TextMeshProUGUI restartText = this._pauseRestartButton.GetComponentInChildren<TextMeshProUGUI>();
-        restartText.text = "<color=#FF0000>[Restart]</color>";
-    }
-
-    public void OnRestartExit() {
-        TextMeshProUGUI restartText = this._pauseRestartButton.GetComponentInChildren<TextMeshProUGUI>();
-        restartText.text = "<color=#FFB90D>[Restart]</color>";
+        } else SetEndScreenButtons(false);
+        LevelManager.instance.StartLevel(); // Start new level
     }
 
     public void OnHome() {
         SceneManager.LoadScene(homeSceneName);
+        LevelManager.hasResetRun = true;
         if (GameManager.isPaused) {
-            GameManager.isPaused = false; 
-            this._pauseHomeButton.gameObject.SetActive(false);
-        } else this._endHomeButton.gameObject.SetActive(false);
+            SetOnPauseButtons(false);
+        } else SetEndScreenButtons(false);
+        OnHomeExit(); // Reset home color to original color
+    }
+    
+    public void OnHomeEnter() {
+        TextMeshProUGUI homeText = this._pauseHomeButton.GetComponentInChildren<TextMeshProUGUI>();
+        homeText.text = "<color=#FF0000>[Exit]</color>";
     }
 
+    public void OnHomeExit() {
+        TextMeshProUGUI homeText = this._pauseHomeButton.GetComponentInChildren<TextMeshProUGUI>();
+        homeText.text = "<color=#FFB90D>[Exit]</color>";
+    }
+    
     public void UpdateScoreText() {
-        ScoreManager.instance.UpdateScore();
+        ScoreManager.instance.CalculateScores();
         var currentScore = ScoreManager.instance.GetCurrentScore();
         var highScore = ScoreManager.instance.GetHighScore();
         this._currentScoreText.text = $"{currentScoreText}: {currentScore:F2}\n" +
@@ -256,7 +253,7 @@ public class UIManager : MonoBehaviour {
         this._timeToMemorizeCoroutine = StartCoroutine(DisplayTimeToMemorize());
     }
 
-    public void StopTimeToMemorizeCoroutine() {
+    public void TryStopTimeToMemorizeCoroutine() {
         if (this._timeToMemorizeCoroutine == null) return;
         StopCoroutine(this._timeToMemorizeCoroutine);
         this._timeToMemorizeCoroutine = null;
@@ -276,10 +273,10 @@ public class UIManager : MonoBehaviour {
             yield return null;
         }
         this.isCompleting = false;
-        this._topText.text = $"{{Complete In: [{0f:F2}s]!}}";
-        // After timeToComplete is done, set player.isEnded to true and update score
+        // After timeToComplete is done, call OnPlayerEnded
         if (GameManager.instance.player.hasEnded) yield break;
-        GameManager.instance.player.hasEnded = true; UpdateScoreText();
+        this._topText.text = $"{{Complete In: [{0f:F2}s]!}}";
+        GameManager.instance.player.OnPlayerEnded(); // Sets hasEnded to true and updates score
     }
     
     public void StartTimeToCompleteCoroutine() {
@@ -287,7 +284,7 @@ public class UIManager : MonoBehaviour {
         this._timeToCompleteCoroutine = StartCoroutine(DisplayTimeToComplete());
     }
     
-    public void StopTimeToCompleteCoroutine() {
+    public void TryStopTimeToCompleteCoroutine() {
         if (this._timeToCompleteCoroutine == null) return;
         StopCoroutine(this._timeToCompleteCoroutine);
         this._timeToCompleteCoroutine = null;

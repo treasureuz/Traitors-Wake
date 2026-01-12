@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour {
     [SerializeField] private Player _playerPrefab;
@@ -75,7 +76,7 @@ public class GameManager : MonoBehaviour {
     public int numOfDirs {get; private set;}
     public int numOfChests { get; private set; }
     public int numOfObstacles { get; private set; }
-    public int levelsPerDiff { get; private set; }
+    private int _levelsPerDiff;
     public float timeToMemorize { get; private set; }
     public float timeToComplete { get; private set; }
 
@@ -90,7 +91,33 @@ public class GameManager : MonoBehaviour {
     public Difficulty difficulty { get; private set; } 
 
     void Awake() {
+        if (instance) {
+            Destroy(gameObject);
+            return;
+        }
         instance = this;
+        DontDestroyOnLoad(this.gameObject);
+    }
+
+    void OnEnable() {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    void OnDisable() {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+    
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode){
+        // If scene is GameScene, start run
+        if (scene.name == "GameScene") Begin();
+    }
+
+    private void Begin() {
+        SpawnPlayers();
+        LevelManager.instance.StartLevel();
+    }
+
+    private void SpawnPlayers() {
         this.player = Instantiate(this._playerPrefab, PlayerManager.SpawnPosV3(), Quaternion.identity);
         this.player.gameObject.SetActive(false);
         this.traitor = Instantiate(this._traitorPrefab, PlayerManager.SpawnPosV3(), Quaternion.identity);
@@ -98,9 +125,10 @@ public class GameManager : MonoBehaviour {
         this.pWeaponManager = this.player.GetComponentInChildren<PWeaponManager>();
         this.tWeaponManager = this.traitor.GetComponentInChildren<TWeaponManager>();
     }
-    
-    void Start() {
-        LevelManager.instance.StartLevelCoroutine(StartCoroutine(LevelManager.instance.GenerateLevel()));
+
+    public void EnablePlayers() {
+        this.player.gameObject.SetActive(true);
+        this.traitor.gameObject.SetActive(true);
     }
     
     private void HandleDifficultySettings() {
@@ -111,7 +139,7 @@ public class GameManager : MonoBehaviour {
                 this.numOfObstacles = this._easyNumOfObstacles;
                 GridManager.instance.SetWidth(this._easyWidth);
                 GridManager.instance.SetHeight(this._easyHeight);
-                this.levelsPerDiff = this._easyLevels;
+                this._levelsPerDiff = this._easyLevels;
                 this.timeToMemorize = this._easyTimeToMemorize;
                 this.timeToComplete = this._easyTimeToComplete;
                 this.player.SetTimeToMove(this._easyPlayerTimeToMove);
@@ -126,7 +154,7 @@ public class GameManager : MonoBehaviour {
                 this.numOfObstacles = this._mediumNumOfObstacles;
                 GridManager.instance.SetWidth(this._mediumWidth);
                 GridManager.instance.SetHeight(this._mediumHeight);
-                this.levelsPerDiff = this._mediumLevels;
+                this._levelsPerDiff = this._mediumLevels;
                 this.timeToMemorize = this._mediumTimeToMemorize;
                 this.timeToComplete = this._mediumTimeToComplete;
                 this.player.SetTimeToMove(this._mediumPlayerTimeToMove);
@@ -141,7 +169,7 @@ public class GameManager : MonoBehaviour {
                 this.numOfObstacles = this._hardNumOfObstacles;
                 GridManager.instance.SetWidth(this._hardWidth);
                 GridManager.instance.SetHeight(this._hardHeight);
-                this.levelsPerDiff = this._hardLevels;
+                this._levelsPerDiff = this._hardLevels;
                 this.timeToMemorize = this._hardTimeToMemorize;
                 this.timeToComplete = this._hardTimeToComplete;
                 this.player.SetTimeToMove(this._hardPlayerTimeToMove);
@@ -155,9 +183,12 @@ public class GameManager : MonoBehaviour {
         this._finishPos = new Vector2Int(GridManager.instance.Width - 1, GridManager.instance.Height - 1);
     }
     
-    public void IncrementDifficulty() {
-        if (this.difficulty == Difficulty.Hard) return;
-        SetDifficulty(++this.difficulty);
+    public void GetNextDifficulty() {
+        while (LevelManager.instance.GetLevelPerDiff() > this._levelsPerDiff) {
+            LevelManager.instance.ResetLevelPerDiff(); // Reset levelDiff per difficulty to 1
+            PowerUpManager.instance.ResetPowerUps(); // Reset power up stats to 0 and disables hotbar sprites
+            SetDifficulty(++this.difficulty);
+        } 
     }
     
     public void SetDifficulty(Difficulty diff) {

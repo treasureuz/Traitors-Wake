@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Player : PlayerManager {
     [SerializeField] private List<Vector2Int> _directions;
@@ -10,7 +11,7 @@ public class Player : PlayerManager {
     
     private InputManager _inputManager;
     public float TimeToMove => this._timeToMove;
-
+        
     protected override void Awake() {
         base.Awake();
         this._directions = new List<Vector2Int>();
@@ -18,7 +19,7 @@ public class Player : PlayerManager {
     }
     
     void Update() {
-        if (GameManager.isPaused || !GameManager.instance.traitor.hasEnded || this.hasEnded || LevelManager.isGameEnded) return;
+        if (GameManager.isPaused || !GameManager.instance.traitor.hasEnded || this.hasEnded) return;
         if (this._inputManager.UpIsPressed()) StartCoroutine(HandleMovement(Vector2Int.up, this._timeToMove));
         else if (this._inputManager.DownIsPressed()) StartCoroutine(HandleMovement(Vector2Int.down, this._timeToMove));
         else if (this._inputManager.LeftIsPressed()) StartCoroutine(HandleMovement(Vector2Int.left, this._timeToMove));
@@ -109,9 +110,17 @@ public class Player : PlayerManager {
         base.OnDamaged(damageAmount);
         UIManager.instance.UpdatePlayerHealthText();
         if (this._currentHealth != 0) return;
-        // If player is dead
+        // If player is dead (Could use UnityEvent for this)
         hasWon = false; this.gameObject.SetActive(false);
         LevelManager.instance.EndGame();
+    }
+
+    public void OnPlayerEnded() {
+        this.hasEnded = true;
+        UIManager.instance.SetActionButtons(false); // Disable buttons so player position isn't overwritten
+        // After level completed, disable UI elements and determine the next event
+        UIManager.instance.SetPauseButton(false); 
+        LevelManager.instance.DetermineNextEvent();
     }
     
     public void HealPlayer(int healAmount) {

@@ -18,14 +18,14 @@ public class HomeUIManager : MonoBehaviour {
     [SerializeField] private float _typewriterDelay = 0.55f;
     
     private const string titleText = "TRAITOR'S WAKE";
-    private const string controlsText = "W(up), A(left), S(down), D(right) — (Arrow Keys)";
+    private const string controlsText = "W, A, S, D (*Arrow keys apply*)";
     private const string gameSceneName = "GameScene";
     
     void Start() {
         this._titleText.text = "";
         StartCoroutine(StartTitleAnimation());
         this._homePanels = new List<GameObject> { this._storyUI, this._powerUpsUI };
-        this._controlsText.text = "<u>Movement Controls</u>: " + controlsText; // Set controls text
+        this._controlsText.text = "<u>Controls</u>: " + controlsText; // Set controls text
     }
     
     private IEnumerator StartTitleAnimation() {
