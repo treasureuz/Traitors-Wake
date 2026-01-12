@@ -111,7 +111,8 @@ public class Player : PlayerManager {
         UIManager.instance.UpdatePlayerHealthText();
         if (this._currentHealth != 0) return;
         // If player is dead (Could use UnityEvent for this)
-        hasWon = false; this.gameObject.SetActive(false);
+        this.hasEnded = true; hasWon = false; 
+        this.gameObject.SetActive(false);
         LevelManager.instance.EndGame();
     }
 

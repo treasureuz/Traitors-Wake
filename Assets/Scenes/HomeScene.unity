@@ -299,7 +299,7 @@ GameObject:
   - component: {fileID: 376605908}
   - component: {fileID: 376605907}
   - component: {fileID: 376605906}
-  - component: {fileID: 376605909}
+  - component: {fileID: 376605910}
   m_Layer: 5
   m_Name: PowerUpsButton
   m_TagString: Untagged
@@ -421,7 +421,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 376605904}
   m_CullTransparentMesh: 1
---- !u!114 &376605909
+--- !u!114 &376605910
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -430,42 +430,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 376605904}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Script: {fileID: 11500000, guid: b6260925ac8fd2248a0afc305d0e0cd8, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.EventSystems.EventTrigger
-  m_Delegates:
-  - eventID: 0
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 2092360167}
-          m_TargetAssemblyTypeName: HomeUIManager, Assembly-CSharp
-          m_MethodName: OnPowerUpEnter
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-  - eventID: 1
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 2092360167}
-          m_TargetAssemblyTypeName: HomeUIManager, Assembly-CSharp
-          m_MethodName: OnPowerUpExit
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
+  m_EditorClassIdentifier: Assembly-CSharp::HomeButtonsBehavior
 --- !u!1 &378397885
 GameObject:
   m_ObjectHideFlags: 0
@@ -1658,7 +1625,7 @@ GameObject:
   - component: {fileID: 1478707221}
   - component: {fileID: 1478707220}
   - component: {fileID: 1478707219}
-  - component: {fileID: 1478707222}
+  - component: {fileID: 1478707223}
   m_Layer: 5
   m_Name: PlayButton
   m_TagString: Untagged
@@ -1780,7 +1747,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1478707217}
   m_CullTransparentMesh: 1
---- !u!114 &1478707222
+--- !u!114 &1478707223
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1789,42 +1756,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1478707217}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Script: {fileID: 11500000, guid: b6260925ac8fd2248a0afc305d0e0cd8, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.EventSystems.EventTrigger
-  m_Delegates:
-  - eventID: 0
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 2092360167}
-          m_TargetAssemblyTypeName: HomeUIManager, Assembly-CSharp
-          m_MethodName: OnPlayEnter
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-  - eventID: 1
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 2092360167}
-          m_TargetAssemblyTypeName: HomeUIManager, Assembly-CSharp
-          m_MethodName: OnPlayExit
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
+  m_EditorClassIdentifier: Assembly-CSharp::HomeButtonsBehavior
 --- !u!1 &1521097501
 GameObject:
   m_ObjectHideFlags: 0
@@ -2107,7 +2041,7 @@ GameObject:
   - component: {fileID: 1794724318}
   - component: {fileID: 1794724317}
   - component: {fileID: 1794724316}
-  - component: {fileID: 1794724319}
+  - component: {fileID: 1794724320}
   m_Layer: 5
   m_Name: StoryButton
   m_TagString: Untagged
@@ -2229,7 +2163,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1794724314}
   m_CullTransparentMesh: 1
---- !u!114 &1794724319
+--- !u!114 &1794724320
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2238,42 +2172,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1794724314}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Script: {fileID: 11500000, guid: b6260925ac8fd2248a0afc305d0e0cd8, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.EventSystems.EventTrigger
-  m_Delegates:
-  - eventID: 0
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 2092360167}
-          m_TargetAssemblyTypeName: HomeUIManager, Assembly-CSharp
-          m_MethodName: OnStoryEnter
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-  - eventID: 1
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 2092360167}
-          m_TargetAssemblyTypeName: HomeUIManager, Assembly-CSharp
-          m_MethodName: OnStoryExit
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
+  m_EditorClassIdentifier: Assembly-CSharp::HomeButtonsBehavior
 --- !u!1 &1858840957
 GameObject:
   m_ObjectHideFlags: 0
@@ -2887,7 +2788,6 @@ MonoBehaviour:
   _powerUpsButton: {fileID: 376605906}
   _storyUIPrefab: {fileID: 8685966483286543339, guid: 875421102c44b174198e8189fcf52801, type: 3}
   _powerUpsUIPrefab: {fileID: 8400080725133008991, guid: e798d5b31f5e5c8418f53944f41c9817, type: 3}
-  _panelsPosition: {x: -550, y: 0, z: 0}
   _titleText: {fileID: 330486850}
   _controlsText: {fileID: 1014319676}
   _typewriterDelay: 0.178

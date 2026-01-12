@@ -9,11 +9,13 @@ public class GridManager : MonoBehaviour {
     [SerializeField] private Transform _cam;
     [SerializeField] private SpriteRenderer _gridBorder;
     [SerializeField] private Tile _tilePrefab;
+    [SerializeField] private GameObject _tilesParent;
     [SerializeField] private Sprite _openedChestSprite;
     [SerializeField] private LayerMask _gridAreaMask;
     [SerializeField] private int _width, _height;
     
     public static GridManager instance;
+    public SpriteRenderer[] tilesParentChildren { get; private set; }
     
     public int Width => this._width;
     public int Height => this._height;
@@ -27,6 +29,7 @@ public class GridManager : MonoBehaviour {
     void Awake() {
         instance = this;
         this._gridBorder.enabled = false;
+        this.tilesParentChildren = this._tilesParent.GetComponentsInChildren<SpriteRenderer>();
         // Deactivate obstacle and chest tile sprites
         this._tilePrefab.transform.Find("Obstacle").gameObject.SetActive(false);
         this._tilePrefab.transform.Find("Chest").gameObject.SetActive(false);
@@ -34,23 +37,23 @@ public class GridManager : MonoBehaviour {
     
     public void GenerateGrid() {
         ClearGrid();
-        for (var x = 0; x < this._width; x++) {
-            for (var y = 0; y < this._height; y++) {
-                this._spawnedTile = Instantiate(this._tilePrefab, new Vector3(x, y), Quaternion.identity);
-                this._spawnedTile.AddToTileTypes(Tile.TileType.Regular); // this calls HandleTileType()
-                this._tiles.Add(new Vector2Int(x, y), this._spawnedTile);
-            }
-        }
-        this._gridBorder.enabled = true;
-        MakeChestTiles(GameManager.instance.numOfChests); // Make X amount of chest tiles
-        
         // Position the every relevant GameObject at the center of the grid (based on the width and height)
         var centerWidth = (float) this._width / 2 - 0.5f;
         var centerHeight = (float) this._height / 2 - 0.5f;
         this._cam.position = new Vector3(centerWidth, centerHeight, -10); 
+        this._gridBorder.enabled = true;
         this.transform.localScale = new Vector3(this._width + 0.09f, this._height + 0.09f, 1); // creates a border
         this.transform.position = new Vector3(centerWidth, centerHeight);
         this._background.position = this.transform.position;
+        
+        for (var x = 0; x < this._width; x++) {
+            for (var y = 0; y < this._height; y++) {
+                this._spawnedTile = Instantiate(this._tilePrefab, new Vector3(x, y), Quaternion.identity, this._tilesParent.transform);
+                this._spawnedTile.AddToTileTypes(Tile.TileType.Regular); // this calls HandleTileType()
+                this._tiles.Add(new Vector2Int(x, y), this._spawnedTile);
+            }
+        }
+        MakeChestTiles(GameManager.instance.numOfChests); // Make X amount of chest tiles
     }
 
     public bool IsWithinGridArea() {

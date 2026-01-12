@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
 using TMPro;
 using UnityEngine;
@@ -49,8 +50,10 @@ public class UIManager : MonoBehaviour {
     [SerializeField] private List<Image> _bulletBars;
     [SerializeField] private Image _playerHealthBar;
     [SerializeField] private Image _traitorHealthBar;
-    
-    [Header("Other Settings")]
+
+    [Header("Others")] 
+    [SerializeField] private CanvasGroup _canvasGroup;
+    [SerializeField] private GameObject _mapBorder;
     [SerializeField] private float _playerHealthBarSpeed = 3f;
     
     public static UIManager instance;
@@ -61,7 +64,8 @@ public class UIManager : MonoBehaviour {
     
     public bool isMemorizing { get; private set; }
     public bool isCompleting { get; private set; }
-    
+
+    private SpriteRenderer[] _mapBorderChildren;
     private const string homeSceneName = "HomeScene";
     private const string loadingLevel = "{Loading Level...}";
     private const string currentScoreText = "Current Score";
@@ -72,6 +76,11 @@ public class UIManager : MonoBehaviour {
     void Awake() {
         instance = this;
         this._topTextBG = this._topText.GetComponentInParent<Image>().rectTransform;
+        this._mapBorderChildren = this._mapBorder.GetComponentsInChildren<SpriteRenderer>();
+    }
+
+    void Start() {
+        ResetCanvasUIAlpha();
     }
     
     void Update() {
@@ -103,7 +112,7 @@ public class UIManager : MonoBehaviour {
     }
 
     public void OnPause() {
-        GameManager.isPaused = true;
+        GameManager.isPaused = true; DimCanvasUI();
         this._pauseButton.interactable = false;
         SetActionButtons(false); // Disable action buttons
         SetOnPauseButtons(true); // Activate Resume, Restart, Home
@@ -116,7 +125,7 @@ public class UIManager : MonoBehaviour {
     private IEnumerator OnResumeCoroutine() {
         SetOnPauseButtons(false); // Disable Resume, Restart, Home
         yield return new WaitForSeconds(0.5f); // Wait before resuming game
-        GameManager.isPaused = false;
+        GameManager.isPaused = false; ResetCanvasUIAlpha();
         SetPauseButton(true); // Reenable the pause button
         if (this.isCompleting) SetActionButtons(true); // Reactivate action buttons
     }
@@ -124,8 +133,9 @@ public class UIManager : MonoBehaviour {
     public void OnRestart() {
         Debug.Log("Restart");
         EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
-        DisplayLoadingText();
         LevelManager.hasResetRun = true;
+        DisplayLoadingText(); 
+        ResetCanvasUIAlpha();
         if (GameManager.isPaused) {
             SetOnPauseButtons(false);
         } else SetEndScreenButtons(false);
@@ -135,6 +145,7 @@ public class UIManager : MonoBehaviour {
     public void OnHome() {
         SceneManager.LoadScene(homeSceneName);
         LevelManager.hasResetRun = true;
+        ResetCanvasUIAlpha();
         if (GameManager.isPaused) {
             SetOnPauseButtons(false);
         } else SetEndScreenButtons(false);
@@ -149,6 +160,25 @@ public class UIManager : MonoBehaviour {
     public void OnHomeExit() {
         TextMeshProUGUI homeText = this._pauseHomeButton.GetComponentInChildren<TextMeshProUGUI>();
         homeText.text = "<color=#FFB90D>[Exit]</color>";
+    }
+
+    private void DimCanvasUI() {
+        this._canvasGroup.alpha = 0.65f;
+        ChangeBGObjectsAlpha();
+    }
+
+    private void ResetCanvasUIAlpha() {
+        this._canvasGroup.alpha = 1f;
+        ChangeBGObjectsAlpha();
+    }
+
+    private void ChangeBGObjectsAlpha() {
+        foreach (SpriteRenderer s in this._mapBorderChildren) {
+            s.color = new Color(s.color.r, s.color.g, s.color.b, this._canvasGroup.alpha);
+        }
+        foreach (SpriteRenderer s in GridManager.instance.tilesParentChildren) {
+            s.color = new Color(s.color.r, s.color.g, s.color.b, this._canvasGroup.alpha);
+        }
     }
     
     public void UpdateScoreText() {
@@ -212,8 +242,9 @@ public class UIManager : MonoBehaviour {
     }
 
     public void DisplayEndScreen() {
-        this._topText.text = Player.hasWon ? winText : loseText;
         this._topTextBG.sizeDelta = new Vector2(this._endTextBGWidth, this._topTextBG.sizeDelta.y);
+        this._topText.text = Player.hasWon ? winText : loseText;
+        DimCanvasUI();
         SetEndScreenButtons(true);
         SetActionButtons(false);
     }
@@ -297,15 +328,9 @@ public class UIManager : MonoBehaviour {
     }
 
     public void SetPauseButton(bool enable) => this._pauseButton.interactable = enable;
-    public void SetOnPauseButtons(bool enable) {
-        this._resumeButton.gameObject.SetActive(enable);
-        this._pauseRestartButton.gameObject.SetActive(enable);
-        this._pauseHomeButton.gameObject.SetActive(enable);
-    }
-    public void SetEndScreenButtons(bool enable) {
-        this._endRestartButton.gameObject.SetActive(enable);
-        this._endHomeButton.gameObject.SetActive(enable);
-    }
+    public void SetOnPauseButtons(bool enable) => this._resumeButton.transform.parent.gameObject.SetActive(enable);
+    public void SetEndScreenButtons(bool enable) => this._endRestartButton.transform.parent.gameObject.SetActive(enable);
+    
     
     public void DisableAllPowerUpSprites() {
         this._rockSprite.SetActive(false); 

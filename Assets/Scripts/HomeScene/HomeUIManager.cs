@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using TMPro;
 using UnityEngine;
@@ -17,12 +18,11 @@ public class HomeUIManager : MonoBehaviour {
     [SerializeField] private TextMeshProUGUI _titleText;
     [SerializeField] private TextMeshProUGUI _controlsText;
     [SerializeField] private float _typewriterDelay = 0.55f;
-    //private List<GameObject> _homePanels;
     private Canvas _canvas;
 
     private GameObject _activePanelPrefab;
     private GameObject _spawnedPanelUI;
-    private static HomeUIManager instance;
+    public static HomeUIManager instance;
     
     private const string titleText = "TRAITOR'S WAKE";
     private const string controlsText = "W, A, S, D (*Arrow keys apply*)";
@@ -59,6 +59,8 @@ public class HomeUIManager : MonoBehaviour {
     
     private void Begin() {
         this._canvas = FindAnyObjectByType<Canvas>();
+        this._controlsText = this._canvas.transform.Find("ControlsText (TMP)").GetComponent<TextMeshProUGUI>();
+        this._titleText = this._canvas.transform.Find("TitleCardBorder/TitleCard/TitleText (TMP)").GetComponent<TextMeshProUGUI>();
         DestroyAllPanelsExcept(this._activePanelPrefab); // Spawn panel
         // Finds all button objects and puts them in an array (unsorted)
         // FirstOrDefault = Get first object with the name or default to null if name doesn't exist
@@ -97,10 +99,10 @@ public class HomeUIManager : MonoBehaviour {
         // Instantiate the one we want
         this._spawnedPanelUI = Instantiate(prefabToInstantiate, _canvas.transform, false);
         this._activePanelPrefab = prefabToInstantiate;
-        AddOnClickListeners();
+        AddPanelOnClickListeners();
     }
 
-    private void AddOnClickListeners() {
+    private void AddPanelOnClickListeners() {
         if (this._activePanelPrefab == this._storyUIPrefab) {
             Button rightButton = this._spawnedPanelUI.transform.Find("StoryBG/StoryTextBG/RightButton").GetComponent<Button>();
             rightButton.onClick.AddListener(OnPowerUps);
@@ -111,12 +113,4 @@ public class HomeUIManager : MonoBehaviour {
             rightButton.onClick.AddListener(OnPowerUps);
         }
     }
-    
-    public void OnPlayEnter() => this._playButton.transform.parent.Rotate(0, 0, 1); // Rotation back to 0
-    public void OnPlayExit() => this._playButton.transform.parent.Rotate(0, 0, -1); // Rotation to -1
-    public void OnStoryEnter() => this._storyButton.transform.parent.Rotate(0, 0, 1); // Rotation back to 0
-    public void OnStoryExit() => this._storyButton.transform.parent.Rotate(0, 0, -1); // Rotation to -1
-    public void OnPowerUpEnter() => this._powerUpsButton.transform.parent.Rotate(0, 0, 1); // Rotation back to 0
-    public void OnPowerUpExit() => this._powerUpsButton.transform.parent.Rotate(0, 0, -1); // Rotation to -1
-    
 }
