@@ -30,7 +30,6 @@ public class UIManager : MonoBehaviour {
     [SerializeField] private TextMeshProUGUI _hotbarFeedText;
     [SerializeField] private TextMeshProUGUI _bulletsText;
     [SerializeField] private TextMeshProUGUI _currentScoreText;
-    //[SerializeField] private TextMeshProUGUI _highScoreText;
     
     [Header("Top Text Settings")]
     [SerializeField] private float _baseLevelTextBGWidth = 480f;
