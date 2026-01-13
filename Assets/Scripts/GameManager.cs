@@ -7,12 +7,6 @@ public class GameManager : MonoBehaviour {
     [SerializeField] private Traitor _traitorPrefab;
 
     [SerializeField] private Vector2Int _finishPos;
-    [SerializeField] private Difficulty _startDifficulty = Difficulty.Easy;
-    
-    [Header("Levels Per Difficulty")] 
-    [SerializeField] private int _easyLevels = 4;
-    [SerializeField] private int _mediumLevels = 3;
-    [SerializeField] private int _hardLevels = 2;
     
     [Header("Number of Up/Right Directions")]
     [SerializeField] private int _easyNumOfDirs = 5;
@@ -64,8 +58,6 @@ public class GameManager : MonoBehaviour {
     [SerializeField] private float _hardMaxTimeBetweenShots = 6f;
     
     public Vector2Int FinishPos => this._finishPos;
-    public Difficulty StartDifficulty => this._startDifficulty;
-    
     public static GameManager instance;
         
     public Player player { get; private set; }
@@ -76,7 +68,7 @@ public class GameManager : MonoBehaviour {
     public int numOfDirs {get; private set;}
     public int numOfChests { get; private set; }
     public int numOfObstacles { get; private set; }
-    private int _levelsPerDiff;
+    //private int _maxLevelsPerDiff;
     public float timeToMemorize { get; private set; }
     public float timeToComplete { get; private set; }
 
@@ -114,7 +106,8 @@ public class GameManager : MonoBehaviour {
 
     private void Begin() {
         SpawnPlayers();
-        LevelManager.instance.StartLevel();
+        HandleDifficultySettings();
+        LevelManager.instance.TryStartLevel();
     }
 
     private void SpawnPlayers() {
@@ -139,7 +132,6 @@ public class GameManager : MonoBehaviour {
                 this.numOfObstacles = this._easyNumOfObstacles;
                 GridManager.instance.SetWidth(this._easyWidth);
                 GridManager.instance.SetHeight(this._easyHeight);
-                this._levelsPerDiff = this._easyLevels;
                 this.timeToMemorize = this._easyTimeToMemorize;
                 this.timeToComplete = this._easyTimeToComplete;
                 this.player.SetTimeToMove(this._easyPlayerTimeToMove);
@@ -154,7 +146,6 @@ public class GameManager : MonoBehaviour {
                 this.numOfObstacles = this._mediumNumOfObstacles;
                 GridManager.instance.SetWidth(this._mediumWidth);
                 GridManager.instance.SetHeight(this._mediumHeight);
-                this._levelsPerDiff = this._mediumLevels;
                 this.timeToMemorize = this._mediumTimeToMemorize;
                 this.timeToComplete = this._mediumTimeToComplete;
                 this.player.SetTimeToMove(this._mediumPlayerTimeToMove);
@@ -169,7 +160,6 @@ public class GameManager : MonoBehaviour {
                 this.numOfObstacles = this._hardNumOfObstacles;
                 GridManager.instance.SetWidth(this._hardWidth);
                 GridManager.instance.SetHeight(this._hardHeight);
-                this._levelsPerDiff = this._hardLevels;
                 this.timeToMemorize = this._hardTimeToMemorize;
                 this.timeToComplete = this._hardTimeToComplete;
                 this.player.SetTimeToMove(this._hardPlayerTimeToMove);
@@ -183,32 +173,26 @@ public class GameManager : MonoBehaviour {
         this._finishPos = new Vector2Int(GridManager.instance.Width - 1, GridManager.instance.Height - 1);
     }
     
-    public void GetNextDifficulty() {
-        while (LevelManager.instance.GetLevelPerDiff() > this._levelsPerDiff) {
-            LevelManager.instance.ResetLevelPerDiff(); // Reset levelDiff per difficulty to 1
-            PowerUpManager.instance.ResetPowerUps(); // Reset power up stats to 0 and disables hotbar sprites
-            SetDifficulty(++this.difficulty);
-        } 
-    }
-    
-    public void SetDifficulty(Difficulty diff) {
-        this.difficulty = diff;
-        HandleDifficultySettings();
-    }
+    public void SetDifficulty(Difficulty diff) => this.difficulty = diff;
     
     public void SetTimeToComplete(float time) => this.timeToComplete = time;
     public void SetTimeToMemorize(float time) => this.timeToMemorize = time;
 
-    public float GetTimeToComplete() {
+    public float GetTimeToMemorizeByDiff() {
+        return this.difficulty switch {
+            Difficulty.Easy => this._easyTimeToMemorize,
+            Difficulty.Medium => this._mediumTimeToMemorize,
+            Difficulty.Hard => this._hardTimeToMemorize,
+            _ => 0f
+        };
+    }
+    
+    public float GetTimeToCompleteByDiff() {
         return this.difficulty switch {
             Difficulty.Easy => this._easyTimeToComplete,
             Difficulty.Medium => this._mediumTimeToComplete,
             Difficulty.Hard => this._hardTimeToComplete,
             _ => 0f
         };
-    }
-    
-    public int GetTotalLevels() {
-        return this._easyLevels + this._mediumLevels + this._hardLevels;
     }
 }

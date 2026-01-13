@@ -66,7 +66,6 @@ public class UIManager : MonoBehaviour {
     public bool isCompleting { get; private set; }
 
     private SpriteRenderer[] _mapBorderChildren;
-    private const string homeSceneName = "HomeScene";
     private const string loadingLevel = "{Loading Level...}";
     private const string currentScoreText = "Current Score";
     private const string highScoreText = "High Score";
@@ -133,17 +132,16 @@ public class UIManager : MonoBehaviour {
     public void OnRestart() {
         Debug.Log("Restart");
         EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
-        LevelManager.hasResetRun = true;
         DisplayLoadingText(); 
         ResetCanvasUIAlpha();
         if (GameManager.isPaused) {
             SetOnPauseButtons(false);
         } else SetEndScreenButtons(false);
-        LevelManager.instance.StartLevel(); // Start new level
+        LevelManager.instance.TryStartLevel(); // Start new level
     }
 
     public void OnHome() {
-        SceneManager.LoadScene(homeSceneName);
+        SceneManager.LoadScene("HomeScene");
         LevelManager.hasResetRun = true;
         ResetCanvasUIAlpha();
         if (GameManager.isPaused) {
@@ -252,6 +250,7 @@ public class UIManager : MonoBehaviour {
     public void DisplayLoadingText() {
         this._topTextBG.sizeDelta = new Vector2(this._mediumLevelTextBGWidth, this._topTextBG.sizeDelta.y);
         this._topText.text = loadingLevel;
+        UpdateScoreText();
     }
     
     public void DisplayLevelText(float level) {
@@ -276,6 +275,7 @@ public class UIManager : MonoBehaviour {
         }
         this.isMemorizing = false;
         this._topText.text = $"{{Memorize The Path: [{0f:F2}s]}}";
+        GameManager.instance.SetTimeToMemorize(GameManager.instance.GetTimeToMemorizeByDiff()); // Resets timeToMemorize
     }
 
     public void StartTimeToMemorizeCoroutine() {
@@ -306,6 +306,7 @@ public class UIManager : MonoBehaviour {
         // After timeToComplete is done, call OnPlayerEnded
         if (GameManager.instance.player.hasEnded) yield break;
         this._topText.text = $"{{Complete In: [{0f:F2}s]!}}";
+        GameManager.instance.SetTimeToComplete(GameManager.instance.GetTimeToCompleteByDiff()); // Resets timeToComplete
         GameManager.instance.player.OnPlayerEnded(); // Sets hasEnded to true and updates score
     }
     

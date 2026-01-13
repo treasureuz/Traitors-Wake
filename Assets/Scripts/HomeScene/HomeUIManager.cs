@@ -9,12 +9,8 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class HomeUIManager : MonoBehaviour {
-    [SerializeField] private Button _playButton;
-    [SerializeField] private Button _storyButton;
-    [SerializeField] private Button _powerUpsButton;
     [SerializeField] private GameObject _storyUIPrefab;
     [SerializeField] private GameObject _powerUpsUIPrefab;
-    //[SerializeField] private Vector3 _panelsPosition = new(-550, 0, 0);
     [SerializeField] private TextMeshProUGUI _titleText;
     [SerializeField] private TextMeshProUGUI _controlsText;
     [SerializeField] private float _typewriterDelay = 0.55f;
@@ -22,11 +18,11 @@ public class HomeUIManager : MonoBehaviour {
 
     private GameObject _activePanelPrefab;
     private GameObject _spawnedPanelUI;
+    private HomeButtonsBehavior[] _homeButtons;
     public static HomeUIManager instance;
     
     private const string titleText = "TRAITOR'S WAKE";
     private const string controlsText = "W, A, S, D (*Arrow keys apply*)";
-    private const string gameSceneName = "GameScene";
 
     void Awake() {
         if (instance) {
@@ -39,9 +35,21 @@ public class HomeUIManager : MonoBehaviour {
     }
     
     void Start() {
+        this._homeButtons = this._canvas.GetComponentsInChildren<HomeButtonsBehavior>();
+        SetHomeButtons(false); // Deactivate homeButtons on start
         this._titleText.text = "";
         StartCoroutine(StartTitleAnimation());
         this._controlsText.text = "<u>Controls</u>: " + controlsText; // Set controls text
+    }
+    
+    private IEnumerator StartTitleAnimation() {
+        var index = 0;
+        while (index < titleText.Length) {
+            yield return new WaitForSeconds(this._typewriterDelay);
+            this._titleText.text += titleText[index++];
+        }
+        this._titleText.text = titleText;
+        SetHomeButtons(true); // Reactivate buttons after title animation is done
     }
     
     void OnEnable() {
@@ -58,29 +66,15 @@ public class HomeUIManager : MonoBehaviour {
     }
     
     private void Begin() {
-        this._canvas = FindAnyObjectByType<Canvas>();
+        this._canvas = FindFirstObjectByType<Canvas>();
         this._controlsText = this._canvas.transform.Find("ControlsText (TMP)").GetComponent<TextMeshProUGUI>();
         this._titleText = this._canvas.transform.Find("TitleCardBorder/TitleCard/TitleText (TMP)").GetComponent<TextMeshProUGUI>();
         DestroyAllPanelsExcept(this._activePanelPrefab); // Spawn panel
-        // Finds all button objects and puts them in an array (unsorted)
-        // FirstOrDefault = Get first object with the name or default to null if name doesn't exist
-        this._playButton = FindObjectsByType<Button>(FindObjectsSortMode.None).FirstOrDefault(button => button.name == "PlayButton");
-        this._storyButton = FindObjectsByType<Button>(FindObjectsSortMode.None).FirstOrDefault(button => button.name == "StoryButton");
-        this._powerUpsButton = FindObjectsByType<Button>(FindObjectsSortMode.None).FirstOrDefault(button => button.name == "PowerUpsButton");
-    }
-    
-    private IEnumerator StartTitleAnimation() {
-        var index = 0;
-        while (index < titleText.Length) {
-            yield return new WaitForSeconds(this._typewriterDelay);
-            this._titleText.text += titleText[index++];
-        }
-        this._titleText.text = titleText;
     }
 
     public void OnPlay() {
         EventSystem.current.SetSelectedGameObject(null); // Removes "selectedButtonColor"
-        SceneManager.LoadScene(gameSceneName);
+        SceneManager.LoadScene("DifficultySelectScene");
     }
 
     public void OnStory() {
@@ -94,15 +88,14 @@ public class HomeUIManager : MonoBehaviour {
     }
 
     private void DestroyAllPanelsExcept(GameObject prefabToInstantiate) {
-        // Destroy previous panel if it exists
-        if (_spawnedPanelUI) Destroy(this._spawnedPanelUI);
-        // Instantiate the one we want
+        if (_spawnedPanelUI) Destroy(this._spawnedPanelUI); // Destroy previous panel if it exists
+        // Instantiate the panel (prefabToInstantiate)
         this._spawnedPanelUI = Instantiate(prefabToInstantiate, _canvas.transform, false);
         this._activePanelPrefab = prefabToInstantiate;
-        AddPanelOnClickListeners();
+        AddPanelsOnClickListeners();
     }
 
-    private void AddPanelOnClickListeners() {
+    private void AddPanelsOnClickListeners() {
         if (this._activePanelPrefab == this._storyUIPrefab) {
             Button rightButton = this._spawnedPanelUI.transform.Find("StoryBG/StoryTextBG/RightButton").GetComponent<Button>();
             rightButton.onClick.AddListener(OnPowerUps);
@@ -111,6 +104,13 @@ public class HomeUIManager : MonoBehaviour {
             Button rightButton = this._spawnedPanelUI.transform.Find("PowerUpBG/PowerUpTextBG/RightButton").GetComponent<Button>();
             leftButton.onClick.AddListener(OnStory);
             rightButton.onClick.AddListener(OnPowerUps);
+        }
+    }
+
+    // ReSharper disable Unity.PerformanceAnalysis
+    private void SetHomeButtons(bool enable) {
+        foreach (HomeButtonsBehavior button in this._homeButtons) {
+            button.GetComponent<Button>().interactable = enable;
         }
     }
 }

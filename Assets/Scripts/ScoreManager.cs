@@ -28,16 +28,16 @@ public class ScoreManager : MonoBehaviour {
             this._currentScore += middleTimePoints * currentTimeToComplete;
         } else {
             if (currentTimeToComplete > CalculateHighTimeToComplete() &&
-                currentTimeToComplete <= GameManager.instance.GetTimeToComplete()) {
+                currentTimeToComplete <= GameManager.instance.GetTimeToCompleteByDiff()) {
                 this._currentScore += highTimePoints * currentTimeToComplete;
             }
         }
         if (this._currentScore > this._highScore) this._highScore = this._currentScore;
     }
 
-    private static float CalculateLowTimeToComplete() => GameManager.instance.GetTimeToComplete() / 4;
+    private static float CalculateLowTimeToComplete() => GameManager.instance.GetTimeToCompleteByDiff() / 4;
     private static float CalculateHighTimeToComplete() {
-        return (GameManager.instance.GetTimeToComplete() + GameManager.instance.GetTimeToComplete() / 2) / 2;
+        return (GameManager.instance.GetTimeToCompleteByDiff() + GameManager.instance.GetTimeToCompleteByDiff() / 2) / 2;
     }
     
     public void SetCurrentScore(float score) => this._currentScore = score;

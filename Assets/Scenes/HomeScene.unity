@@ -350,9 +350,9 @@ MonoBehaviour:
   m_Colors:
     m_NormalColor: {r: 0.94117653, g: 0.68235296, b: 0.04705883, a: 1}
     m_HighlightedColor: {r: 1, g: 0.7411765, b: 0.10980392, a: 1}
-    m_PressedColor: {r: 0.8509804, g: 0.6431373, b: 0.13333334, a: 1}
+    m_PressedColor: {r: 0.8980392, g: 0.6784314, b: 0.14901961, a: 1}
     m_SelectedColor: {r: 1, g: 1, b: 1, a: 1}
-    m_DisabledColor: {r: 0.103773594, g: 0.103773594, b: 0.103773594, a: 0.9647059}
+    m_DisabledColor: {r: 0.8980392, g: 0.6784314, b: 0.14901961, a: 0.9647059}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.08
   m_SpriteState:
@@ -1451,9 +1451,9 @@ MonoBehaviour:
   m_Colors:
     m_NormalColor: {r: 0.94117653, g: 0.68235296, b: 0.04705883, a: 1}
     m_HighlightedColor: {r: 1, g: 0.7411765, b: 0.10980392, a: 1}
-    m_PressedColor: {r: 0.8509804, g: 0.6431373, b: 0.13333334, a: 1}
+    m_PressedColor: {r: 0.8980392, g: 0.6784314, b: 0.14901961, a: 1}
     m_SelectedColor: {r: 1, g: 1, b: 1, a: 1}
-    m_DisabledColor: {r: 0.103773594, g: 0.103773594, b: 0.103773594, a: 0.9647059}
+    m_DisabledColor: {r: 0.8980392, g: 0.6784314, b: 0.14901961, a: 0.9647059}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.08
   m_SpriteState:
@@ -1676,9 +1676,9 @@ MonoBehaviour:
   m_Colors:
     m_NormalColor: {r: 0.94117653, g: 0.68235296, b: 0.04705883, a: 1}
     m_HighlightedColor: {r: 1, g: 0.7411765, b: 0.10980392, a: 1}
-    m_PressedColor: {r: 0.8509804, g: 0.6431373, b: 0.13333334, a: 1}
+    m_PressedColor: {r: 0.8962264, g: 0.6795159, b: 0.14796188, a: 1}
     m_SelectedColor: {r: 1, g: 1, b: 1, a: 1}
-    m_DisabledColor: {r: 0.103773594, g: 0.103773594, b: 0.103773594, a: 0.9647059}
+    m_DisabledColor: {r: 0.8980392, g: 0.6784314, b: 0.14901961, a: 0.9647059}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.08
   m_SpriteState:
@@ -2092,9 +2092,9 @@ MonoBehaviour:
   m_Colors:
     m_NormalColor: {r: 0.94117653, g: 0.68235296, b: 0.04705883, a: 1}
     m_HighlightedColor: {r: 1, g: 0.7411765, b: 0.10980392, a: 1}
-    m_PressedColor: {r: 0.8509804, g: 0.6431373, b: 0.13333334, a: 1}
+    m_PressedColor: {r: 0.8980392, g: 0.6784314, b: 0.14901961, a: 1}
     m_SelectedColor: {r: 1, g: 1, b: 1, a: 1}
-    m_DisabledColor: {r: 0.103773594, g: 0.103773594, b: 0.103773594, a: 0.9647059}
+    m_DisabledColor: {r: 0.8980392, g: 0.6784314, b: 0.14901961, a: 0.9647059}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.08
   m_SpriteState:
@@ -2783,9 +2783,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2db441cd3e1ab404899a46f1edd93adb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HomeUIManager
-  _playButton: {fileID: 1478707219}
-  _storyButton: {fileID: 1794724316}
-  _powerUpsButton: {fileID: 376605906}
   _storyUIPrefab: {fileID: 8685966483286543339, guid: 875421102c44b174198e8189fcf52801, type: 3}
   _powerUpsUIPrefab: {fileID: 8400080725133008991, guid: e798d5b31f5e5c8418f53944f41c9817, type: 3}
   _titleText: {fileID: 330486850}

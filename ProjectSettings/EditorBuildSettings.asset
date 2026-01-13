@@ -11,6 +11,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/GameScene.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
+  - enabled: 1
+    path: Assets/Scenes/DifficultySelectScene.unity
+    guid: 42a906d138dc11a42ac6017387dcdecc
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 671bdd80f9fadf744b7d0af7986947f8, type: 3}
   m_UseUCBPForAssetBundles: 0
