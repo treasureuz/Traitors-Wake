@@ -1,19 +1,20 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PWeaponManager : WeaponManager {
     [SerializeField] private float _timeBetweenShots = 3f;
-
+    
     void Awake() {
         this._owner = this.GetComponentInParent<Player>();
     }
     
     protected override void HandleShoot() {
-        if (GameManager.isPaused || !GameManager.instance.traitor.hasEnded || LevelManager.hasResetRun || 
-            this._owner.hasEnded || !Mouse.current.leftButton.isPressed || !GridManager.instance.IsWithinGridArea() 
+        if (Player.isDead || GameManager.isPaused || !GameManager.instance.traitor.hasEnded || this._owner.hasEnded 
+            || !Mouse.current.leftButton.isPressed || !GridManager.instance.IsWithinGridArea() 
             || !HasBullets() || Time.time < this._nextShootTime) return;
         Shoot();
-        UIManager.instance.UpdateBulletBar(false);
+        UIManager.instance.UpdateBulletBar();
         this._nextShootTime = Time.time + this._timeBetweenShots;
     }
 

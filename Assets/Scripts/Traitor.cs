@@ -5,7 +5,7 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 using Vector3 = UnityEngine.Vector3;
 
-public class Traitor : PlayerManager {
+public class Traitor : PlayersManager {
     [SerializeField] private LineRenderer _lineRenderer;
     
     private static readonly Vector2Int[] directions = { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
@@ -51,11 +51,11 @@ public class Traitor : PlayerManager {
             this._randomDir = NextDir();
         }
         this.isMoving = false;
-        if (PowerUpManager.instance.hasClearedObstacles) yield break;
+        if (GameManager.instance.GetPowerUpManagerByDiff().hasClearedObstacles) yield break;
         GridManager.instance.MakeObstacleTile(GameManager.instance.numOfObstacles);
     }
 
-    protected override IEnumerator HandleMovement(Vector2Int direction, float timeToMove) {
+    private IEnumerator HandleMovement(Vector2Int direction, float timeToMove) {
         Vector2Int startPos = new((int) this.transform.position.x, (int) this.transform.position.y);
         Vector2Int targetPos = startPos + direction;
         
@@ -110,18 +110,13 @@ public class Traitor : PlayerManager {
         this._moveSequenceCoroutine = null;
         this.isMoving = false;
     }
-    
-    public override void ResetPlayerSettings() {
-        base.ResetPlayerSettings();
-        UIManager.instance.UpdateTraitorHealth();
-    }
 
     protected override void OnDamaged(float damageAmount) {
         base.OnDamaged(damageAmount);
         UIManager.instance.UpdateTraitorHealth();
         if (this._currentHealth != 0) return;
         Player.hasWon = true; // Player wins if traitor is killed
-        LevelManager.instance.EndGame();
+        LevelManager.instance.HandleGameEnd();
     }
 
     protected override void OnCollisionEnter2D(Collision2D collision) {

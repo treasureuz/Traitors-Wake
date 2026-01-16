@@ -16,7 +16,6 @@ public class ScoreManager : MonoBehaviour {
     }
 
     public void CalculateScores() {
-        if (LevelManager.hasResetRun) return; // Don't calculate on start of every level
         var currentTimeToComplete = GameManager.instance.timeToComplete;
         // LowTimeToComplete range = [0, CalculateLowTimeComplete)
         // MidTimeToComplete range = [CalculateLowTimeToComplete, CalculateHighTimeToComplete]

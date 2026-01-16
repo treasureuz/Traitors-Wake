@@ -1,10 +1,10 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Vector3 = UnityEngine.Vector3;
 
-public abstract class PlayerManager : MonoBehaviour {
+public abstract class PlayersManager : MonoBehaviour {
     [SerializeField] protected WeaponManager _weaponManager;
     [SerializeField] protected int _maxHealth = 100;
     [SerializeField] protected List<Vector2Int> _moves;
@@ -23,23 +23,20 @@ public abstract class PlayerManager : MonoBehaviour {
         this._moves = new List<Vector2Int>();
     }
 
-    protected virtual void Start() {
-        ResetLevelSettings();
-        ResetPlayerSettings(); // Sets currentHealth = maxHealth
+    private void OnDestroy() {
+        PlayersDataManager.instance.SavePlayersData();
     }
-
-    protected abstract IEnumerator HandleMovement(Vector2Int direction, float timeToMove);
 
     protected virtual void OnDamaged(float damageAmount) {
         var damage = Mathf.RoundToInt(damageAmount);
         this._currentHealth = Mathf.Clamp(this._currentHealth - damage, 0, this._maxHealth);
     }
-
-    public bool MovesEquals(PlayerManager otherPlayer) {
-        return this._moves.SequenceEqual(otherPlayer._moves);
+    
+    public bool MovesEquals(PlayersManager otherPlayers) {
+        return this._moves.SequenceEqual(otherPlayers._moves);
     }
 
-    public virtual void ResetPlayerSettings() {
+    public void ResetPlayerSettings() {
         this._currentHealth = this._maxHealth;
         this._weaponManager.SetCurrentMagazineCount(this._weaponManager.GetMaxMagazineCount());
     }
@@ -50,6 +47,7 @@ public abstract class PlayerManager : MonoBehaviour {
         this.hasEnded = false;
     }
     
+    public void SetCurrentHealth(int health) => this._currentHealth = health; 
     public int GetCurrentHealth() => this._currentHealth;
     public int GetMaxHealth() => this._maxHealth;
     

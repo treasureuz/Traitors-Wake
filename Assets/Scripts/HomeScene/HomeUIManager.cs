@@ -1,7 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.Tracing;
-using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -18,7 +16,7 @@ public class HomeUIManager : MonoBehaviour {
 
     private GameObject _activePanelPrefab;
     private GameObject _spawnedPanelUI;
-    private HomeButtonsBehavior[] _homeButtons;
+    private readonly List<Button> _homeButtons = new();
     public static HomeUIManager instance;
     
     private const string titleText = "TRAITOR'S WAKE";
@@ -35,7 +33,9 @@ public class HomeUIManager : MonoBehaviour {
     }
     
     void Start() {
-        this._homeButtons = this._canvas.GetComponentsInChildren<HomeButtonsBehavior>();
+        foreach (HomeButtonsBehavior hb in FindObjectsByType<HomeButtonsBehavior>(FindObjectsSortMode.None)) {
+            this._homeButtons.Add(hb.GetComponent<Button>());
+        }
         SetHomeButtons(false); // Deactivate homeButtons on start
         this._titleText.text = "";
         StartCoroutine(StartTitleAnimation());
@@ -106,11 +106,10 @@ public class HomeUIManager : MonoBehaviour {
             rightButton.onClick.AddListener(OnPowerUps);
         }
     }
-
-    // ReSharper disable Unity.PerformanceAnalysis
+    
     private void SetHomeButtons(bool enable) {
-        foreach (HomeButtonsBehavior button in this._homeButtons) {
-            button.GetComponent<Button>().interactable = enable;
+        foreach (Button button in this._homeButtons) {
+            button.interactable = enable;
         }
     }
 }

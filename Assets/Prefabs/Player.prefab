@@ -49,7 +49,7 @@ MonoBehaviour:
   _bulletSpawnPoint: {fileID: 6722637120029100682}
   _bulletMagazineCount: 10
   _bulletDamage: 13.5
-  _timeBetweenShots: 1.65
+  _timeBetweenShots: 1.5
 --- !u!1 &3336450450354296420
 GameObject:
   m_ObjectHideFlags: 0

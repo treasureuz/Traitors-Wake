@@ -4,10 +4,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class Player : PlayerManager {
+public class Player : PlayersManager {
     [SerializeField] private List<Vector2Int> _directions;
     
     public static bool hasWon;
+    public static bool isDead { get; private set; }
+    private event Action OnDead;
     
     private InputManager _inputManager;
     public float TimeToMove => this._timeToMove;
@@ -18,15 +20,20 @@ public class Player : PlayerManager {
         this._inputManager = this.GetComponent<InputManager>();
     }
     
+    void Start() {
+        isDead = false;
+        OnDead += OnPlayerDead;
+    }
+    
     void Update() {
-        if (GameManager.isPaused || !GameManager.instance.traitor.hasEnded || this.hasEnded) return;
+        if (GameManager.isPaused || !GameManager.instance.traitor.hasEnded || isDead || this.hasEnded) return;
         if (this._inputManager.UpIsPressed()) StartCoroutine(HandleMovement(Vector2Int.up, this._timeToMove));
         else if (this._inputManager.DownIsPressed()) StartCoroutine(HandleMovement(Vector2Int.down, this._timeToMove));
         else if (this._inputManager.LeftIsPressed()) StartCoroutine(HandleMovement(Vector2Int.left, this._timeToMove));
         else if (this._inputManager.RightIsPressed()) StartCoroutine(HandleMovement(Vector2Int.right, this._timeToMove));
     }
     
-    protected override IEnumerator HandleMovement(Vector2Int direction, float timeToMove) {
+    private IEnumerator HandleMovement(Vector2Int direction, float timeToMove) {
         if (this.hasEnded || this.isMoving) yield break;
         this.isMoving = true;
         
@@ -95,12 +102,6 @@ public class Player : PlayerManager {
         this.isMoving = false;
     }
 
-    public override void ResetPlayerSettings() {
-        base.ResetPlayerSettings();
-        UIManager.instance.UpdatePlayerHealthText();
-        UIManager.instance.UpdateBulletBar(true); // Enables all bullet bars
-    }
-
     public override void ResetLevelSettings() {
         this._directions.Clear();
         base.ResetLevelSettings();
@@ -110,12 +111,17 @@ public class Player : PlayerManager {
         base.OnDamaged(damageAmount);
         UIManager.instance.UpdatePlayerHealthText();
         if (this._currentHealth != 0) return;
-        // If player is dead (Could use UnityEvent for this)
-        this.hasEnded = true; hasWon = false; 
-        this.gameObject.SetActive(false);
-        LevelManager.instance.EndGame();
+        // If player is dead 
+        OnDead?.Invoke();
     }
 
+    private void OnPlayerDead() {
+        isDead = true; hasWon = false;
+        this.gameObject.SetActive(false);
+        LevelManager.hasResetRun = true;
+        LevelManager.instance.HandleGameEnd();
+    }
+    
     public void OnPlayerEnded() {
         this.hasEnded = true;
         UIManager.instance.SetActionButtons(false); // Disable buttons so player position isn't overwritten

@@ -43,7 +43,7 @@ public class UIManager : MonoBehaviour {
     [SerializeField] private GameObject _cannonBallSprite;
     [SerializeField] private GameObject _traitorsLineSprite;
     [SerializeField] private GameObject _hourglassIcon;
-    [SerializeField] private GameObject _rockSprite;
+    [SerializeField] private GameObject _rockSprites;
     [SerializeField] private GameObject _heartIcon;
     
     [Header("Image References")]
@@ -77,14 +77,15 @@ public class UIManager : MonoBehaviour {
         this._topTextBG = this._topText.GetComponentInParent<Image>().rectTransform;
         this._mapBorderChildren = this._mapBorder.GetComponentsInChildren<SpriteRenderer>();
     }
-
+    
     void Start() {
+        UpdatePowerUpsUI(); // Every time this scene loads, update power up ui (based on difficulty)
         ResetCanvasUIAlpha();
     }
     
     void Update() {
         // Update Player Health Bar
-        var healthPercent = (float)GameManager.instance.player.GetCurrentHealth() / GameManager.instance.player.GetMaxHealth();
+        var healthPercent = (float) GameManager.instance.player.GetCurrentHealth() / GameManager.instance.player.GetMaxHealth();
         this._playerHealthBar.fillAmount = Mathf.Lerp(this._playerHealthBar.fillAmount, healthPercent, 
             this._playerHealthBarSpeed * Time.deltaTime);
         this._playerHealthBar.color = Color.Lerp(Color.red, Color.green, healthPercent);
@@ -128,26 +129,35 @@ public class UIManager : MonoBehaviour {
         SetPauseButton(true); // Reenable the pause button
         if (this.isCompleting) SetActionButtons(true); // Reactivate action buttons
     }
+
+    public void OnPauseRestart() {
+        DisableGameButtonsOnPause(); 
+        // Undo powerups if player restarted
+        GameManager.instance.GetPowerUpManagerByDiff().UndoStolenPowerUps();
+        GameManager.instance.GetPowerUpManagerByDiff().ResetCurrentCollectedChests(); 
+        OnRestart(); 
+    }
+
+    public void OnEndRestart() {
+        LevelManager.hasResetRun = true; // Calls ResetRunState if user lost
+        OnRestart();
+    }
     
-    public void OnRestart() {
+    private void OnRestart() {
         Debug.Log("Restart");
         EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
-        DisplayLoadingText(); 
-        ResetCanvasUIAlpha();
-        if (GameManager.isPaused) {
-            SetOnPauseButtons(false);
-        } else SetEndScreenButtons(false);
-        LevelManager.instance.TryStartLevel(); // Start new level
+        DisplayLoadingText(); ResetCanvasUIAlpha(); 
+        // Calls ResetRunState if player restarted in first level 
+        if (LevelManager.instance.GetCurrentLevelByDiff() == 0) LevelManager.hasResetRun = true;
+        LevelManager.instance.StopAllCoroutines(true);
+        LevelManager.instance.TryStartLevel(); // Restart current level
     }
 
     public void OnHome() {
         SceneManager.LoadScene("HomeScene");
-        LevelManager.hasResetRun = true;
-        ResetCanvasUIAlpha();
-        if (GameManager.isPaused) {
-            SetOnPauseButtons(false);
-        } else SetEndScreenButtons(false);
         OnHomeExit(); // Reset home color to original color
+        DisableGameButtonsOnPause();
+        ResetCanvasUIAlpha();
     }
     
     public void OnHomeEnter() {
@@ -179,21 +189,24 @@ public class UIManager : MonoBehaviour {
         }
     }
     
-    public void UpdateScoreText() {
-        ScoreManager.instance.CalculateScores();
+    public void UpdateScoreText(bool calculateScore) {
+        if (calculateScore) ScoreManager.instance.CalculateScores();
         var currentScore = ScoreManager.instance.GetCurrentScore();
         var highScore = ScoreManager.instance.GetHighScore();
         this._currentScoreText.text = $"{currentScoreText}: {currentScore:F2}\n" +
                                       $"{highScoreText}: {highScore:F2}";
     }
     
-    public void UpdateBulletBar (bool enable) {
+    public void UpdateBulletBar() {
         this._bulletsText.text = $"({GameManager.instance.pWeaponManager.GetCurrentMagazineCount()}/" + 
                                  $"{GameManager.instance.pWeaponManager.GetMaxMagazineCount()})";
-        if (enable) {
-            for (var i = 0; i < GameManager.instance.pWeaponManager.GetCurrentMagazineCount(); i++) {
-                this._bulletBars[i].enabled = true; }
-        } else this._bulletBars[GameManager.instance.pWeaponManager.GetCurrentMagazineCount()].enabled = false;
+        for (var i = 0; i < GameManager.instance.pWeaponManager.GetCurrentMagazineCount(); i++) {
+            this._bulletBars[i].enabled = true; 
+        }
+        for (var i = GameManager.instance.pWeaponManager.GetMaxMagazineCount() - 1;
+             i >= GameManager.instance.pWeaponManager.GetCurrentMagazineCount(); i--) {
+            this._bulletBars[i].enabled = false;
+        }
     }
     
     public void UpdatePlayerHealthText() {
@@ -208,37 +221,61 @@ public class UIManager : MonoBehaviour {
     
     public void UpdateGiveAmmoText() {
         this._cannonBallSprite.SetActive(true);
-        this._ammoPowerUpText.text = $"{PowerUpManager.instance.totalAmmo}";
+        this._ammoPowerUpText.text = $"{GameManager.instance.GetPowerUpManagerByDiff().totalAmmo}";
     }
     
     public void EnableTraitorsLineSprite() => this._traitorsLineSprite.SetActive(true);
-    public void EnableRockSprite() => this._rockSprite.SetActive(true);
+    public void EnableRockSprites() => this._rockSprites.SetActive(true);
     
     public void UpdateTimeIncreaseText() {
         this._hourglassIcon.SetActive(true);
-        this._timePowerUpText.text = $"{PowerUpManager.instance.totalAddedTime:F2}s";
+        this._timePowerUpText.text = $"{GameManager.instance.GetPowerUpManagerByDiff().totalAddedTime:F2}s";
     }
     
     public void UpdateHealthBoostText() {
         this._heartIcon.SetActive(true);
-        this._healthPowerUpText.text = $"{PowerUpManager.instance.totalHealPoints}";
+        this._healthPowerUpText.text = $"{GameManager.instance.GetPowerUpManagerByDiff().totalHealPoints}";
+    }
+    
+    private void UpdatePowerUpsUI() {
+        UpdateHotBarFeedText();
+        foreach (PowerUpManager.PowerUp powerUp in GameManager.instance.GetPowerUpManagerByDiff().GetActivatedPowerUps()) {
+            switch (powerUp) {
+                case PowerUpManager.PowerUp.AmmoSurplus: UpdateGiveAmmoText(); break;
+                case PowerUpManager.PowerUp.LineTrace: EnableTraitorsLineSprite(); break;
+                case PowerUpManager.PowerUp.ClearObstacles: EnableRockSprites(); break;
+                case PowerUpManager.PowerUp.BonusTime: UpdateTimeIncreaseText(); break;
+                case PowerUpManager.PowerUp.HealthBoost: UpdateHealthBoostText(); break;
+            }
+        }
+    }
+    
+    public void DisablePowerUp(PowerUpManager.PowerUp powerUp) {
+        switch (powerUp) {
+            case PowerUpManager.PowerUp.AmmoSurplus: this._cannonBallSprite.SetActive(false); break;
+            case PowerUpManager.PowerUp.LineTrace: this._traitorsLineSprite.SetActive(false); break;
+            case PowerUpManager.PowerUp.ClearObstacles: this._rockSprites.SetActive(false); break;
+            case PowerUpManager.PowerUp.BonusTime: this._hourglassIcon.SetActive(false); break;
+            case PowerUpManager.PowerUp.HealthBoost: this._heartIcon.SetActive(false); break;
+        }
     }
     
     public void UpdateHotBarFeedText() {
         this._hotbarFeedText.enabled = true;
-        switch (PowerUpManager.instance.powerUp) {
+        switch (GameManager.instance.GetPowerUpManagerByDiff().powerUp) {
             case PowerUpManager.PowerUp.LineTrace: this._hotbarFeedText.text = "• Restored Traitor's Wake"; break;
             case PowerUpManager.PowerUp.ClearObstacles: this._hotbarFeedText.text = "• Cleared all obstacles"; break;
             case PowerUpManager.PowerUp.AmmoSurplus: {
-                this._hotbarFeedText.text = $"• Gave {PowerUpManager.instance.ammo} ammo"; break; }
+                this._hotbarFeedText.text = $"• Gave {GameManager.instance.GetPowerUpManagerByDiff().ammo} ammo"; break; }
             case PowerUpManager.PowerUp.BonusTime: {
-                this._hotbarFeedText.text = $"• Added {PowerUpManager.instance.addedTime:F2}s"; break; }
+                this._hotbarFeedText.text = $"• Added {GameManager.instance.GetPowerUpManagerByDiff().addedTime:F2}s"; break; }
             case PowerUpManager.PowerUp.HealthBoost: {
-                this._hotbarFeedText.text = $"• Granted {PowerUpManager.instance.healPoints} health"; break;
+                this._hotbarFeedText.text = $"• Granted {GameManager.instance.GetPowerUpManagerByDiff().healPoints} health"; break;
             }
+            case PowerUpManager.PowerUp.None: this._hotbarFeedText.text = ""; break;
         }
     }
-
+    
     public void DisplayEndScreen() {
         this._topTextBG.sizeDelta = new Vector2(this._endTextBGWidth, this._topTextBG.sizeDelta.y);
         this._topText.text = Player.hasWon ? winText : loseText;
@@ -250,7 +287,6 @@ public class UIManager : MonoBehaviour {
     public void DisplayLoadingText() {
         this._topTextBG.sizeDelta = new Vector2(this._mediumLevelTextBGWidth, this._topTextBG.sizeDelta.y);
         this._topText.text = loadingLevel;
-        UpdateScoreText();
     }
     
     public void DisplayLevelText(float level) {
@@ -328,13 +364,18 @@ public class UIManager : MonoBehaviour {
         this._undoButton.interactable = enable;
     }
 
+    private void DisableGameButtonsOnPause() {
+        if (GameManager.isPaused) {
+            GameManager.isPaused = false;
+            SetOnPauseButtons(false);
+        } else SetEndScreenButtons(false);
+    }
     public void SetPauseButton(bool enable) => this._pauseButton.interactable = enable;
     public void SetOnPauseButtons(bool enable) => this._resumeButton.transform.parent.gameObject.SetActive(enable);
     public void SetEndScreenButtons(bool enable) => this._endRestartButton.transform.parent.gameObject.SetActive(enable);
     
-    
     public void DisableAllPowerUpSprites() {
-        this._rockSprite.SetActive(false); 
+        this._rockSprites.SetActive(false); 
         this._traitorsLineSprite.SetActive(false); 
         this._hourglassIcon.SetActive(false); 
         this._cannonBallSprite.SetActive(false); 

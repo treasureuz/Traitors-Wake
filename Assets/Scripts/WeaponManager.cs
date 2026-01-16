@@ -9,8 +9,8 @@ public abstract class WeaponManager : MonoBehaviour {
 
     private const float rotationDuration = 0.072f; //How long to rotate towards mouse position
     
-    protected PlayerManager _owner;
-    private int _currentMagazineCount;
+    protected PlayersManager _owner;
+    protected int _currentMagazineCount;
     protected float _nextShootTime;
 
     protected virtual void Update() {
@@ -31,14 +31,13 @@ public abstract class WeaponManager : MonoBehaviour {
         var angle = Vector3.SignedAngle(transform.right, direction, Vector3.forward);
         transform.Rotate(Vector3.forward, angle);
     }
-    protected abstract Vector3 GetTargetPosition();
     
+    protected abstract Vector3 GetTargetPosition();
     protected bool HasBullets() => this._currentMagazineCount > 0;
 
     public void SetCurrentMagazineCount(int num) {
         this._currentMagazineCount = Mathf.Clamp(num, 0, this._bulletMagazineCount);
     }
-
     public int GetCurrentMagazineCount() => this._currentMagazineCount;
     public int GetMaxMagazineCount() => this._bulletMagazineCount;
     public float GetBulletDamage() => this._bulletDamage;
