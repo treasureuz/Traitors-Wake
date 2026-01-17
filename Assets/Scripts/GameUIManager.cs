@@ -45,6 +45,7 @@ public class UIManager : MonoBehaviour {
     [SerializeField] private GameObject _hourglassIcon;
     [SerializeField] private GameObject _rockSprites;
     [SerializeField] private GameObject _heartIcon;
+    [SerializeField] private GameObject _mapBorder;
     
     [Header("Image References")]
     [SerializeField] private List<Image> _bulletBars;
@@ -53,19 +54,18 @@ public class UIManager : MonoBehaviour {
 
     [Header("Others")] 
     [SerializeField] private CanvasGroup _canvasGroup;
-    [SerializeField] private GameObject _mapBorder;
     [SerializeField] private float _playerHealthBarSpeed = 3f;
     
     public static UIManager instance;
     private RectTransform _topTextBG;
-
+    private SpriteRenderer[] _mapBorderChildren;
+    
     private Coroutine _timeToMemorizeCoroutine;
     private Coroutine _timeToCompleteCoroutine;
     
     public bool isMemorizing { get; private set; }
     public bool isCompleting { get; private set; }
-
-    private SpriteRenderer[] _mapBorderChildren;
+    
     private const string loadingLevel = "{Loading Level...}";
     private const string currentScoreText = "Current Score";
     private const string highScoreText = "High Score";
@@ -79,8 +79,9 @@ public class UIManager : MonoBehaviour {
     }
     
     void Start() {
-        UpdatePowerUpsUI(); // Every time this scene loads, update power up ui (based on difficulty)
         ResetCanvasUIAlpha();
+        // Every time this scene loads, update these UI Elements (based on difficulty)
+        UpdatePowerUpsUI(); UpdateScoreText(false); // Don't calculate score
     }
     
     void Update() {
@@ -132,14 +133,16 @@ public class UIManager : MonoBehaviour {
 
     public void OnPauseRestart() {
         DisableGameButtonsOnPause(); 
-        // Undo powerups if player restarted
-        GameManager.instance.GetPowerUpManagerByDiff().UndoStolenPowerUps();
-        GameManager.instance.GetPowerUpManagerByDiff().ResetCurrentCollectedChests(); 
+        // Undo power ups if player restarted
+        PowerUpManager.instance.UndoStolenPowerUps();
+        PowerUpManager.instance.ResetCurrentCollectedChests(); 
         OnRestart(); 
     }
 
     public void OnEndRestart() {
-        LevelManager.hasResetRun = true; // Calls ResetRunState if user lost
+        // If player lost
+        LevelManager.instance.ResetCurrentLevelByDiff();
+        LevelManager.hasResetRun = true; // Calls ResetRunState
         OnRestart();
     }
     
@@ -148,7 +151,7 @@ public class UIManager : MonoBehaviour {
         EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
         DisplayLoadingText(); ResetCanvasUIAlpha(); 
         // Calls ResetRunState if player restarted in first level 
-        if (LevelManager.instance.GetCurrentLevelByDiff() == 0) LevelManager.hasResetRun = true;
+        if (LevelManager.instance.GetTotalLevelsCompleted() == 0) LevelManager.hasResetRun = true;
         LevelManager.instance.StopAllCoroutines(true);
         LevelManager.instance.TryStartLevel(); // Restart current level
     }
@@ -191,10 +194,10 @@ public class UIManager : MonoBehaviour {
     
     public void UpdateScoreText(bool calculateScore) {
         if (calculateScore) ScoreManager.instance.CalculateScores();
-        var currentScore = ScoreManager.instance.GetCurrentScore();
-        var highScore = ScoreManager.instance.GetHighScore();
+        var currentScore = ScoreManager.instance.GetTotalCurrentScore();
+        var totalHighScore = ScoreManager.instance.GetTotalHighScore();
         this._currentScoreText.text = $"{currentScoreText}: {currentScore:F2}\n" +
-                                      $"{highScoreText}: {highScore:F2}";
+                                      $"{highScoreText}: {totalHighScore:F2}";
     }
     
     public void UpdateBulletBar() {
@@ -221,7 +224,7 @@ public class UIManager : MonoBehaviour {
     
     public void UpdateGiveAmmoText() {
         this._cannonBallSprite.SetActive(true);
-        this._ammoPowerUpText.text = $"{GameManager.instance.GetPowerUpManagerByDiff().totalAmmo}";
+        this._ammoPowerUpText.text = $"{PowerUpManager.instance.totalAmmo}";
     }
     
     public void EnableTraitorsLineSprite() => this._traitorsLineSprite.SetActive(true);
@@ -229,17 +232,17 @@ public class UIManager : MonoBehaviour {
     
     public void UpdateTimeIncreaseText() {
         this._hourglassIcon.SetActive(true);
-        this._timePowerUpText.text = $"{GameManager.instance.GetPowerUpManagerByDiff().totalAddedTime:F2}s";
+        this._timePowerUpText.text = $"{PowerUpManager.instance.totalAddedTime:F2}s";
     }
     
     public void UpdateHealthBoostText() {
         this._heartIcon.SetActive(true);
-        this._healthPowerUpText.text = $"{GameManager.instance.GetPowerUpManagerByDiff().totalHealPoints}";
+        this._healthPowerUpText.text = $"{PowerUpManager.instance.totalHealPoints}";
     }
     
-    private void UpdatePowerUpsUI() {
+    public void UpdatePowerUpsUI() {
         UpdateHotBarFeedText();
-        foreach (PowerUpManager.PowerUp powerUp in GameManager.instance.GetPowerUpManagerByDiff().GetActivatedPowerUps()) {
+        foreach (PowerUpManager.PowerUp powerUp in PowerUpManager.instance.GetActivatedPowerUps()) {
             switch (powerUp) {
                 case PowerUpManager.PowerUp.AmmoSurplus: UpdateGiveAmmoText(); break;
                 case PowerUpManager.PowerUp.LineTrace: EnableTraitorsLineSprite(); break;
@@ -262,15 +265,15 @@ public class UIManager : MonoBehaviour {
     
     public void UpdateHotBarFeedText() {
         this._hotbarFeedText.enabled = true;
-        switch (GameManager.instance.GetPowerUpManagerByDiff().powerUp) {
+        switch (PowerUpManager.instance.powerUp) {
             case PowerUpManager.PowerUp.LineTrace: this._hotbarFeedText.text = "• Restored Traitor's Wake"; break;
             case PowerUpManager.PowerUp.ClearObstacles: this._hotbarFeedText.text = "• Cleared all obstacles"; break;
             case PowerUpManager.PowerUp.AmmoSurplus: {
-                this._hotbarFeedText.text = $"• Gave {GameManager.instance.GetPowerUpManagerByDiff().ammo} ammo"; break; }
+                this._hotbarFeedText.text = $"• Gave {PowerUpManager.instance.ammo} ammo"; break; }
             case PowerUpManager.PowerUp.BonusTime: {
-                this._hotbarFeedText.text = $"• Added {GameManager.instance.GetPowerUpManagerByDiff().addedTime:F2}s"; break; }
+                this._hotbarFeedText.text = $"• Added {PowerUpManager.instance.addedTime:F2}s"; break; }
             case PowerUpManager.PowerUp.HealthBoost: {
-                this._hotbarFeedText.text = $"• Granted {GameManager.instance.GetPowerUpManagerByDiff().healPoints} health"; break;
+                this._hotbarFeedText.text = $"• Granted {PowerUpManager.instance.healPoints} health"; break;
             }
             case PowerUpManager.PowerUp.None: this._hotbarFeedText.text = ""; break;
         }

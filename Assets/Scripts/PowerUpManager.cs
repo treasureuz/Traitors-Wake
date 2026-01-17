@@ -8,6 +8,8 @@ public class PowerUpManager : MonoBehaviour {
     [SerializeField] private float _maxCompleteTime = 8f;
     [SerializeField] private int _minHealPoints = 10;
     [SerializeField] private int _maxHealPoints = 50;
+
+    public static PowerUpManager instance;
     
     private readonly List<PowerUp> _activatedPowerUps = new();
     private int _currentCollectedChests;
@@ -35,6 +37,10 @@ public class PowerUpManager : MonoBehaviour {
         None
     }
     public PowerUp powerUp { get; private set; } = PowerUp.None;
+
+    void Awake() {
+        instance = this;
+    }
     
     public void ActivatePowerUp() {
         // Get random number between 0 - PowerUp.length - 2 (4)
@@ -86,7 +92,7 @@ public class PowerUpManager : MonoBehaviour {
             }
             case PowerUp.HealthBoost: {
                 this._activatedPowerUps.Add(PowerUp.HealthBoost);
-                // Amount of health to grant the player (between minHeal(10) - maxHeal(50))
+                // Amount of health to grant the player (between minHeal(5) - maxHeal(25))
                 this.healPoints = Random.Range(this._minHealPoints, this._maxHealPoints);
                 this.totalHealPoints += this.healPoints;
                 this._totalHealPointsList.Add(this.totalHealPoints);
@@ -116,27 +122,34 @@ public class PowerUpManager : MonoBehaviour {
             UIManager.instance.DisablePowerUp(power);
         }
         this.powerUp = this._activatedPowerUps.Count == 0 ? PowerUp.None : this._activatedPowerUps[^1];
+        UIManager.instance.UpdatePowerUpsUI();
     }
 
     private void UndoTotalAmmo() {
-        this._totalAmmoList.Remove(this._totalAmmoList[^1]);
+        var itemToRemove = this._totalAmmoList[^1];
+        this._totalAmmoList.Remove(itemToRemove);
         if (this._totalAmmoList.Count == 0) return;
-        this.totalAmmo = this._totalAmmoList[^1];
-        UIManager.instance.UpdateGiveAmmoText();
+        var itemToAssign = this._totalAmmoList[^1];
+        this.ammo = itemToRemove - itemToAssign;
+        this.totalAmmo = itemToAssign;
     }
     
     private void UndoTotalAddedTime() {
-        this._totalAddedTimeList.Remove(this._totalAddedTimeList[^1]);
+        var itemToRemove = this._totalAddedTimeList[^1];
+        this._totalAddedTimeList.Remove(itemToRemove);
         if (this._totalAddedTimeList.Count == 0) return;
-        this.totalAddedTime = this._totalAddedTimeList[^1];
-        UIManager.instance.UpdateTimeIncreaseText();
+        var itemToAssign = this._totalAddedTimeList[^1];
+        this.addedTime = itemToRemove - itemToAssign;
+        this.totalAddedTime = itemToAssign;
     }
     
     private void UndoTotalHealPoints() {
-        this._totalHealPointsList.Remove(this._totalHealPointsList[^1]);
+        var itemToRemove = this._totalHealPointsList[^1];
+        this._totalHealPointsList.Remove(itemToRemove);
         if (this._totalHealPointsList.Count == 0) return;
-        this.totalHealPoints = this._totalHealPointsList[^1];
-        UIManager.instance.UpdateHealthBoostText();
+        var itemToAssign = this._totalHealPointsList[^1];
+        this.healPoints = itemToRemove - itemToAssign;
+        this.totalHealPoints = itemToAssign;
     }
     
     public void ResetPowerUpsSettings() {

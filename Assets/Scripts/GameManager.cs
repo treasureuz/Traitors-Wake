@@ -120,9 +120,6 @@ public class GameManager : MonoBehaviour {
     }
 
     private void SpawnPlayers() {
-        this._easyPowerUpManager = this.transform.Find("EasyPowerUpManager").GetComponent<PowerUpManager>();
-        this._mediumPowerUpManager = this.transform.Find("MediumPowerUpManager").GetComponent<PowerUpManager>();
-        this._hardPowerUpManager = this.transform.Find("HardPowerUpManager").GetComponent<PowerUpManager>();
         this.player = Instantiate(this._playerPrefab, PlayersManager.SpawnPosV3(), Quaternion.identity);
         this.player.gameObject.SetActive(false);
         this.traitor = Instantiate(this._traitorPrefab, PlayersManager.SpawnPosV3(), Quaternion.identity);
@@ -206,13 +203,5 @@ public class GameManager : MonoBehaviour {
             _ => 0f
         };
     }
-
-    public PowerUpManager GetPowerUpManagerByDiff() {
-        return this.difficulty switch {
-            Difficulty.Easy => this._easyPowerUpManager,
-            Difficulty.Medium => this._mediumPowerUpManager,
-            Difficulty.Hard => this._hardPowerUpManager,
-            _ => null
-        };
-    }
+    
 }

@@ -3030,7 +3030,7 @@ MonoBehaviour:
   m_Elasticity: 0.1
   m_Inertia: 1
   m_DecelerationRate: 0.1
-  m_ScrollSensitivity: 3
+  m_ScrollSensitivity: 3.5
   m_Viewport: {fileID: 3764601100879164845}
   m_HorizontalScrollbar: {fileID: 9100820296312983687}
   m_VerticalScrollbar: {fileID: 5784003514745720486}
@@ -5060,7 +5060,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0.93200004}
-  m_AnchoredPosition: {x: 0, y: -105.96948}
+  m_AnchoredPosition: {x: 0, y: -105.9695}
   m_SizeDelta: {x: 470, y: 284.0597}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &8878426417552578821
@@ -5134,8 +5134,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 13.000015, y: 0}
-  m_SizeDelta: {x: 345, y: 50}
+  m_AnchoredPosition: {x: 15.0416, y: 0}
+  m_SizeDelta: {x: 349.0832, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &988524583653237875
 CanvasRenderer:
@@ -5165,7 +5165,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u2022 Increases player health by 10hp - 50hp."
+  m_text: "\u2022 Increases player health by 5 hp - 25 hp."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -5231,7 +5231,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 51.084427, w: 0}
+  m_margin: {x: 0, y: 0, z: 22.5018, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0

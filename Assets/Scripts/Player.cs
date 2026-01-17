@@ -118,7 +118,8 @@ public class Player : PlayersManager {
     private void OnPlayerDead() {
         isDead = true; hasWon = false;
         this.gameObject.SetActive(false);
-        LevelManager.hasResetRun = true;
+        LevelManager.hasResetRun = true; // Calls ResetRunState
+        LevelManager.instance.ResetAllLevels(); // Sets isCurrent{difficulty}Completed to false
         LevelManager.instance.HandleGameEnd();
     }
     

@@ -51,7 +51,7 @@ public class Traitor : PlayersManager {
             this._randomDir = NextDir();
         }
         this.isMoving = false;
-        if (GameManager.instance.GetPowerUpManagerByDiff().hasClearedObstacles) yield break;
+        if (PowerUpManager.instance.hasClearedObstacles) yield break;
         GridManager.instance.MakeObstacleTile(GameManager.instance.numOfObstacles);
     }
 
