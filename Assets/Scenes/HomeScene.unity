@@ -471,6 +471,92 @@ RectTransform:
   m_AnchoredPosition: {x: -126.934616, y: -5.3590393}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &470306516
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 470306518}
+  - component: {fileID: 470306517}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &470306517
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 470306516}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c709f8c9d48d9d5498f914d2569f7082, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameManager
+  _playerPrefab: {fileID: 6199433977086528752, guid: 2ec11d17ab26e4040b0f6d0eb96e404c, type: 3}
+  _traitorPrefab: {fileID: 6684053849032733189, guid: 658e6bce8f378bf4fbfbcb64b4197dba, type: 3}
+  _finishPos: {x: 0, y: 0}
+  _easyNumOfDirs: 14
+  _mediumNumOfDirs: 12
+  _hardNumOfDirs: 11
+  _easyWidth: 7
+  _easyHeight: 5
+  _mediumWidth: 7
+  _mediumHeight: 6
+  _hardWidth: 8
+  _hardHeight: 6
+  _easyMinNumOfChests: 1
+  _easyMaxNumOfChests: 2
+  _easyMinNumOfObstacles: 2
+  _easyMaxNumOfObstacles: 3
+  _mediumMinNumOfChests: 2
+  _mediumMaxNumOfChests: 3
+  _mediumMinNumOfObstacles: 3
+  _mediumMaxNumOfObstacles: 4
+  _hardMinNumOfChests: 3
+  _hardMaxNumOfChests: 4
+  _hardMinNumOfObstacles: 4
+  _hardMaxNumOfObstacles: 5
+  _easyTimeToMemorize: 3.78
+  _mediumTimeToMemorize: 3.55
+  _hardTimeToMemorize: 3.3
+  _easyTimeToComplete: 100
+  _mediumTimeToComplete: 100
+  _hardTimeToComplete: 100
+  _easyPlayerTimeToMove: 0.28
+  _mediumPlayerTimeToMove: 0.25
+  _hardPlayerTimeToMove: 0.23
+  _easyTraitorTimeToMove: 0.4
+  _mediumTraitorTimeToMove: 0.38
+  _hardTraitorTimeToMove: 0.35
+  _easyMinTimeBetweenShots: 2.5
+  _easyMaxTimeBetweenShots: 6
+  _mediumMinTimeBetweenShots: 2
+  _mediumMaxTimeBetweenShots: 5
+  _hardMinTimeBetweenShots: 1.5
+  _hardMaxTimeBetweenShots: 4
+--- !u!4 &470306518
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 470306516}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &485462742
 GameObject:
   m_ObjectHideFlags: 0
@@ -1286,8 +1372,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -590, y: 490}
-  m_SizeDelta: {x: 650, y: 50}
+  m_AnchoredPosition: {x: -555, y: 490}
+  m_SizeDelta: {x: 733.5, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1014319676
 MonoBehaviour:
@@ -1311,8 +1397,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'Controls: W, A, S, D (*Arrow keys apply*)'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 4a45160fc30d3fe4882edc2712c0b051, type: 2}
+  m_sharedMaterial: {fileID: -462789608907736891, guid: 4a45160fc30d3fe4882edc2712c0b051, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1342,7 +1428,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 33
+  m_fontStyle: 9
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -1401,8 +1487,9 @@ GameObject:
   - component: {fileID: 1032421131}
   - component: {fileID: 1032421130}
   - component: {fileID: 1032421129}
+  - component: {fileID: 1032421132}
   m_Layer: 5
-  m_Name: ScoreButton
+  m_Name: ScoresButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1451,7 +1538,7 @@ MonoBehaviour:
   m_Colors:
     m_NormalColor: {r: 0.94117653, g: 0.68235296, b: 0.04705883, a: 1}
     m_HighlightedColor: {r: 1, g: 0.7411765, b: 0.10980392, a: 1}
-    m_PressedColor: {r: 0.8980392, g: 0.6784314, b: 0.14901961, a: 1}
+    m_PressedColor: {r: 0.9529412, g: 0.7294118, b: 0.18431373, a: 1}
     m_SelectedColor: {r: 1, g: 1, b: 1, a: 1}
     m_DisabledColor: {r: 0.9254902, g: 0.7058824, b: 0.1882353, a: 0.9647059}
     m_ColorMultiplier: 1
@@ -1472,9 +1559,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: ButtonManager, Assembly-CSharp
-        m_MethodName: OnSubmit
+      - m_Target: {fileID: 2092360167}
+        m_TargetAssemblyTypeName: HomeUIManager, Assembly-CSharp
+        m_MethodName: OnScores
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1522,6 +1609,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1032421127}
   m_CullTransparentMesh: 1
+--- !u!114 &1032421132
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1032421127}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6260925ac8fd2248a0afc305d0e0cd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HomeButtonsBehavior
 --- !u!1 &1086312034
 GameObject:
   m_ObjectHideFlags: 0
@@ -1990,6 +2089,50 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1752126553}
   m_CullTransparentMesh: 1
+--- !u!1 &1761292390
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1761292392}
+  - component: {fileID: 1761292391}
+  m_Layer: 0
+  m_Name: ScoreManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1761292391
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1761292390}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c2336d0cd3f596498cbfcea3ea16d5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ScoreManager
+--- !u!4 &1761292392
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1761292390}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 263, y: 992, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1789651845
 GameObject:
   m_ObjectHideFlags: 0
@@ -2295,7 +2438,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '[Score]'
+  m_text: '[Scores]'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: dddfeef603d96c844b587ae8e4baca8d, type: 2}
   m_sharedMaterial: {fileID: 1427065064804696303, guid: dddfeef603d96c844b587ae8e4baca8d, type: 2}
@@ -2375,6 +2518,54 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1911205104}
   m_CullTransparentMesh: 1
+--- !u!1 &1917764842
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1917764844}
+  - component: {fileID: 1917764843}
+  m_Layer: 0
+  m_Name: LevelManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1917764843
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1917764842}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6acc02461d9bc5943b6a82b3a8f09333, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LevelManager
+  _maxEasyLevels: 4
+  _maxMediumLevels: 3
+  _maxHardLevels: 2
+  _timeBeforeLevelStart: 1
+--- !u!4 &1917764844
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1917764842}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.4066, y: 0.40584, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2020910414
 GameObject:
   m_ObjectHideFlags: 0
@@ -2538,7 +2729,7 @@ GameObject:
   - component: {fileID: 2060343840}
   - component: {fileID: 2060343839}
   m_Layer: 5
-  m_Name: ScoreButtonBorder
+  m_Name: ScoresButtonBorder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2785,6 +2976,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HomeUIManager
   _storyUIPrefab: {fileID: 8685966483286543339, guid: 875421102c44b174198e8189fcf52801, type: 3}
   _powerUpsUIPrefab: {fileID: 8400080725133008991, guid: e798d5b31f5e5c8418f53944f41c9817, type: 3}
+  _scoresUIPrefab: {fileID: 5532927556658466821, guid: e8a1b7222d2ab1b45a1ad0f8391f6da1, type: 3}
   _titleText: {fileID: 330486850}
   _controlsText: {fileID: 1014319676}
   _typewriterDelay: 0.178
@@ -2830,6 +3022,9 @@ SceneRoots:
   - {fileID: 345902741}
   - {fileID: 2092360166}
   - {fileID: 1858840958}
+  - {fileID: 470306518}
+  - {fileID: 1761292392}
+  - {fileID: 1917764844}
   - {fileID: 914044523}
   - {fileID: 790613138}
   - {fileID: 1521097504}

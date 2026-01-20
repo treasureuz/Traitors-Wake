@@ -39,7 +39,12 @@ public class PowerUpManager : MonoBehaviour {
     public PowerUp powerUp { get; private set; } = PowerUp.None;
 
     void Awake() {
+        if (instance) {
+            Destroy(gameObject);
+            return;
+        }
         instance = this;
+        DontDestroyOnLoad(this.gameObject);
     }
     
     public void ActivatePowerUp() {
@@ -52,9 +57,9 @@ public class PowerUpManager : MonoBehaviour {
 
     private void HandlePowerUps() {
         this._currentCollectedChests++;
+        this._activatedPowerUps.Add(this.powerUp);
         switch (this.powerUp) {
             case PowerUp.AmmoSurplus: {
-                this._activatedPowerUps.Add(PowerUp.AmmoSurplus);
                 // Amount of ammo to give the player (between 1 - maxMagCount;) 
                 this.ammo = Random.Range(1, GameManager.instance.pWeaponManager.GetMaxMagazineCount() + 1); 
                 this.totalAmmo += this.ammo;
@@ -66,7 +71,6 @@ public class PowerUpManager : MonoBehaviour {
                 break;
             }
             case PowerUp.LineTrace: {
-                this._activatedPowerUps.Add(PowerUp.LineTrace);
                 // Enable the AIManager.LineRenderer after timeToMemorize is done
                 this.isLineTrace = true;
                 GameManager.instance.traitor.SetLineRendererStatus(true);
@@ -74,7 +78,6 @@ public class PowerUpManager : MonoBehaviour {
                 break;
             }
             case PowerUp.BonusTime: {
-                this._activatedPowerUps.Add(PowerUp.BonusTime);
                 // Amount to increase the timeToComplete by (between minCompleteTime(3) - maxCompleteTime(8))
                 this.addedTime = Random.Range(this._minCompleteTime, this._maxCompleteTime); 
                 this.totalAddedTime += this.addedTime;
@@ -84,14 +87,12 @@ public class PowerUpManager : MonoBehaviour {
                 break;
             }
             case PowerUp.ClearObstacles: {
-                this._activatedPowerUps.Add(PowerUp.ClearObstacles);
                 this.hasClearedObstacles = true;
                 GridManager.instance.ClearObstacleTiles();
                 UIManager.instance.EnableRockSprites();
                 break;
             }
             case PowerUp.HealthBoost: {
-                this._activatedPowerUps.Add(PowerUp.HealthBoost);
                 // Amount of health to grant the player (between minHeal(5) - maxHeal(25))
                 this.healPoints = Random.Range(this._minHealPoints, this._maxHealPoints);
                 this.totalHealPoints += this.healPoints;
@@ -154,6 +155,7 @@ public class PowerUpManager : MonoBehaviour {
     
     public void ResetPowerUpsSettings() {
         this._activatedPowerUps.Clear();
+        this.powerUp = PowerUp.None;
         UIManager.instance.DisableAllPowerUpSprites(); // Disable hotbar sprites
         this.totalAddedTime = 0;
         this.totalAmmo = 0;

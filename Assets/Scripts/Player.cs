@@ -8,8 +8,6 @@ public class Player : PlayersManager {
     [SerializeField] private List<Vector2Int> _directions;
     
     public static bool hasWon;
-    public static bool isDead { get; private set; }
-    private event Action OnDead;
     
     private InputManager _inputManager;
     public float TimeToMove => this._timeToMove;
@@ -26,7 +24,8 @@ public class Player : PlayersManager {
     }
     
     void Update() {
-        if (GameManager.isPaused || !GameManager.instance.traitor.hasEnded || isDead || this.hasEnded) return;
+        if (this.isDead || GameManager.isPaused || !GameManager.instance.traitor.hasEnded 
+            || GameManager.instance.traitor.isDead || this.hasEnded) return;
         if (this._inputManager.UpIsPressed()) StartCoroutine(HandleMovement(Vector2Int.up, this._timeToMove));
         else if (this._inputManager.DownIsPressed()) StartCoroutine(HandleMovement(Vector2Int.down, this._timeToMove));
         else if (this._inputManager.LeftIsPressed()) StartCoroutine(HandleMovement(Vector2Int.left, this._timeToMove));
@@ -102,24 +101,36 @@ public class Player : PlayersManager {
         this.isMoving = false;
     }
 
+    public override void ResetPlayerSettings() {
+        base.ResetPlayerSettings();
+        isDead = false;
+    }
+    
     public override void ResetLevelSettings() {
         this._directions.Clear();
         base.ResetLevelSettings();
     }
-
+     
+    public void HealPlayer(int healAmount) {
+        if (this._currentHealth >= this._maxHealth) return;
+        this._currentHealth = Mathf.Clamp(this._currentHealth += healAmount, 0, this._maxHealth);
+        UIManager.instance.UpdatePlayerHealthText();
+    }
+    
     protected override void OnDamaged(float damageAmount) {
         base.OnDamaged(damageAmount);
         UIManager.instance.UpdatePlayerHealthText();
         if (this._currentHealth != 0) return;
-        // If player is dead 
-        OnDead?.Invoke();
+        // Invoke if player is dead 
+        InvokeOnDead();
     }
 
-    private void OnPlayerDead() {
+    protected override void OnPlayerDead() {
         isDead = true; hasWon = false;
         this.gameObject.SetActive(false);
         LevelManager.hasResetRun = true; // Calls ResetRunState
-        LevelManager.instance.ResetAllLevels(); // Sets isCurrent{difficulty}Completed to false
+        GameManager.instance.SetDifficulty(GameManager.Difficulty.Easy); // Reset difficulty back to Easy mode
+        LevelManager.instance.ResetAllLevels(); // Sets isCurrentEasy/Medium/HardCompleted to false
         LevelManager.instance.HandleGameEnd();
     }
     
@@ -129,12 +140,6 @@ public class Player : PlayersManager {
         // After level completed, disable UI elements and determine the next event
         UIManager.instance.SetPauseButton(false); 
         LevelManager.instance.DetermineNextEvent();
-    }
-    
-    public void HealPlayer(int healAmount) {
-        if (this._currentHealth >= this._maxHealth) return;
-        this._currentHealth = Mathf.Clamp(this._currentHealth += healAmount, 0, this._maxHealth);
-        UIManager.instance.UpdatePlayerHealthText();
     }
 
     protected override void OnCollisionEnter2D(Collision2D collision) {

@@ -139,12 +139,7 @@ public class UIManager : MonoBehaviour {
         OnRestart(); 
     }
 
-    public void OnEndRestart() {
-        // If player lost
-        LevelManager.instance.ResetCurrentLevelByDiff();
-        LevelManager.hasResetRun = true; // Calls ResetRunState
-        OnRestart();
-    }
+    public void OnEndRestart() => OnRestart();
     
     private void OnRestart() {
         Debug.Log("Restart");
@@ -157,9 +152,10 @@ public class UIManager : MonoBehaviour {
     }
 
     public void OnHome() {
-        SceneManager.LoadScene("HomeScene");
+        SceneManager.LoadScene("DifficultySelectScene");
+        LevelManager.instance.StopAllCoroutines(true);
         OnHomeExit(); // Reset home color to original color
-        DisableGameButtonsOnPause();
+        DisableGameButtonsOnPause(); // If GameManager.isPaused, disable pauseGameButtons instead disable endScreenButtons
         ResetCanvasUIAlpha();
     }
     
@@ -281,7 +277,10 @@ public class UIManager : MonoBehaviour {
     
     public void DisplayEndScreen() {
         this._topTextBG.sizeDelta = new Vector2(this._endTextBGWidth, this._topTextBG.sizeDelta.y);
-        this._topText.text = Player.hasWon ? winText : loseText;
+        if (Player.hasWon) {
+            this._topText.text = winText;
+            this._endRestartButton.interactable = false; // Can't restart if won
+        } else this._topText.text = loseText;
         DimCanvasUI();
         SetEndScreenButtons(true);
         SetActionButtons(false);
@@ -305,6 +304,7 @@ public class UIManager : MonoBehaviour {
         this.isMemorizing = true;
         // Adjust topText size based on the timeToMemorize text
         this._topTextBG.sizeDelta = new Vector2(this._memorizeTextBGWidth, this._topTextBG.sizeDelta.y);
+        GameManager.instance.SetTimeToMemorize(GameManager.instance.GetTimeToMemorizeByDiff()); // Resets timeToMemorize
         while (GameManager.instance.timeToMemorize > 0f) {
             if (GameManager.isPaused) yield return new WaitUntil(() => !GameManager.isPaused);
             // float.ToString("F2") or $"{float:F2}" converts the float value to 2 decimal places
@@ -314,7 +314,6 @@ public class UIManager : MonoBehaviour {
         }
         this.isMemorizing = false;
         this._topText.text = $"{{Memorize The Path: [{0f:F2}s]}}";
-        GameManager.instance.SetTimeToMemorize(GameManager.instance.GetTimeToMemorizeByDiff()); // Resets timeToMemorize
     }
 
     public void StartTimeToMemorizeCoroutine() {
@@ -334,6 +333,7 @@ public class UIManager : MonoBehaviour {
         this.isCompleting = true;
         // Adjust topText size based on the timeToComplete text
         this._topTextBG.sizeDelta = new Vector2(this._completeTextBGWidth, this._topTextBG.sizeDelta.y);
+        GameManager.instance.SetTimeToComplete(GameManager.instance.GetTimeToCompleteByDiff()); // Resets timeToComplete
         while (!GameManager.instance.player.hasEnded && GameManager.instance.timeToComplete > 0f) {
             if (GameManager.isPaused) yield return new WaitUntil(() => !GameManager.isPaused);
             // float.ToString("F2") or $"{float:F2}" converts the float value to 2 decimal places
@@ -345,7 +345,6 @@ public class UIManager : MonoBehaviour {
         // After timeToComplete is done, call OnPlayerEnded
         if (GameManager.instance.player.hasEnded) yield break;
         this._topText.text = $"{{Complete In: [{0f:F2}s]!}}";
-        GameManager.instance.SetTimeToComplete(GameManager.instance.GetTimeToCompleteByDiff()); // Resets timeToComplete
         GameManager.instance.player.OnPlayerEnded(); // Sets hasEnded to true and updates score
     }
     

@@ -19,6 +19,10 @@ public class Traitor : PlayersManager {
         base.Awake();
         this._lineRenderer.positionCount = 1;
     }
+
+    void Start() {
+        OnDead += OnPlayerDead;
+    }
     
     private IEnumerator MoveSequence() {
         if (this.isMoving) yield break;
@@ -60,7 +64,7 @@ public class Traitor : PlayersManager {
         Vector2Int targetPos = startPos + direction;
         
         var elapsedTime = 0f;
-        while (elapsedTime < timeToMove) {
+        while (elapsedTime < timeToMove && !this.isDead) {
             this.transform.position = Vector2.Lerp(startPos, targetPos, elapsedTime / timeToMove);
             elapsedTime += Time.deltaTime;
             yield return null;
@@ -115,7 +119,12 @@ public class Traitor : PlayersManager {
         base.OnDamaged(damageAmount);
         UIManager.instance.UpdateTraitorHealth();
         if (this._currentHealth != 0) return;
-        Player.hasWon = true; // Player wins if traitor is killed
+        InvokeOnDead(); // Invoke if traitor is killed
+    }
+
+    protected override void OnPlayerDead() {
+        isDead = true; Player.hasWon = true; // Player wins 
+        LevelManager.instance.ActivateAllLevels(); // Sets LevelManager-related UI appropriately
         LevelManager.instance.HandleGameEnd();
     }
 

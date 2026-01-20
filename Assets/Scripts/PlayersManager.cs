@@ -14,6 +14,9 @@ public abstract class PlayersManager : MonoBehaviour {
 
     public bool isMoving { get; protected set; }
     public bool hasEnded { get; set; }
+    public bool isDead { get; protected set; }
+    
+    protected event Action OnDead;
 
     protected int _currentHealth;
     protected float _timeToMove;
@@ -24,19 +27,22 @@ public abstract class PlayersManager : MonoBehaviour {
     }
 
     private void OnDestroy() {
-        PlayersDataManager.instance.SavePlayersData();
+        PlayersSettingsManager.instance.SavePlayersSettings();
     }
 
     protected virtual void OnDamaged(float damageAmount) {
         var damage = Mathf.RoundToInt(damageAmount);
         this._currentHealth = Mathf.Clamp(this._currentHealth - damage, 0, this._maxHealth);
     }
+    protected void InvokeOnDead() => OnDead?.Invoke();
+    protected abstract void OnPlayerDead();
+    
     
     public bool MovesEquals(PlayersManager otherPlayers) {
         return this._moves.SequenceEqual(otherPlayers._moves);
     }
 
-    public void ResetPlayerSettings() {
+    public virtual void ResetPlayerSettings() {
         this._currentHealth = this._maxHealth;
         this._weaponManager.SetCurrentMagazineCount(this._weaponManager.GetMaxMagazineCount());
     }
@@ -54,7 +60,7 @@ public abstract class PlayersManager : MonoBehaviour {
     public int GetMovesCount() => this._moves.Count;
     public Vector2Int GetMovesPosByIndex(int index) => this._moves[index];
     
-     protected abstract void OnCollisionEnter2D(Collision2D collision);
+    protected abstract void OnCollisionEnter2D(Collision2D collision);
 }
     
     

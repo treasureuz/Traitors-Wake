@@ -8,12 +8,12 @@ public class ScoreManager : MonoBehaviour {
     private const float middleTimePoints = 15f;
     private const float highTimePoints = 20f;
 
-    private float _currentEasyScore;
-    private float _currentMediumScore;
-    private float _currentHardScore;
-    private float _easyHighScore;
-    private float _mediumHighScore;
-    private float _hardHighScore;
+    private float _easyCurrentScore;
+    private float _mediumCurrentScore;
+    private float _hardCurrentScore;
+    public float easyHighScore { get; private set; }
+    public float mediumHighScore { get; private set; }
+    public float hardHighScore { get; private set; }
     
     void Awake() {
         if (instance) {
@@ -26,6 +26,7 @@ public class ScoreManager : MonoBehaviour {
 
     void Start() => SetHighScoreByDiff(0f); // Reset high score one time
     
+    // This is done by difficulty
     public void CalculateScores() {
         var currentTimeToComplete = GameManager.instance.timeToComplete;
         // LowTimeToComplete range = [0, CalculateLowTimeComplete)
@@ -52,36 +53,38 @@ public class ScoreManager : MonoBehaviour {
 
     public void SetCurrentScoreByDiff(float score) {
         switch (GameManager.instance.difficulty) {
-            case GameManager.Difficulty.Easy: this._currentEasyScore = score; break;
-            case GameManager.Difficulty.Medium: this._currentMediumScore = score; break;
-            case GameManager.Difficulty.Hard: this._currentHardScore = score; break;
-        }
-    }
-    
-    private void SetHighScoreByDiff(float score) {
-        switch (GameManager.instance.difficulty) {
-            case GameManager.Difficulty.Easy: this._easyHighScore = score; break;
-            case GameManager.Difficulty.Medium: this._mediumHighScore = score; break;
-            case GameManager.Difficulty.Hard: this._hardHighScore = score; break;
+            case GameManager.Difficulty.Easy: this._easyCurrentScore = score; break;
+            case GameManager.Difficulty.Medium: this._mediumCurrentScore = score; break;
+            case GameManager.Difficulty.Hard: this._hardCurrentScore = score; break;
         }
     }
     
     private float GetCurrentScoreByDiff() {
         return GameManager.instance.difficulty switch {
-            GameManager.Difficulty.Easy => this._currentEasyScore,
-            GameManager.Difficulty.Medium => this._currentMediumScore,
-            GameManager.Difficulty.Hard => this._currentHardScore,
+            GameManager.Difficulty.Easy => this._easyCurrentScore,
+            GameManager.Difficulty.Medium => this._mediumCurrentScore,
+            GameManager.Difficulty.Hard => this._hardCurrentScore,
             _ => 0f
         };
     }
-    public float GetTotalCurrentScore() => this._currentEasyScore + this._currentMediumScore + this._currentHardScore;
-    public float GetTotalHighScore() => this._easyHighScore + this._mediumHighScore + this._hardHighScore;
-    public float GetHighScoreByDiff() {
+    
+    private void SetHighScoreByDiff(float score) {
+        switch (GameManager.instance.difficulty) {
+            case GameManager.Difficulty.Easy: this.easyHighScore = score; break;
+            case GameManager.Difficulty.Medium: this.mediumHighScore = score; break;
+            case GameManager.Difficulty.Hard: this.hardHighScore = score; break;
+        }
+    }
+    
+    private float GetHighScoreByDiff() {
         return GameManager.instance.difficulty switch {
-            GameManager.Difficulty.Easy => this._easyHighScore,
-            GameManager.Difficulty.Medium => this._mediumHighScore,
-            GameManager.Difficulty.Hard => this._hardHighScore,
+            GameManager.Difficulty.Easy => this.easyHighScore,
+            GameManager.Difficulty.Medium => this.mediumHighScore,
+            GameManager.Difficulty.Hard => this.hardHighScore,
             _ => 0f
         };
     }
+    // Total scores used in GameUIManager
+    public float GetTotalCurrentScore() => this._easyCurrentScore + this._mediumCurrentScore + this._hardCurrentScore;
+    public float GetTotalHighScore() => this.easyHighScore + this.mediumHighScore + this.hardHighScore;
 }
