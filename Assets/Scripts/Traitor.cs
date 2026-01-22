@@ -19,10 +19,6 @@ public class Traitor : PlayersManager {
         base.Awake();
         this._lineRenderer.positionCount = 1;
     }
-
-    void Start() {
-        OnDead += OnPlayerDead;
-    }
     
     private IEnumerator MoveSequence() {
         if (this.isMoving) yield break;
@@ -55,7 +51,7 @@ public class Traitor : PlayersManager {
             this._randomDir = NextDir();
         }
         this.isMoving = false;
-        if (PowerUpManager.instance.hasClearedObstacles) yield break;
+        if (GameManager.instance.GetPowerUpManagerByDiff().hasClearedObstacles) yield break;
         GridManager.instance.MakeObstacleTile(GameManager.instance.numOfObstacles);
     }
 
@@ -123,9 +119,8 @@ public class Traitor : PlayersManager {
     }
 
     protected override void OnPlayerDead() {
-        isDead = true; Player.hasWon = true; // Player wins 
-        LevelManager.instance.ActivateAllLevels(); // Sets LevelManager-related UI appropriately
-        LevelManager.instance.HandleGameEnd();
+        isDead = true; ScoreManager.instance.CalculateScores();
+        LevelManager.instance.ActivateAllLevelsByDiff(); // Sets isCurrentEasy/Medium/HardCompleted to true
     }
 
     protected override void OnCollisionEnter2D(Collision2D collision) {

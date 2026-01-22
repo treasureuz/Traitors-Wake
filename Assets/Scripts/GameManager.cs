@@ -35,6 +35,14 @@ public class GameManager : MonoBehaviour {
     [SerializeField] private int _hardMinNumOfObstacles = 4;
     [SerializeField] private int _hardMaxNumOfObstacles = 5;
     
+    [Header("Players Max Health")]
+    [SerializeField] private int _easyPlayerMaxHealth = 70;
+    [SerializeField] private int _easyTraitorMaxHealth = 200;
+    [SerializeField] private int _mediumPlayerMaxHealth = 85;
+    [SerializeField] private int _mediumTraitorMaxHealth = 175;
+    [SerializeField] private int _hardPlayerMaxHealth = 100;
+    [SerializeField] private int _hardTraitorMaxHealth = 150;
+    
     [Header("Time To Memorize")]
     [SerializeField] private float _easyTimeToMemorize = 3.5f;
     [SerializeField] private float _mediumTimeToMemorize = 3f;
@@ -63,6 +71,10 @@ public class GameManager : MonoBehaviour {
     [SerializeField] private float _hardMinTimeBetweenShots = 2.5f;
     [SerializeField] private float _hardMaxTimeBetweenShots = 6f;
     
+    [Header("Easy/Medium Reset Count")]
+    [SerializeField] private int _maxEasyResetCount = 2;
+    [SerializeField] private int _maxMediumResetCount = 1;
+    
     public Vector2Int FinishPos => this._finishPos;
     public static GameManager instance;
         
@@ -78,6 +90,8 @@ public class GameManager : MonoBehaviour {
     public int numOfDirs {get; private set;}
     public int numOfChests { get; private set; }
     public int numOfObstacles { get; private set; }
+    public int easyResetCount { get; private set; }
+    public int mediumResetCount { get; private set; }
     public float timeToMemorize { get; private set; }
     public float timeToComplete { get; private set; }
 
@@ -100,6 +114,11 @@ public class GameManager : MonoBehaviour {
         DontDestroyOnLoad(this.gameObject);
     }
 
+    void Start() {
+        this.easyResetCount = this._maxEasyResetCount;
+        this.mediumResetCount = this._maxMediumResetCount;
+    }
+    
     void OnEnable() {
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
@@ -114,12 +133,15 @@ public class GameManager : MonoBehaviour {
     }
 
     private void Begin() {
-        SpawnPlayers();
+        SetupReferences();
         HandleDifficultySettings();
         LevelManager.instance.TryStartLevel();
     }
 
-    private void SpawnPlayers() {
+    private void SetupReferences() {
+        this._easyPowerUpManager = this.transform.Find("EasyPowerUpManager").GetComponent<PowerUpManager>();
+        this._mediumPowerUpManager = this.transform.Find("MediumPowerUpManager").GetComponent<PowerUpManager>();
+        this._hardPowerUpManager = this.transform.Find("HardPowerUpManager").GetComponent<PowerUpManager>();
         this.player = Instantiate(this._playerPrefab, PlayersManager.SpawnPosV3(), Quaternion.identity);
         this.player.gameObject.SetActive(false);
         this.traitor = Instantiate(this._traitorPrefab, PlayersManager.SpawnPosV3(), Quaternion.identity);
@@ -141,6 +163,8 @@ public class GameManager : MonoBehaviour {
                 this.numOfObstacles = Random.Range(this._easyMinNumOfObstacles, this._easyMaxNumOfObstacles + 1);
                 GridManager.instance.SetWidth(this._easyWidth);
                 GridManager.instance.SetHeight(this._easyHeight);
+                this.player.SetMaxHealth(this._easyPlayerMaxHealth);
+                this.traitor.SetMaxHealth(this._easyTraitorMaxHealth);
                 this.timeToMemorize = this._easyTimeToMemorize;
                 this.timeToComplete = this._easyTimeToComplete;
                 this.player.SetTimeToMove(this._easyPlayerTimeToMove);
@@ -155,6 +179,8 @@ public class GameManager : MonoBehaviour {
                 this.numOfObstacles = Random.Range(this._mediumMinNumOfObstacles, this._mediumMaxNumOfObstacles + 1);
                 GridManager.instance.SetWidth(this._mediumWidth);
                 GridManager.instance.SetHeight(this._mediumHeight);
+                this.player.SetMaxHealth(this._mediumPlayerMaxHealth);
+                this.traitor.SetMaxHealth(this._mediumTraitorMaxHealth);
                 this.timeToMemorize = this._mediumTimeToMemorize;
                 this.timeToComplete = this._mediumTimeToComplete;
                 this.player.SetTimeToMove(this._mediumPlayerTimeToMove);
@@ -169,6 +195,8 @@ public class GameManager : MonoBehaviour {
                 this.numOfObstacles = Random.Range(this._hardMinNumOfObstacles, this._hardMaxNumOfObstacles + 1);
                 GridManager.instance.SetWidth(this._hardWidth);
                 GridManager.instance.SetHeight(this._hardHeight);
+                this.player.SetMaxHealth(this._hardPlayerMaxHealth);
+                this.traitor.SetMaxHealth(this._hardTraitorMaxHealth);
                 this.timeToMemorize = this._hardTimeToMemorize;
                 this.timeToComplete = this._hardTimeToComplete;
                 this.player.SetTimeToMove(this._hardPlayerTimeToMove);
@@ -203,5 +231,31 @@ public class GameManager : MonoBehaviour {
             _ => 0f
         };
     }
+
+    public int GetMaxResetCount(Difficulty diff) {
+        return diff switch {
+            Difficulty.Easy => this._maxEasyResetCount,
+            Difficulty.Medium => this._maxMediumResetCount,
+            _ => 0
+        };
+    }
+    public void DecrementResetCount(Difficulty diff) {
+        switch (this.difficulty) {
+            case Difficulty.Easy: --this.easyResetCount; break;
+            case Difficulty.Medium: -- this.mediumResetCount; break;
+        }
+    }
+    public void ResetResetCounts() {
+        this.easyResetCount = this._maxEasyResetCount;
+        this.mediumResetCount = this._maxMediumResetCount;
+    }
     
+    public PowerUpManager GetPowerUpManagerByDiff() {
+        return this.difficulty switch {
+            Difficulty.Easy => this._easyPowerUpManager,
+            Difficulty.Medium => this._mediumPowerUpManager,
+            Difficulty.Hard => this._hardPowerUpManager,
+            _ => null
+        };
+    }
 }

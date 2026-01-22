@@ -31,9 +31,17 @@ public class HomeStatsManager : MonoBehaviour {
     }
 
     private void UpdateLevelsCompletedTexts() {
-        this._totalLevelsCText.text = $"{LevelManager.instance.GetTotalLevelsCompleted()/LevelManager.instance.GetTotalLevels():F1}";
-        this._easyLevelsCText.text = $"{LevelManager.instance.currentEasyLevelsCompleted/LevelManager.instance.GetMaxEasyLevels():F1}";
-        this._mediumLevelsCText.text = $"{LevelManager.instance.currentMediumLevelsCompleted/LevelManager.instance.GetMaxMediumLevels():F1}";
-        this._hardLevelsCText.text = $"{LevelManager.instance.currentHardLevelsCompleted/LevelManager.instance.GetMaxHardLevels():F1}";
+        // Shows in percentage 
+        this._totalLevelsCText.text = 
+            $"{(float)LevelManager.instance.GetTotalLevelsCompleted()/LevelManager.instance.GetTotalLevels()*100:F1}%";
+        this._easyLevelsCText.text = LevelManager.instance.isCurrentEasyCompleted ? 
+            $"{(float)LevelManager.instance.GetMaxEasyLevels()/LevelManager.instance.GetMaxEasyLevels()*100:F1}%" :
+            $"{(float)LevelManager.instance.currentEasyLevelsCompleted/LevelManager.instance.GetMaxEasyLevels()*100:F1}%";
+        this._mediumLevelsCText.text = LevelManager.instance.isCurrentMediumCompleted ? 
+            $"{(float)LevelManager.instance.GetMaxMediumLevels()/LevelManager.instance.GetMaxMediumLevels()*100:F1}%" :
+            $"{(float)LevelManager.instance.currentMediumLevelsCompleted/LevelManager.instance.GetMaxMediumLevels()*100:F1}%";
+        this._hardLevelsCText.text = LevelManager.instance.isCurrentHardCompleted ? 
+            $"{(float)LevelManager.instance.GetMaxHardLevels()/LevelManager.instance.GetMaxHardLevels()*100:F1}%" :
+            $"{(float)LevelManager.instance.currentHardLevelsCompleted/LevelManager.instance.GetMaxHardLevels()*100:F1}%";
     }
 }

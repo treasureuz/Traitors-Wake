@@ -7,9 +7,12 @@ using UnityEngine.Events;
 public class Player : PlayersManager {
     [SerializeField] private List<Vector2Int> _directions;
     
-    public static bool hasWon;
-    
     private InputManager _inputManager;
+    
+    public static bool hasWon;
+    public static bool isOutOfLives;
+
+    //private int _currentLivesCount;
     public float TimeToMove => this._timeToMove;
         
     protected override void Awake() {
@@ -17,10 +20,9 @@ public class Player : PlayersManager {
         this._directions = new List<Vector2Int>();
         this._inputManager = this.GetComponent<InputManager>();
     }
-    
-    void Start() {
-        isDead = false;
-        OnDead += OnPlayerDead;
+
+    protected override void Start() {
+        base.Start(); isOutOfLives = PlayersSettingsManager.instance.GetCurrentLivesCount() <= 0;
     }
     
     void Update() {
@@ -117,21 +119,43 @@ public class Player : PlayersManager {
         UIManager.instance.UpdatePlayerHealthText();
     }
     
+    private void DecrementLives() {
+        if (PlayersSettingsManager.instance.DecrementCurrentLivesCount() > 0) return;
+        OnPlayerOutOfLives();
+    }
+    
+    public void OnPlayerOutOfLives() { 
+        isOutOfLives = true; hasWon = false; 
+        this.gameObject.SetActive(false); 
+        LevelManager.instance.ResetAll(); // Sets isCurrentEasy/Medium/HardCompleted to false, calls ResetRunState
+        LevelManager.instance.HandleGameEnd(); // -> Out of Lives Screen
+    }
+    
     protected override void OnDamaged(float damageAmount) {
         base.OnDamaged(damageAmount);
         UIManager.instance.UpdatePlayerHealthText();
         if (this._currentHealth != 0) return;
-        // Invoke if player is dead 
-        InvokeOnDead();
+        InvokeOnDead(); // Invoke if player is dead 
+    }
+    
+    protected override void OnPlayerDead() {
+        DecrementLives(); // 1 life gone
+        if (!isOutOfLives) return; // Return if OOL
+        isDead = true; hasWon = false; 
+        this.gameObject.SetActive(false); 
+        LevelManager.instance.ResetCurrentLevelByDiff(GameManager.instance.difficulty); // Calls ResetRunState
+        LevelManager.instance.HandleGameEnd();
     }
 
-    protected override void OnPlayerDead() {
-        isDead = true; hasWon = false;
-        this.gameObject.SetActive(false);
-        LevelManager.hasResetRun = true; // Calls ResetRunState
-        GameManager.instance.SetDifficulty(GameManager.Difficulty.Easy); // Reset difficulty back to Easy mode
-        LevelManager.instance.ResetAllLevels(); // Sets isCurrentEasy/Medium/HardCompleted to false
-        LevelManager.instance.HandleGameEnd();
+    public void OnPlayerWon() {
+        hasWon = true; LevelManager.instance.HandleGameEnd(); // -> Win Screen
+    }
+    
+    public void OnPlayerLost() {
+        hasWon = false; DecrementLives();
+        if (!isOutOfLives) return; // Return if OOL
+        LevelManager.instance.ResetCurrentLevelByDiff(GameManager.instance.difficulty);
+        LevelManager.instance.HandleGameEnd(); // -> Lose Screen
     }
     
     public void OnPlayerEnded() {

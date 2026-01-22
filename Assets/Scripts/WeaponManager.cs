@@ -10,7 +10,7 @@ public abstract class WeaponManager : MonoBehaviour {
     private const float rotationDuration = 0.072f; //How long to rotate towards mouse position
     
     protected PlayersManager _owner;
-    protected int _currentMagazineCount;
+    private int _currentMagazineCount;
     protected float _nextShootTime;
 
     protected virtual void Update() {

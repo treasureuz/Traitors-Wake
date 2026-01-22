@@ -6,7 +6,6 @@ using Vector3 = UnityEngine.Vector3;
 
 public abstract class PlayersManager : MonoBehaviour {
     [SerializeField] protected WeaponManager _weaponManager;
-    [SerializeField] protected int _maxHealth = 100;
     [SerializeField] protected List<Vector2Int> _moves;
 
     protected static readonly Vector2Int spawnPos = Vector2Int.zero;
@@ -18,12 +17,17 @@ public abstract class PlayersManager : MonoBehaviour {
     
     protected event Action OnDead;
 
+    protected int _maxHealth;
     protected int _currentHealth;
     protected float _timeToMove;
     public void SetTimeToMove(float time) => this._timeToMove = time;
 
     protected virtual void Awake() {
         this._moves = new List<Vector2Int>();
+    }
+
+    protected virtual void Start() {
+        isDead = false; OnDead += OnPlayerDead;
     }
 
     private void OnDestroy() {
@@ -36,7 +40,6 @@ public abstract class PlayersManager : MonoBehaviour {
     }
     protected void InvokeOnDead() => OnDead?.Invoke();
     protected abstract void OnPlayerDead();
-    
     
     public bool MovesEquals(PlayersManager otherPlayers) {
         return this._moves.SequenceEqual(otherPlayers._moves);
@@ -55,6 +58,7 @@ public abstract class PlayersManager : MonoBehaviour {
     
     public void SetCurrentHealth(int health) => this._currentHealth = health; 
     public int GetCurrentHealth() => this._currentHealth;
+    public void SetMaxHealth(int health) => this._maxHealth = health;
     public int GetMaxHealth() => this._maxHealth;
     
     public int GetMovesCount() => this._moves.Count;

@@ -7,6 +7,7 @@ public class ScoreManager : MonoBehaviour {
     private const float lowTimePoints = 10f;
     private const float middleTimePoints = 15f;
     private const float highTimePoints = 20f;
+    private const float traitorKillPercent = 0.15f;
 
     private float _easyCurrentScore;
     private float _mediumCurrentScore;
@@ -29,20 +30,20 @@ public class ScoreManager : MonoBehaviour {
     // This is done by difficulty
     public void CalculateScores() {
         var currentTimeToComplete = GameManager.instance.timeToComplete;
-        // LowTimeToComplete range = [0, CalculateLowTimeComplete)
-        // MidTimeToComplete range = [CalculateLowTimeToComplete, CalculateHighTimeToComplete]
         // HighTimeToComplete range = (CalculateHighTimeToComplete, GetTimeToComplete]
-        if (currentTimeToComplete >= 0f && currentTimeToComplete < CalculateLowTimeToComplete()) {
+        // MidTimeToComplete range = [CalculateLowTimeToComplete, CalculateHighTimeToComplete]
+        // LowTimeToComplete range = [0, CalculateLowTimeComplete)
+        if (currentTimeToComplete > CalculateHighTimeToComplete()) {
+            SetCurrentScoreByDiff(GetCurrentScoreByDiff() + highTimePoints * currentTimeToComplete);
+        } else if (currentTimeToComplete >= 0f && currentTimeToComplete < CalculateLowTimeToComplete()) {
             SetCurrentScoreByDiff(GetCurrentScoreByDiff() + lowTimePoints * currentTimeToComplete);
-        } else if (currentTimeToComplete >= CalculateLowTimeToComplete() &&
-                   currentTimeToComplete <= CalculateHighTimeToComplete()) {
-            SetCurrentScoreByDiff(GetCurrentScoreByDiff() + middleTimePoints * currentTimeToComplete);
         } else {
-            if (currentTimeToComplete > CalculateHighTimeToComplete() &&
-                currentTimeToComplete <= GameManager.instance.GetTimeToCompleteByDiff()) {
-                SetCurrentScoreByDiff(GetCurrentScoreByDiff() + highTimePoints * currentTimeToComplete);
+            if (currentTimeToComplete >= CalculateLowTimeToComplete() &&
+                currentTimeToComplete <= CalculateHighTimeToComplete()) {
+                SetCurrentScoreByDiff(GetCurrentScoreByDiff() + middleTimePoints * currentTimeToComplete);
             }
-        }
+        } 
+        if (GameManager.instance.traitor.isDead) SetCurrentScoreByDiff(GetCurrentScoreByDiff() + GetCurrentScoreByDiff() * traitorKillPercent);
         if (GetCurrentScoreByDiff() > GetHighScoreByDiff()) SetHighScoreByDiff(GetCurrentScoreByDiff());
     }
 

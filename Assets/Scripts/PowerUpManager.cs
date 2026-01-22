@@ -6,10 +6,8 @@ using Random = UnityEngine.Random;
 public class PowerUpManager : MonoBehaviour {
     [SerializeField] private float _minCompleteTime = 3f;
     [SerializeField] private float _maxCompleteTime = 8f;
-    [SerializeField] private int _minHealPoints = 10;
-    [SerializeField] private int _maxHealPoints = 50;
-
-    public static PowerUpManager instance;
+    [SerializeField] private int _minHealPoints = 5;
+    [SerializeField] private int _maxHealPoints = 15;
     
     private readonly List<PowerUp> _activatedPowerUps = new();
     private int _currentCollectedChests;
@@ -37,15 +35,6 @@ public class PowerUpManager : MonoBehaviour {
         None
     }
     public PowerUp powerUp { get; private set; } = PowerUp.None;
-
-    void Awake() {
-        if (instance) {
-            Destroy(gameObject);
-            return;
-        }
-        instance = this;
-        DontDestroyOnLoad(this.gameObject);
-    }
     
     public void ActivatePowerUp() {
         // Get random number between 0 - PowerUp.length - 2 (4)
@@ -93,7 +82,7 @@ public class PowerUpManager : MonoBehaviour {
                 break;
             }
             case PowerUp.HealthBoost: {
-                // Amount of health to grant the player (between minHeal(5) - maxHeal(25))
+                // Amount of health to grant the player (between minHeal(5) - maxHeal(15))
                 this.healPoints = Random.Range(this._minHealPoints, this._maxHealPoints);
                 this.totalHealPoints += this.healPoints;
                 this._totalHealPointsList.Add(this.totalHealPoints);
@@ -106,6 +95,7 @@ public class PowerUpManager : MonoBehaviour {
     }
 
     public void UndoStolenPowerUps() {
+        if (this._activatedPowerUps.Count == 0) return;
         var end = this._activatedPowerUps.Count - this._currentCollectedChests;
         for (var i = this._activatedPowerUps.Count - 1; i >= end; --i) {
             PowerUp power = this._activatedPowerUps[i];
@@ -123,6 +113,7 @@ public class PowerUpManager : MonoBehaviour {
             UIManager.instance.DisablePowerUp(power);
         }
         this.powerUp = this._activatedPowerUps.Count == 0 ? PowerUp.None : this._activatedPowerUps[^1];
+        ResetCurrentCollectedChests();
         UIManager.instance.UpdatePowerUpsUI();
     }
 

@@ -14,6 +14,10 @@ public class BulletBehavior : MonoBehaviour
         LaunchBullet();
         DestroyAfter(this._destroyTime);
     }
+
+    void Update() {
+        if (GameManager.isPaused && this.gameObject) Destroy(this.gameObject);
+    }
     
     private void LaunchBullet() {
         // Both do the same thing

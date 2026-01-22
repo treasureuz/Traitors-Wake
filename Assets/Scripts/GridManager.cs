@@ -86,7 +86,7 @@ public class GridManager : MonoBehaviour {
         // Also changes the chestTile sprite to the opened version
         chestTile.isOpened = true; 
         chestTile.transform.Find("Chest").GetComponent<SpriteRenderer>().sprite = this._openedChestSprite;
-        PowerUpManager.instance.ActivatePowerUp();
+        GameManager.instance.GetPowerUpManagerByDiff().ActivatePowerUp();
         chestTile.PopTileType(); // this calls HandleTileType();
         this._chestTiles.Remove(position);
     }

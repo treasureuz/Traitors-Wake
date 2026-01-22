@@ -69,8 +69,11 @@ public class UIManager : MonoBehaviour {
     private const string loadingLevel = "{Loading Level...}";
     private const string currentScoreText = "Current Score";
     private const string highScoreText = "High Score";
+    private const string exitText = "<color=#FFB90D>[Exit]</color>";
     private const string winText = "<color=#00FF00>Traitor Captured!</color>";
     private const string loseText = "<color=#FF0000>*Translation Mismatch*</color>";
+    private const string outOfLivesText = "<color=#FF0000>*You Are Out of Lives*</color>";
+    private const string deadText = "<color=#FF0000>*DOWN BUT NOT OUT*</color>";
 
     void Awake() {
         instance = this;
@@ -78,10 +81,14 @@ public class UIManager : MonoBehaviour {
         this._mapBorderChildren = this._mapBorder.GetComponentsInChildren<SpriteRenderer>();
     }
     
-    void Start() {
-        ResetCanvasUIAlpha();
+    public void Start() {
+        // Reset relevant UI elements 
+        ResetCanvasUIAlpha(); // Reset opacity 
+        SetActionButtons(false); SetPauseButton(false);
+        SetOnPauseButtons(false); // Disable Resume, Restart, Home on start
+        SetEndScreenButtons(false);
         // Every time this scene loads, update these UI Elements (based on difficulty)
-        UpdatePowerUpsUI(); UpdateScoreText(false); // Don't calculate score
+        UpdatePowerUpsUI(); UpdateScoreText(); // Don't calculate score
     }
     
     void Update() {
@@ -132,11 +139,9 @@ public class UIManager : MonoBehaviour {
     }
 
     public void OnPauseRestart() {
-        DisableGameButtonsOnPause(); 
         // Undo power ups if player restarted
-        PowerUpManager.instance.UndoStolenPowerUps();
-        PowerUpManager.instance.ResetCurrentCollectedChests(); 
-        OnRestart(); 
+        GameManager.instance.GetPowerUpManagerByDiff().UndoStolenPowerUps();
+        DisableGameButtonsOnPause(); OnRestart(); 
     }
 
     public void OnEndRestart() => OnRestart();
@@ -144,7 +149,7 @@ public class UIManager : MonoBehaviour {
     private void OnRestart() {
         Debug.Log("Restart");
         EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
-        DisplayLoadingText(); ResetCanvasUIAlpha(); 
+        ResetCanvasUIAlpha(); 
         // Calls ResetRunState if player restarted in first level 
         if (LevelManager.instance.GetTotalLevelsCompleted() == 0) LevelManager.hasResetRun = true;
         LevelManager.instance.StopAllCoroutines(true);
@@ -153,6 +158,8 @@ public class UIManager : MonoBehaviour {
 
     public void OnHome() {
         SceneManager.LoadScene("DifficultySelectScene");
+        // Undo power ups if player exited
+        GameManager.instance.GetPowerUpManagerByDiff().UndoStolenPowerUps();
         LevelManager.instance.StopAllCoroutines(true);
         OnHomeExit(); // Reset home color to original color
         DisableGameButtonsOnPause(); // If GameManager.isPaused, disable pauseGameButtons instead disable endScreenButtons
@@ -166,10 +173,10 @@ public class UIManager : MonoBehaviour {
 
     public void OnHomeExit() {
         TextMeshProUGUI homeText = this._pauseHomeButton.GetComponentInChildren<TextMeshProUGUI>();
-        homeText.text = "<color=#FFB90D>[Exit]</color>";
+        homeText.text = exitText;
     }
 
-    private void DimCanvasUI() {
+    public void DimCanvasUI() {
         this._canvasGroup.alpha = 0.65f;
         ChangeBGObjectsAlpha();
     }
@@ -188,8 +195,7 @@ public class UIManager : MonoBehaviour {
         }
     }
     
-    public void UpdateScoreText(bool calculateScore) {
-        if (calculateScore) ScoreManager.instance.CalculateScores();
+    public void UpdateScoreText() {
         var currentScore = ScoreManager.instance.GetTotalCurrentScore();
         var totalHighScore = ScoreManager.instance.GetTotalHighScore();
         this._currentScoreText.text = $"{currentScoreText}: {currentScore:F2}\n" +
@@ -220,7 +226,7 @@ public class UIManager : MonoBehaviour {
     
     public void UpdateGiveAmmoText() {
         this._cannonBallSprite.SetActive(true);
-        this._ammoPowerUpText.text = $"{PowerUpManager.instance.totalAmmo}";
+        this._ammoPowerUpText.text = $"{GameManager.instance.GetPowerUpManagerByDiff().totalAmmo}";
     }
     
     public void EnableTraitorsLineSprite() => this._traitorsLineSprite.SetActive(true);
@@ -228,17 +234,17 @@ public class UIManager : MonoBehaviour {
     
     public void UpdateTimeIncreaseText() {
         this._hourglassIcon.SetActive(true);
-        this._timePowerUpText.text = $"{PowerUpManager.instance.totalAddedTime:F2}s";
+        this._timePowerUpText.text = $"{GameManager.instance.GetPowerUpManagerByDiff().totalAddedTime:F2}s";
     }
     
     public void UpdateHealthBoostText() {
         this._heartIcon.SetActive(true);
-        this._healthPowerUpText.text = $"{PowerUpManager.instance.totalHealPoints}";
+        this._healthPowerUpText.text = $"{GameManager.instance.GetPowerUpManagerByDiff().totalHealPoints}";
     }
     
     public void UpdatePowerUpsUI() {
         UpdateHotBarFeedText();
-        foreach (PowerUpManager.PowerUp powerUp in PowerUpManager.instance.GetActivatedPowerUps()) {
+        foreach (PowerUpManager.PowerUp powerUp in GameManager.instance.GetPowerUpManagerByDiff().GetActivatedPowerUps()) {
             switch (powerUp) {
                 case PowerUpManager.PowerUp.AmmoSurplus: UpdateGiveAmmoText(); break;
                 case PowerUpManager.PowerUp.LineTrace: EnableTraitorsLineSprite(); break;
@@ -261,15 +267,15 @@ public class UIManager : MonoBehaviour {
     
     public void UpdateHotBarFeedText() {
         this._hotbarFeedText.enabled = true;
-        switch (PowerUpManager.instance.powerUp) {
+        switch (GameManager.instance.GetPowerUpManagerByDiff().powerUp) {
             case PowerUpManager.PowerUp.LineTrace: this._hotbarFeedText.text = "• Restored Traitor's Wake"; break;
             case PowerUpManager.PowerUp.ClearObstacles: this._hotbarFeedText.text = "• Cleared all obstacles"; break;
             case PowerUpManager.PowerUp.AmmoSurplus: {
-                this._hotbarFeedText.text = $"• Gave {PowerUpManager.instance.ammo} ammo"; break; }
+                this._hotbarFeedText.text = $"• Gave {GameManager.instance.GetPowerUpManagerByDiff().ammo} ammo"; break; }
             case PowerUpManager.PowerUp.BonusTime: {
-                this._hotbarFeedText.text = $"• Added {PowerUpManager.instance.addedTime:F2}s"; break; }
+                this._hotbarFeedText.text = $"• Added {GameManager.instance.GetPowerUpManagerByDiff().addedTime:F2}s"; break; }
             case PowerUpManager.PowerUp.HealthBoost: {
-                this._hotbarFeedText.text = $"• Granted {PowerUpManager.instance.healPoints} health"; break;
+                this._hotbarFeedText.text = $"• Granted {GameManager.instance.GetPowerUpManagerByDiff().healPoints} health"; break;
             }
             case PowerUpManager.PowerUp.None: this._hotbarFeedText.text = ""; break;
         }
@@ -277,10 +283,15 @@ public class UIManager : MonoBehaviour {
     
     public void DisplayEndScreen() {
         this._topTextBG.sizeDelta = new Vector2(this._endTextBGWidth, this._topTextBG.sizeDelta.y);
+        Debug.Log($"From DecrementLives: {Player.isOutOfLives}");
         if (Player.hasWon) {
             this._topText.text = winText;
             this._endRestartButton.interactable = false; // Can't restart if won
-        } else this._topText.text = loseText;
+        } else if (Player.isOutOfLives) {
+            this._topText.text = outOfLivesText;
+            this._endRestartButton.interactable = false; // Can't restart if out of lives
+        } else if (GameManager.instance.player.isDead) this._topText.text = deadText;
+        else this._topText.text = loseText;
         DimCanvasUI();
         SetEndScreenButtons(true);
         SetActionButtons(false);
@@ -373,8 +384,8 @@ public class UIManager : MonoBehaviour {
         } else SetEndScreenButtons(false);
     }
     public void SetPauseButton(bool enable) => this._pauseButton.interactable = enable;
-    public void SetOnPauseButtons(bool enable) => this._resumeButton.transform.parent.gameObject.SetActive(enable);
-    public void SetEndScreenButtons(bool enable) => this._endRestartButton.transform.parent.gameObject.SetActive(enable);
+    private void SetOnPauseButtons(bool enable) => this._resumeButton.transform.parent.gameObject.SetActive(enable);
+    private void SetEndScreenButtons(bool enable) => this._endRestartButton.transform.parent.gameObject.SetActive(enable);
     
     public void DisableAllPowerUpSprites() {
         this._rockSprites.SetActive(false); 
