@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class DiffSelectUIManager : MonoBehaviour {
+    [SerializeField] private GameObject _homeSpritesPrefab;
     [SerializeField] private Button _easyGoButton;
     [SerializeField] private Button _easyResetButton;
     [SerializeField] private Button _mediumGoButton;
@@ -18,6 +19,7 @@ public class DiffSelectUIManager : MonoBehaviour {
     [SerializeField] private TextMeshProUGUI _easyHSText;
     [SerializeField] private TextMeshProUGUI _mediumHSText;
     [SerializeField] private TextMeshProUGUI _hardHSText;
+    [SerializeField] private TextMeshProUGUI _livesCountText;
     
     private const string levelsText = "Levels";
     private const string highScoreText = "High Score";
@@ -32,7 +34,8 @@ public class DiffSelectUIManager : MonoBehaviour {
     }
     
     void Start() {
-        AdjustButtonsSettings(); UpdateTexts(); // Updates levels and high score texts
+        AdjustButtonsSettings(); TryForceWinSequence();
+        UpdateTexts(); // Updates levels and high score texts
     }
 
     private void OnGo(GameManager.Difficulty difficulty) {
@@ -60,6 +63,7 @@ public class DiffSelectUIManager : MonoBehaviour {
             }
         } Start(); // Calls AdjustButtonsSettings and UpdateTextsByDiff
     }
+    
     public void OnResetAll() {
         EventSystem.current.SetSelectedGameObject(null); // Removes "selectedButtonColor"
         LevelManager.instance.ResetAll(); // Sets isCurrentEasy/Medium/HardCompleted to false, calls ResetRunState
@@ -69,16 +73,23 @@ public class DiffSelectUIManager : MonoBehaviour {
     
     private void AdjustButtonsSettings() {
         // Can only play easy if easy isn't completed
-        this._easyGoButton.interactable = !Player.isOutOfLives && LevelManager.instance.NextLevelExistsByDiff(GameManager.Difficulty.Easy);
-        this._easyResetButton.interactable = !Player.isOutOfLives && GameManager.instance.easyResetCount > 0 && !this._easyGoButton.interactable;
+        this._easyGoButton.interactable = !Player.isOutOfLives && !Player.hasWon && LevelManager.instance.NextLevelExistsByDiff(GameManager.Difficulty.Easy);
+        this._easyResetButton.interactable = !Player.isOutOfLives && !Player.hasWon && 
+                                             GameManager.instance.easyResetCount > 0 && !this._easyGoButton.interactable;
         // Can only play medium if easy is completed and medium isn't completed
-        this._mediumGoButton.interactable = !Player.isOutOfLives && LevelManager.instance.isCurrentEasyCompleted && 
+        this._mediumGoButton.interactable = !Player.isOutOfLives && !Player.hasWon && LevelManager.instance.isCurrentEasyCompleted && 
                                             LevelManager.instance.NextLevelExistsByDiff(GameManager.Difficulty.Medium);
-        this._mediumResetButton.interactable = !Player.isOutOfLives && GameManager.instance.mediumResetCount > 0 && LevelManager.instance.isCurrentEasyCompleted &&
-                                               !LevelManager.instance.NextLevelExistsByDiff(GameManager.Difficulty.Medium);
+        this._mediumResetButton.interactable = !Player.isOutOfLives && !Player.hasWon && GameManager.instance.mediumResetCount > 0 
+                                               && LevelManager.instance.isCurrentMediumCompleted;
         // Can only play hard if medium is completed and hard isn't completed
         this._hardGoButton.interactable = !Player.isOutOfLives && LevelManager.instance.isCurrentMediumCompleted &&
                                           LevelManager.instance.NextLevelExistsByDiff(GameManager.Difficulty.Hard);
+    }
+
+    private void TryForceWinSequence() {
+        if (PlayersSettingsManager.instance.hasPlayerWon) {
+            Instantiate(this._homeSpritesPrefab, this.transform.position, Quaternion.identity);
+        }
     }
 
     private void UpdateTexts() {
@@ -101,5 +112,6 @@ public class DiffSelectUIManager : MonoBehaviour {
               + "<color=#FFFFFF>(*C.*)</color>"
             : $"{levelsText}: {LevelManager.instance.currentHardLevelsCompleted}/{LevelManager.instance.GetMaxHardLevels()}";
         this._hardHSText.text = $"{highScoreText}: {ScoreManager.instance.hardHighScore:F2}";
+        this._livesCountText.text = $"{PlayersSettingsManager.instance.GetCurrentLivesCount()}";
     }
 }

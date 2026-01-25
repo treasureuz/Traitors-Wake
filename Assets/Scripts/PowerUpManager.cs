@@ -96,8 +96,8 @@ public class PowerUpManager : MonoBehaviour {
 
     public void UndoStolenPowerUps() {
         if (this._activatedPowerUps.Count == 0) return;
-        var end = this._activatedPowerUps.Count - this._currentCollectedChests;
-        for (var i = this._activatedPowerUps.Count - 1; i >= end; --i) {
+        var endIndex = this._activatedPowerUps.Count - this._currentCollectedChests;
+        for (var i = this._activatedPowerUps.Count - 1; i >= endIndex; --i) {
             PowerUp power = this._activatedPowerUps[i];
             this._activatedPowerUps.RemoveAt(i);
             switch (power) {
@@ -110,7 +110,7 @@ public class PowerUpManager : MonoBehaviour {
                 case PowerUp.ClearObstacles: hasClearedObstacles = false; break;
                 case PowerUp.LineTrace: isLineTrace = false; break;
             }
-            UIManager.instance.DisablePowerUp(power);
+            UIManager.instance.DisablePowerUp(power); // Deactivates the power up sprite
         }
         this.powerUp = this._activatedPowerUps.Count == 0 ? PowerUp.None : this._activatedPowerUps[^1];
         ResetCurrentCollectedChests();

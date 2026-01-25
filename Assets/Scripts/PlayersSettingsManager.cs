@@ -21,7 +21,8 @@ public class PlayersSettingsManager : MonoBehaviour {
     private int _hardTraitorCurrentMagazineCount;
     
     private int _currentLivesCount;
-    
+    public bool hasPlayerWon { get; private set; }
+        
     void Awake() {
         if (instance) {
             Destroy(gameObject);
@@ -76,6 +77,7 @@ public class PlayersSettingsManager : MonoBehaviour {
     }
     
     public void SavePlayersSettings() {
+        this.hasPlayerWon = Player.hasWon;
         switch (GameManager.instance.difficulty) {
             case GameManager.Difficulty.Easy: {
                 this._easyPlayerCurrentHealth = GameManager.instance.player.GetCurrentHealth(); 
@@ -102,6 +104,7 @@ public class PlayersSettingsManager : MonoBehaviour {
     }
     
     public int GetCurrentLivesCount() => this._currentLivesCount;
+    public int GetMaxLivesCount() => this._maxLivesCount;
     public int DecrementCurrentLivesCount() => --this._currentLivesCount;
     public void ResetCurrentLivesCount() {
         this._currentLivesCount = this._maxLivesCount;

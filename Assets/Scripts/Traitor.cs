@@ -14,6 +14,8 @@ public class Traitor : PlayersManager {
     private Coroutine _moveSequenceCoroutine;
     private Vector2Int _randomDir;
     private int _lineIndex;
+    
+    public bool isShipDestroyed { get; private set; }
 
     protected override void Awake() {
         base.Awake();
@@ -60,7 +62,7 @@ public class Traitor : PlayersManager {
         Vector2Int targetPos = startPos + direction;
         
         var elapsedTime = 0f;
-        while (elapsedTime < timeToMove && !this.isDead) {
+        while (elapsedTime < timeToMove && !this.isDead && !this.isShipDestroyed) {
             this.transform.position = Vector2.Lerp(startPos, targetPos, elapsedTime / timeToMove);
             elapsedTime += Time.deltaTime;
             yield return null;
@@ -99,6 +101,26 @@ public class Traitor : PlayersManager {
         return weightedDirs[Random.Range(0, weightedDirs.Count)];
     }
     
+    protected override void OnDamaged(float damageAmount) {
+        base.OnDamaged(damageAmount);
+        UIManager.instance.UpdateTraitorHealth();
+        if (this._currentHealth != 0) return;
+        InvokeOnDead(); // Invoke if traitor is killed
+    }
+
+    protected override void OnPlayerLostOrDead() {
+        if (GameManager.instance.difficulty == GameManager.Difficulty.Hard) isDead = true; // Only can "die" in final stage
+        else this.isShipDestroyed = true; // Any other stage is destroying parts of the ship
+        ScoreManager.instance.CalculateScores(); // Calculate currentScore with traitorKillPercent
+        // Sets isCurrentEasy/Medium/HardCompleted to true and calls HandleGameEnd
+        LevelManager.instance.HandleTraitorDeathByDiff(); 
+    }
+    
+    public override void ResetPlayerSettings() {
+        base.ResetPlayerSettings();
+        isDead = false; isShipDestroyed = false;
+    }
+    
     public void StartMoveSequenceCoroutine() {
         if (this._moveSequenceCoroutine != null) StopCoroutine(this._moveSequenceCoroutine);
         this._moveSequenceCoroutine = StartCoroutine(MoveSequence());
@@ -109,18 +131,6 @@ public class Traitor : PlayersManager {
         StopCoroutine(this._moveSequenceCoroutine);
         this._moveSequenceCoroutine = null;
         this.isMoving = false;
-    }
-
-    protected override void OnDamaged(float damageAmount) {
-        base.OnDamaged(damageAmount);
-        UIManager.instance.UpdateTraitorHealth();
-        if (this._currentHealth != 0) return;
-        InvokeOnDead(); // Invoke if traitor is killed
-    }
-
-    protected override void OnPlayerDead() {
-        isDead = true; ScoreManager.instance.CalculateScores();
-        LevelManager.instance.ActivateAllLevelsByDiff(); // Sets isCurrentEasy/Medium/HardCompleted to true
     }
 
     protected override void OnCollisionEnter2D(Collision2D collision) {

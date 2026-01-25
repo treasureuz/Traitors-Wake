@@ -11,8 +11,7 @@ public class Player : PlayersManager {
     
     public static bool hasWon;
     public static bool isOutOfLives;
-
-    //private int _currentLivesCount;
+    
     public float TimeToMove => this._timeToMove;
         
     protected override void Awake() {
@@ -27,7 +26,7 @@ public class Player : PlayersManager {
     
     void Update() {
         if (this.isDead || GameManager.isPaused || !GameManager.instance.traitor.hasEnded 
-            || GameManager.instance.traitor.isDead || this.hasEnded) return;
+            || GameManager.instance.traitor.isDead || GameManager.instance.traitor.isShipDestroyed || this.hasEnded) return;
         if (this._inputManager.UpIsPressed()) StartCoroutine(HandleMovement(Vector2Int.up, this._timeToMove));
         else if (this._inputManager.DownIsPressed()) StartCoroutine(HandleMovement(Vector2Int.down, this._timeToMove));
         else if (this._inputManager.LeftIsPressed()) StartCoroutine(HandleMovement(Vector2Int.left, this._timeToMove));
@@ -120,7 +119,9 @@ public class Player : PlayersManager {
     }
     
     private void DecrementLives() {
-        if (PlayersSettingsManager.instance.DecrementCurrentLivesCount() > 0) return;
+        PlayersSettingsManager.instance.DecrementCurrentLivesCount();
+        UIManager.instance.UpdateLivesIcons(); // 1 life gone
+        if (PlayersSettingsManager.instance.GetCurrentLivesCount() > 0) return;
         OnPlayerOutOfLives();
     }
     
@@ -128,34 +129,27 @@ public class Player : PlayersManager {
         isOutOfLives = true; hasWon = false; 
         this.gameObject.SetActive(false); 
         LevelManager.instance.ResetAll(); // Sets isCurrentEasy/Medium/HardCompleted to false, calls ResetRunState
-        LevelManager.instance.HandleGameEnd(); // -> Out of Lives Screen
+        GameManager.instance.HandleGameEnd(); // -> Out of Lives Screen
     }
     
     protected override void OnDamaged(float damageAmount) {
         base.OnDamaged(damageAmount);
         UIManager.instance.UpdatePlayerHealthText();
         if (this._currentHealth != 0) return;
-        InvokeOnDead(); // Invoke if player is dead 
+        isDead = true; this.gameObject.SetActive(false); 
+        InvokeOnDead(); // Calls OnPlayerLostOrDead
     }
     
-    protected override void OnPlayerDead() {
-        DecrementLives(); // 1 life gone
-        if (!isOutOfLives) return; // Return if OOL
-        isDead = true; hasWon = false; 
-        this.gameObject.SetActive(false); 
+    public void OnPlayerLost() => OnPlayerLostOrDead(); // -> Mismatch Screen
+    protected override void OnPlayerLostOrDead() {
+        hasWon = false; DecrementLives(); 
+        if (isOutOfLives) return; // Return if OOL
         LevelManager.instance.ResetCurrentLevelByDiff(GameManager.instance.difficulty); // Calls ResetRunState
-        LevelManager.instance.HandleGameEnd();
-    }
-
-    public void OnPlayerWon() {
-        hasWon = true; LevelManager.instance.HandleGameEnd(); // -> Win Screen
+        GameManager.instance.HandleGameEnd(); // -> Mismatch/DBNO Screen
     }
     
-    public void OnPlayerLost() {
-        hasWon = false; DecrementLives();
-        if (!isOutOfLives) return; // Return if OOL
-        LevelManager.instance.ResetCurrentLevelByDiff(GameManager.instance.difficulty);
-        LevelManager.instance.HandleGameEnd(); // -> Lose Screen
+    public void OnPlayerWon() {
+        hasWon = true; GameManager.instance.HandleGameEnd(); // -> Win Screen
     }
     
     public void OnPlayerEnded() {
@@ -163,7 +157,7 @@ public class Player : PlayersManager {
         UIManager.instance.SetActionButtons(false); // Disable buttons so player position isn't overwritten
         // After level completed, disable UI elements and determine the next event
         UIManager.instance.SetPauseButton(false); 
-        LevelManager.instance.DetermineNextEvent();
+        LevelManager.instance.DetermineNextEvent(); 
     }
 
     protected override void OnCollisionEnter2D(Collision2D collision) {

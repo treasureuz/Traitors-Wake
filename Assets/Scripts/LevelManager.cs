@@ -39,7 +39,6 @@ public class LevelManager : MonoBehaviour {
         StopAllCoroutines(true);
         // Reset everything
         hasResetRun = false; GameManager.isPaused = false;
-        ScoreManager.instance.SetCurrentScoreByDiff(0f); // Reset current score by diff
         UIManager.instance.UpdateScoreText(); // Doesn't calculate score
         GameManager.instance.player.ResetPlayerSettings();
         GameManager.instance.traitor.ResetPlayerSettings();
@@ -52,10 +51,11 @@ public class LevelManager : MonoBehaviour {
     
     public void TryStartLevel() {
         // Setup everything before starting
-        if (hasResetRun) ResetRunState(); // only works on start
+        if (hasResetRun) ResetRunState(); 
         // Reset Power Ups on start of new/reset difficulty, *can be called twice*
         if (GetCurrentLevelByDiff() == 0) GameManager.instance.GetPowerUpManagerByDiff().ResetPowerUpsSettings();
-        UIManager.instance.Start(); // Reset relevant UI Elements
+        PlayersSettingsManager.instance.ApplyPlayersSettings(); // Apply saved players data/settings
+        UIManager.instance.Start(); // Reset/Update every relevant UI Elements
         // If player has won or lost, don't generate a level
         if (Player.hasWon || Player.isOutOfLives) {
             UIManager.instance.DimCanvasUI(); // Dim Canvas
@@ -113,8 +113,7 @@ public class LevelManager : MonoBehaviour {
     public void DetermineNextEvent() {
         if (GameManager.instance.player.MovesEquals(GameManager.instance.traitor)) {
             // Calculate scores and display them
-            ScoreManager.instance.CalculateScores();
-            UIManager.instance.UpdateScoreText();
+            ScoreManager.instance.CalculateScores(); UIManager.instance.UpdateScoreText();
             IncrementLevelsCompletedByDiff(); // Only increment if last level was completed
             // Set currentCollectedChests to 0 per level
             GameManager.instance.GetPowerUpManagerByDiff().ResetCurrentCollectedChests(); 
@@ -170,11 +169,6 @@ public class LevelManager : MonoBehaviour {
             _ => false
         };
     }
-    
-    public void HandleGameEnd() {
-        StopAllCoroutines(true);
-        UIManager.instance.DisplayEndScreen();
-    }
 
     public void StopAllCoroutines(bool includeLevelCoroutine) {
         GameManager.instance.traitor.TryStopMoveSequenceCoroutine();
@@ -200,6 +194,8 @@ public class LevelManager : MonoBehaviour {
     
     public void ResetCurrentLevelByDiff(GameManager.Difficulty diff) {
         GameManager.instance.SetDifficulty(diff);
+        // Reset current score to 0 only-if current score was greater than 0 by diff
+        if (ScoreManager.instance.GetCurrentScoreByDiff() > 0) ScoreManager.instance.SetCurrentScoreByDiff(0f); 
         hasResetRun = true; // calls ResetRunState on GO
         switch (diff) {
             case GameManager.Difficulty.Easy: {
@@ -219,6 +215,7 @@ public class LevelManager : MonoBehaviour {
     
     public void ResetAll() {
         Player.hasWon = false; hasResetRun = true; // calls ResetRunState on GO
+        ScoreManager.instance.ResetCurrentScore(); // Sets easy/medium/hardCurrenScore to 0
         this._totalLevelsCompleted = 0;
         this.currentEasyLevelsCompleted = 0;
         this.isCurrentEasyCompleted = false;
@@ -229,25 +226,30 @@ public class LevelManager : MonoBehaviour {
         GameManager.instance.ResetResetCounts();
     }
     
-    // this is only for when the traitor dies...
-    public void ActivateAllLevelsByDiff() {
+    // this is only for when the traitor's ship/traitor dies...
+    public void HandleTraitorDeathByDiff() {
+        this._totalLevelsCompleted = GetMaxLevelsByDiff();
         switch (GameManager.instance.difficulty) {
             case GameManager.Difficulty.Easy: {
                 this.currentEasyLevelsCompleted = GetMaxEasyLevels();
-                this.isCurrentEasyCompleted = true; break;
+                this.isCurrentEasyCompleted = true; 
+                GameManager.instance.HandleGameEnd(); // calls DisplayEndScreen -> OnTraitorShipDestroyed
+                break;
             }
             case GameManager.Difficulty.Medium: {
                 this.currentMediumLevelsCompleted = GetMaxMediumLevels();
-                this.isCurrentMediumCompleted = true; break;
+                this.isCurrentMediumCompleted = true; 
+                GameManager.instance.HandleGameEnd(); // calls DisplayEndScreen -> OnTraitorShipDestroyed
+                break;
             }
             case GameManager.Difficulty.Hard: {
                 this.currentHardLevelsCompleted = GetMaxHardLevels();
-                this.isCurrentHardCompleted = true; break;
+                this.isCurrentHardCompleted = true;
+                // Player wins if traitor is killed in final stage (Hard)
+                GameManager.instance.player.OnPlayerWon(); // calls DisplayEndScreen -> Win Screen
+                break; 
             }
         }
-        this._totalLevelsCompleted = GetMaxLevelsByDiff();
-        // Take player back to DiffSelectScene with completed difficulty
-        SceneManager.LoadScene("DifficultySelectScene"); 
     }
     
     private void IncrementLevelsCompletedByDiff() {
@@ -270,7 +272,5 @@ public class LevelManager : MonoBehaviour {
     public int GetMaxEasyLevels() => this._maxEasyLevels;
     public int GetMaxMediumLevels() => this._maxMediumLevels;
     public int GetMaxHardLevels() => this._maxHardLevels;
-    public int GetTotalLevels() {
-        return this._maxEasyLevels + this._maxMediumLevels + this._maxHardLevels;
-    }
+    public int GetTotalLevels() => this._maxEasyLevels + this._maxMediumLevels + this._maxHardLevels;
 }

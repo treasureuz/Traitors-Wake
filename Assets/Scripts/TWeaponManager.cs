@@ -20,8 +20,8 @@ public class TWeaponManager : WeaponManager {
     }
 
     protected override void HandleShoot() {
-        if (GameManager.isPaused || this._owner.isDead || !this._owner.hasEnded || GameManager.instance.player.isDead 
-            || GameManager.instance.player.hasEnded || !HasBullets()) return;
+        if (GameManager.isPaused || this._owner.isDead || GameManager.instance.traitor.isShipDestroyed || !this._owner.hasEnded 
+            || GameManager.instance.player.isDead || GameManager.instance.player.hasEnded || !HasBullets()) return;
         this._nextShootTime += Time.deltaTime;
         if (this._nextShootTime < this._timeBetweenShots) return;
         Shoot();

@@ -7,14 +7,15 @@ public class ScoreManager : MonoBehaviour {
     private const float lowTimePoints = 10f;
     private const float middleTimePoints = 15f;
     private const float highTimePoints = 20f;
-    private const float traitorKillPercent = 0.15f;
+    private const float traitorKillPoints = 250f;
+    private const float penaltyPoints = 90f;
 
-    private float _easyCurrentScore;
-    private float _mediumCurrentScore;
-    private float _hardCurrentScore;
     public float easyHighScore { get; private set; }
     public float mediumHighScore { get; private set; }
     public float hardHighScore { get; private set; }
+    private float _easyCurrentScore;
+    private float _mediumCurrentScore;
+    private float _hardCurrentScore;
     
     void Awake() {
         if (instance) {
@@ -25,14 +26,14 @@ public class ScoreManager : MonoBehaviour {
         DontDestroyOnLoad(this.gameObject);
     }
 
-    void Start() => SetHighScoreByDiff(0f); // Reset high score one time
+    //void Start() => SetHighScoreByDiff(0f); // Reset high score one time
     
     // This is done by difficulty
     public void CalculateScores() {
-        var currentTimeToComplete = GameManager.instance.timeToComplete;
         // HighTimeToComplete range = (CalculateHighTimeToComplete, GetTimeToComplete]
         // MidTimeToComplete range = [CalculateLowTimeToComplete, CalculateHighTimeToComplete]
         // LowTimeToComplete range = [0, CalculateLowTimeComplete)
+        var currentTimeToComplete = GameManager.instance.timeToComplete;
         if (currentTimeToComplete > CalculateHighTimeToComplete()) {
             SetCurrentScoreByDiff(GetCurrentScoreByDiff() + highTimePoints * currentTimeToComplete);
         } else if (currentTimeToComplete >= 0f && currentTimeToComplete < CalculateLowTimeToComplete()) {
@@ -42,16 +43,24 @@ public class ScoreManager : MonoBehaviour {
                 currentTimeToComplete <= CalculateHighTimeToComplete()) {
                 SetCurrentScoreByDiff(GetCurrentScoreByDiff() + middleTimePoints * currentTimeToComplete);
             }
-        } 
-        if (GameManager.instance.traitor.isDead) SetCurrentScoreByDiff(GetCurrentScoreByDiff() + GetCurrentScoreByDiff() * traitorKillPercent);
+        }
+        if (GameManager.instance.traitor.isShipDestroyed || GameManager.instance.traitor.isDead) 
+            SetCurrentScoreByDiff(GetCurrentScoreByDiff() + traitorKillPoints); 
         if (GetCurrentScoreByDiff() > GetHighScoreByDiff()) SetHighScoreByDiff(GetCurrentScoreByDiff());
+    }
+
+    // On Restart or Exit
+    public void HandleScorePenalty() {
+        // *"isPaused" check might be unnecessary since this method is only called in their two places*
+        // Subtracts 200 points off current score
+        if (GameManager.isPaused) SetCurrentScoreByDiff(GetCurrentScoreByDiff() - penaltyPoints);
     }
 
     private static float CalculateLowTimeToComplete() => GameManager.instance.GetTimeToCompleteByDiff() / 4;
     private static float CalculateHighTimeToComplete() {
         return (GameManager.instance.GetTimeToCompleteByDiff() + GameManager.instance.GetTimeToCompleteByDiff() / 2) / 2;
     }
-
+    
     public void SetCurrentScoreByDiff(float score) {
         switch (GameManager.instance.difficulty) {
             case GameManager.Difficulty.Easy: this._easyCurrentScore = score; break;
@@ -60,7 +69,13 @@ public class ScoreManager : MonoBehaviour {
         }
     }
     
-    private float GetCurrentScoreByDiff() {
+    public void ResetCurrentScore() {
+        this._easyCurrentScore = 0f;
+        this._mediumCurrentScore = 0f;
+        this._hardCurrentScore = 0f; 
+    }
+    
+    public float GetCurrentScoreByDiff() {
         return GameManager.instance.difficulty switch {
             GameManager.Difficulty.Easy => this._easyCurrentScore,
             GameManager.Difficulty.Medium => this._mediumCurrentScore,

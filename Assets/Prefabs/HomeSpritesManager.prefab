@@ -1,0 +1,65 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5145047940412832770
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4651951979984017329}
+  - component: {fileID: 5694645444020096338}
+  m_Layer: 0
+  m_Name: HomeSpritesManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4651951979984017329
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5145047940412832770}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5694645444020096338
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5145047940412832770}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e348fdb82574b3f49ab738164df9863c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HomeSpritesBehavior
+  _spritePrefabs:
+  - {fileID: 1963231832357259459, guid: bcacf11702aee4842b84d1a458d3444e, type: 3}
+  - {fileID: 8857615722023766623, guid: 37d1c1688b7a9404a849720589acf7f4, type: 3}
+  - {fileID: 556333011321205316, guid: dd5dc52e84d3a244193d2ea1af5c072e, type: 3}
+  - {fileID: 89375265964035941, guid: 500bcedb53ab2ce43a7baebfd0469a54, type: 3}
+  - {fileID: 880674818556203559, guid: 114c95c0ecfc43f4796bfce2e72ef0af, type: 3}
+  - {fileID: 7707451597797768554, guid: 0fc2ba58620554643ad448fdcd4ad92b, type: 3}
+  - {fileID: 405390219888611342, guid: ed3b2e92cf525884b9c4c0d9d9874526, type: 3}
+  - {fileID: 1564406733100574719, guid: 02c9a57c8b9a7684889558f795d3d986, type: 3}
+  - {fileID: 3841960923211616052, guid: f412cceb719f35a4b9b5e481abbb1e40, type: 3}
+  - {fileID: 6476438979143105826, guid: 1921cfae74c09d3468e4017b7ef82869, type: 3}
+  _rotationSpeed: -77
+  _launchSpeed: 2.73
+  _minWaitTime: 2
+  _maxWaitTime: 5.35
+  _minX: -11.5
+  _maxX: 11.5
+  _minY: -5.5
+  _maxY: 5.5

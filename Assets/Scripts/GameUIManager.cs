@@ -24,6 +24,7 @@ public class UIManager : MonoBehaviour {
     [Header("TMP References")]
     [SerializeField] private TextMeshProUGUI _topText;
     [SerializeField] private TextMeshProUGUI _playerHealthText;
+    [SerializeField] private TextMeshProUGUI _traitorText;
     [SerializeField] private TextMeshProUGUI _traitorHealthText;
     [SerializeField] private TextMeshProUGUI _ammoPowerUpText;
     [SerializeField] private TextMeshProUGUI _timePowerUpText;
@@ -48,6 +49,7 @@ public class UIManager : MonoBehaviour {
     [SerializeField] private GameObject _mapBorder;
     
     [Header("Image References")]
+    [SerializeField] private List<Image> _livesIcons;
     [SerializeField] private List<Image> _bulletBars;
     [SerializeField] private Image _playerHealthBar;
     [SerializeField] private Image _traitorHealthBar;
@@ -69,11 +71,17 @@ public class UIManager : MonoBehaviour {
     private const string loadingLevel = "{Loading Level...}";
     private const string currentScoreText = "Current Score";
     private const string highScoreText = "High Score";
-    private const string exitText = "<color=#FFB90D>[Exit]</color>";
-    private const string winText = "<color=#00FF00>Traitor Captured!</color>";
-    private const string loseText = "<color=#FF0000>*Translation Mismatch*</color>";
-    private const string outOfLivesText = "<color=#FF0000>*You Are Out of Lives*</color>";
+    private const string restartText = "<color=#FFB90D><size=34.2px>[Restart]</size></color><size=28px><color=#FF0000>(-200)</size></color>";
+    private const string exitText = "<color=#FFB90D>[Exit]</color><size=30px><color=#FF0000>(-200)</size></color>";
+    private const string traitorHealthText = "<size=28px>{Traitor's Health}</size>";
+    private const string tillerHealthText = "<size=27px>{Traitor's Tiller Health}</size>";
+    private const string sternHealthText = "<size=27px>{Traitor's Stern Health}</size>";
+    private const string tillerEndText = "*TRAITOR'S SHIP LOST CONTROL!*"; 
+    private const string sternEndText = "*YOU BLEW OUT THE STERN!*"; 
+    private const string winText = "<color=#00FF00><size=45px>*TRAITOR CAPTURED!*</color></size>";
+    private const string loseText = "<color=#FF0000>*TRANSLATION MISMATCH*</color>";
     private const string deadText = "<color=#FF0000>*DOWN BUT NOT OUT*</color>";
+    private const string outOfLivesText = "<color=#FF0000>*YOU ARE OUT OF LIVES*</color>";
 
     void Awake() {
         instance = this;
@@ -83,12 +91,11 @@ public class UIManager : MonoBehaviour {
     
     public void Start() {
         // Reset relevant UI elements 
-        ResetCanvasUIAlpha(); // Reset opacity 
-        SetActionButtons(false); SetPauseButton(false);
-        SetOnPauseButtons(false); // Disable Resume, Restart, Home on start
-        SetEndScreenButtons(false);
-        // Every time this scene loads, update these UI Elements (based on difficulty)
-        UpdatePowerUpsUI(); UpdateScoreText(); // Don't calculate score
+        ResetCanvasUIAlpha(); // Reset opacity
+        SetPauseButton(false); SetOnPauseButtons(false); // Disable Resume, Restart, Home on start
+        SetActionButtons(false); SetEndScreenButtons(false);
+        // Every time this scene loads, update these UI Elements 
+        UpdateLivesIcons(); UpdatePowerUpsUI(); UpdateScoreText(); // Don't calculate score
     }
     
     void Update() {
@@ -121,8 +128,8 @@ public class UIManager : MonoBehaviour {
 
     public void OnPause() {
         GameManager.isPaused = true; DimCanvasUI();
-        this._pauseButton.interactable = false;
-        SetActionButtons(false); // Disable action buttons
+        // this._pauseButton.interactable = false;
+        // SetActionButtons(false); // Disable action buttons
         SetOnPauseButtons(true); // Activate Resume, Restart, Home
     }
     
@@ -141,29 +148,40 @@ public class UIManager : MonoBehaviour {
     public void OnPauseRestart() {
         // Undo power ups if player restarted
         GameManager.instance.GetPowerUpManagerByDiff().UndoStolenPowerUps();
-        DisableGameButtonsOnPause(); OnRestart(); 
+        ScoreManager.instance.HandleScorePenalty(); // If player restarted level
+        GameManager.isPaused = false; // Set isPaused to false on restart
+        OnRestart(); 
     }
-
     public void OnEndRestart() => OnRestart();
     
     private void OnRestart() {
         Debug.Log("Restart");
         EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
-        ResetCanvasUIAlpha(); 
+        ResetCanvasUIAlpha(); OnRestartExit(); // Reset restart color to original color
         // Calls ResetRunState if player restarted in first level 
         if (LevelManager.instance.GetTotalLevelsCompleted() == 0) LevelManager.hasResetRun = true;
         LevelManager.instance.StopAllCoroutines(true);
         LevelManager.instance.TryStartLevel(); // Restart current level
     }
 
+    public void OnRestartEnter() {
+        TextMeshProUGUI restartTMP = this._pauseRestartButton.GetComponentInChildren<TextMeshProUGUI>();
+        restartTMP.text = "<color=#FFB90D><size=38.2px>[Restart]</size></color>";
+    }
+    
+    public void OnRestartExit() {
+        TextMeshProUGUI restartTMP = this._pauseRestartButton.GetComponentInChildren<TextMeshProUGUI>();
+        restartTMP.text = restartText;
+    }
+
     public void OnHome() {
         SceneManager.LoadScene("DifficultySelectScene");
         // Undo power ups if player exited
-        GameManager.instance.GetPowerUpManagerByDiff().UndoStolenPowerUps();
         LevelManager.instance.StopAllCoroutines(true);
-        OnHomeExit(); // Reset home color to original color
-        DisableGameButtonsOnPause(); // If GameManager.isPaused, disable pauseGameButtons instead disable endScreenButtons
-        ResetCanvasUIAlpha();
+        if (GameManager.isPaused) GameManager.instance.GetPowerUpManagerByDiff().UndoStolenPowerUps();
+        ScoreManager.instance.HandleScorePenalty(); // If player exit while in level
+        GameManager.isPaused = false; // Set isPaused to false when player exits
+        ResetCanvasUIAlpha(); OnHomeExit(); // Reset home color to original color
     }
     
     public void OnHomeEnter() {
@@ -178,11 +196,13 @@ public class UIManager : MonoBehaviour {
 
     public void DimCanvasUI() {
         this._canvasGroup.alpha = 0.65f;
+        this._canvasGroup.interactable = false;
         ChangeBGObjectsAlpha();
     }
 
     private void ResetCanvasUIAlpha() {
         this._canvasGroup.alpha = 1f;
+        this._canvasGroup.interactable = true;
         ChangeBGObjectsAlpha();
     }
 
@@ -200,6 +220,16 @@ public class UIManager : MonoBehaviour {
         var totalHighScore = ScoreManager.instance.GetTotalHighScore();
         this._currentScoreText.text = $"{currentScoreText}: {currentScore:F2}\n" +
                                       $"{highScoreText}: {totalHighScore:F2}";
+    }
+    
+    public void UpdateLivesIcons() {
+        for (var i = 0; i < PlayersSettingsManager.instance.GetCurrentLivesCount(); i++) {
+            this._livesIcons[i].enabled = true;
+        }
+        for (var i = PlayersSettingsManager.instance.GetMaxLivesCount() - 1;
+             i >= PlayersSettingsManager.instance.GetCurrentLivesCount(); i--) {
+            this._livesIcons[i].enabled = false;
+        }
     }
     
     public void UpdateBulletBar() {
@@ -222,6 +252,11 @@ public class UIManager : MonoBehaviour {
         this._traitorHealthText.text = $"{GameManager.instance.traitor.GetCurrentHealth()}%";
         var healthPercent = (float) GameManager.instance.traitor.GetCurrentHealth()/GameManager.instance.traitor.GetMaxHealth();
         this._traitorHealthBar.fillAmount = healthPercent;
+        switch (GameManager.instance.difficulty) {
+            case GameManager.Difficulty.Easy: this._traitorText.text = sternHealthText; break; // Traitor's Ship - Stern
+            case GameManager.Difficulty.Medium: this._traitorText.text = tillerHealthText; break; // Traitor's Ship - Tiller
+            case GameManager.Difficulty.Hard: this._traitorText.text = traitorHealthText; break; // Traitor's Health
+        }
     }
     
     public void UpdateGiveAmmoText() {
@@ -283,20 +318,27 @@ public class UIManager : MonoBehaviour {
     
     public void DisplayEndScreen() {
         this._topTextBG.sizeDelta = new Vector2(this._endTextBGWidth, this._topTextBG.sizeDelta.y);
-        Debug.Log($"From DecrementLives: {Player.isOutOfLives}");
-        if (Player.hasWon) {
+        if (Player.hasWon) { // Also works for Traitor's death 
             this._topText.text = winText;
             this._endRestartButton.interactable = false; // Can't restart if won
         } else if (Player.isOutOfLives) {
             this._topText.text = outOfLivesText;
             this._endRestartButton.interactable = false; // Can't restart if out of lives
         } else if (GameManager.instance.player.isDead) this._topText.text = deadText;
+        else if (GameManager.instance.traitor.isShipDestroyed) OnTraitorShipDestroyed();
         else this._topText.text = loseText;
-        DimCanvasUI();
-        SetEndScreenButtons(true);
-        SetActionButtons(false);
+        DimCanvasUI(); SetEndScreenButtons(true);
     }
 
+    private void OnTraitorShipDestroyed() {
+        switch(GameManager.instance.difficulty) {
+            case GameManager.Difficulty.Easy: this._topText.text = sternEndText; break;
+            case GameManager.Difficulty.Medium: this._topText.text = tillerEndText; break;
+        }
+        // Can't restart if traitor's ship are destroyed (All levels are "activated")
+        this._endRestartButton.interactable = false; 
+    }
+    
     public void DisplayLoadingText() {
         this._topTextBG.sizeDelta = new Vector2(this._mediumLevelTextBGWidth, this._topTextBG.sizeDelta.y);
         this._topText.text = loadingLevel;
@@ -376,13 +418,7 @@ public class UIManager : MonoBehaviour {
         this._resetButton.interactable = enable;
         this._undoButton.interactable = enable;
     }
-
-    private void DisableGameButtonsOnPause() {
-        if (GameManager.isPaused) {
-            GameManager.isPaused = false;
-            SetOnPauseButtons(false);
-        } else SetEndScreenButtons(false);
-    }
+    
     public void SetPauseButton(bool enable) => this._pauseButton.interactable = enable;
     private void SetOnPauseButtons(bool enable) => this._resumeButton.transform.parent.gameObject.SetActive(enable);
     private void SetEndScreenButtons(bool enable) => this._endRestartButton.transform.parent.gameObject.SetActive(enable);

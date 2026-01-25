@@ -27,7 +27,7 @@ public abstract class PlayersManager : MonoBehaviour {
     }
 
     protected virtual void Start() {
-        isDead = false; OnDead += OnPlayerDead;
+        isDead = false; OnDead += OnPlayerLostOrDead;
     }
 
     private void OnDestroy() {
@@ -39,7 +39,7 @@ public abstract class PlayersManager : MonoBehaviour {
         this._currentHealth = Mathf.Clamp(this._currentHealth - damage, 0, this._maxHealth);
     }
     protected void InvokeOnDead() => OnDead?.Invoke();
-    protected abstract void OnPlayerDead();
+    protected abstract void OnPlayerLostOrDead();
     
     public bool MovesEquals(PlayersManager otherPlayers) {
         return this._moves.SequenceEqual(otherPlayers._moves);

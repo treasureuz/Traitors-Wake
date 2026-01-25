@@ -21,8 +21,8 @@ public class BulletBehavior : MonoBehaviour
     
     private void LaunchBullet() {
         // Both do the same thing
-        this._rb2d.AddForce(this.transform.right * this._bulletForce, ForceMode2D.Impulse);
-        //this._rb2d.linearVelocity = this.transform.right * this._bulletForce; // Better for this setting
+        this._rb2d.AddForce(this.transform.right * this._bulletForce, ForceMode2D.Impulse); // Better for this setting
+        //this._rb2d.linearVelocity = this.transform.right * this._bulletForce; 
         this._rb2d.angularVelocity = this._bulletRotationSpeed;
     }
 

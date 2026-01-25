@@ -22,7 +22,7 @@ public class HomeUIManager : MonoBehaviour {
     public static HomeUIManager instance;
     
     private const string titleText = "TRAITOR'S WAKE";
-    private const string controlsText = "W, A, S, D (*Arrow keys apply*)";
+    private const string controlsText = "<u>Controls</u>: W, A, S, D (*Arrow keys apply*)";
 
     void Awake() {
         if (instance) {
@@ -60,7 +60,7 @@ public class HomeUIManager : MonoBehaviour {
         SetHomeButtons(false); // Deactivate homeButtons on start
         this._titleText.text = "";
         StartCoroutine(StartTitleAnimation());
-        this._controlsText.text = "<u>Controls</u>: " + controlsText; // Set controls text
+        this._controlsText.text = controlsText; // Set controls text
     }
     
     private IEnumerator StartTitleAnimation() {

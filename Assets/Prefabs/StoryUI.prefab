@@ -168,7 +168,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -0, y: 0}
-  m_SizeDelta: {x: 506.5, y: 460}
+  m_SizeDelta: {x: 516.5, y: 460}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7445998079864030920
 CanvasRenderer:
@@ -380,8 +380,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.000061035156, y: -45}
-  m_SizeDelta: {x: 510, y: 464}
+  m_AnchoredPosition: {x: 0, y: -45}
+  m_SizeDelta: {x: 520, y: 464}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3305224414505686947
 CanvasRenderer:
@@ -532,8 +532,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 2.5, y: 7.5}
-  m_SizeDelta: {x: 552, y: 50}
+  m_AnchoredPosition: {x: -7.2, y: 0}
+  m_SizeDelta: {x: 543.5, y: 75}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &9129097036328640088
 CanvasRenderer:
@@ -563,13 +563,14 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: A fellow pirate betrayed your pirate ship, The Square Sail, by relaying
-    confidential information to nearby rival pirate ships. With a bounty on his head,
-    the traitor escaped The Square Sail and is headed on to the main land. Your job
-    as the captain is to chase this traitor by memorizing and following his trail
-    on the sea. As you gain momentum, his routes gets trickier and cannon balls are
-    fired to slow you down. Do not worry! Collecting nearby chests grants upgrades
-    that get you closer, leading to his demise.
+  m_text: A fellow pirate betrayed your shipmates by relaying confidential information
+    to nearby rival pirate ships. With a bounty on his head, this traitor escaped
+    onto his own ship and is headed on to the main land. Your job as the captain
+    is to capture him by memorizing and following his trail on the sea. Keep in mind,
+    his routes get more difficulty and trickier, and cannon balls are fired to slow
+    you down. Do not worry! Collecting nearby chests grants powerups. You have 5
+    lives to spare, but every death or mismatch resets your current stage progress.
+    In the final stage, you must either kill him or mirror his wake to win the game.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4a45160fc30d3fe4882edc2712c0b051, type: 2}
   m_sharedMaterial: {fileID: -462789608907736891, guid: 4a45160fc30d3fe4882edc2712c0b051, type: 2}
@@ -596,8 +597,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 23
-  m_fontSizeBase: 23
+  m_fontSize: 21.3
+  m_fontSizeBase: 21.3
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -635,7 +636,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 0, y: 0, z: -18.244873, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0

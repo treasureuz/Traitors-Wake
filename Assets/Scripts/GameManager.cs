@@ -210,6 +210,11 @@ public class GameManager : MonoBehaviour {
         this._finishPos = new Vector2Int(GridManager.instance.Width - 1, GridManager.instance.Height - 1);
     }
     
+    public void HandleGameEnd() {
+        LevelManager.instance.StopAllCoroutines(true);
+        UIManager.instance.DisplayEndScreen();
+    }
+    
     public void SetDifficulty(Difficulty diff) => this.difficulty = diff;
     public void SetTimeToComplete(float time) => this.timeToComplete = time;
     public void SetTimeToMemorize(float time) => this.timeToMemorize = time;

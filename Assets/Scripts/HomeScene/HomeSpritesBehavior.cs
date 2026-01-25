@@ -5,7 +5,7 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public partial class HomeSpritesBehavior : MonoBehaviour {
+public class HomeSpritesBehavior : MonoBehaviour {
     [SerializeField] private GameObject [] _spritePrefabs;
     [SerializeField] private float _rotationSpeed = -75f;
     [SerializeField] private float _launchSpeed = 5.3f;
@@ -24,26 +24,26 @@ public partial class HomeSpritesBehavior : MonoBehaviour {
     }
 
     void Update() {
+        // Destroy sprite if it is past the maxX
         foreach (GameObject sprite in this._spawnedSprites.ToList().Where(sprite => sprite.transform.position.x >= this._maxX)) {
             this._spawnedSprites.Remove(sprite);
             Destroy(sprite);
         }
     }
-
+    
     // ReSharper disable Unity.PerformanceAnalysis
-    [SuppressMessage("ReSharper", "FunctionRecursiveOnAllPaths")]
     private IEnumerator LaunchSprites() {
-        GameObject randomSprite = GetRandomSprite();
-        this._spawnedSprite = Instantiate(randomSprite, ResetPosition(), Quaternion.identity);
-        this._spawnedSprite.transform.SetParent(this.transform);
-        this._spawnedSprites.Add(this._spawnedSprite);
-        Rigidbody2D spriteRB2D = this._spawnedSprite.GetComponent<Rigidbody2D>();
-        spriteRB2D.linearVelocity = this._spawnedSprite.transform.right * this._launchSpeed;
-        spriteRB2D.angularVelocity = this._rotationSpeed;
-        yield return new WaitForSeconds(Random.Range(this._minWaitTime, this._maxWaitTime));
-        StartCoroutine(LaunchSprites());
+        while (true) {
+            GameObject randomSpriteRB2D = GetRandomSprite();
+            this._spawnedSprite = Instantiate(randomSpriteRB2D, ResetPosition(), Quaternion.identity, this.transform);
+            this._spawnedSprites.Add(this._spawnedSprite.gameObject); // Add sprite to the spawnedSprites list
+            Rigidbody2D rb2d = this._spawnedSprite.GetComponent<Rigidbody2D>();
+            rb2d.linearVelocity = this._spawnedSprite.transform.right * this._launchSpeed;
+            rb2d.angularVelocity = this._rotationSpeed;
+            yield return new WaitForSeconds(Random.Range(this._minWaitTime, this._maxWaitTime));
+        }
     }
     
-    private GameObject GetRandomSprite() => this._spritePrefabs[Random.Range(0, this._spritePrefabs.Length)].gameObject;
+    private GameObject GetRandomSprite() => this._spritePrefabs[Random.Range(0, this._spritePrefabs.Length)];
     private Vector3 ResetPosition() => new(this._minX, Random.Range(this._minY, this._maxY));
 }
