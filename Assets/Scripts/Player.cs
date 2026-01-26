@@ -101,11 +101,6 @@ public class Player : PlayersManager {
         this.transform.position = new Vector3(targetPos.x, targetPos.y);
         this.isMoving = false;
     }
-
-    public override void ResetPlayerSettings() {
-        base.ResetPlayerSettings();
-        isDead = false;
-    }
     
     public override void ResetLevelSettings() {
         this._directions.Clear();

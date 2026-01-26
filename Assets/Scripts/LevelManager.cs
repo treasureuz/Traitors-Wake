@@ -20,10 +20,10 @@ public class LevelManager : MonoBehaviour {
     public int currentEasyLevelsCompleted { get; private set; }
     public int currentMediumLevelsCompleted { get; private set; }
     public int currentHardLevelsCompleted { get; private set; }
-
     public bool isCurrentEasyCompleted { get; private set; }
     public bool isCurrentMediumCompleted { get; private set; }
     public bool isCurrentHardCompleted { get; private set; }
+    public bool isDifficultyComplete { get; set; }
 
     void Awake() {
         if (instance) {
@@ -56,7 +56,7 @@ public class LevelManager : MonoBehaviour {
         if (GetCurrentLevelByDiff() == 0) GameManager.instance.GetPowerUpManagerByDiff().ResetPowerUpsSettings();
         PlayersSettingsManager.instance.ApplyPlayersSettings(); // Apply saved players data/settings
         UIManager.instance.Start(); // Reset/Update every relevant UI Elements
-        // If player has won or lost, don't generate a level
+        // If player has won or is out of lives, don't generate a level
         if (Player.hasWon || Player.isOutOfLives) {
             UIManager.instance.DimCanvasUI(); // Dim Canvas
             if (Player.hasWon) GameManager.instance.player.OnPlayerWon();
@@ -103,7 +103,7 @@ public class LevelManager : MonoBehaviour {
         yield return new WaitForSeconds(0.5f);
         UIManager.instance.SetActionButtons(true);
         // Disable LineRenderer if player doesn't have the power up (based on levels per difficulty)
-        if (!GameManager.instance.GetPowerUpManagerByDiff().isLineTrace) GameManager.instance.traitor.SetLineRendererStatus(false);
+        if (!GameManager.instance.GetPowerUpManagerByDiff().hasTraitorsWake) GameManager.instance.traitor.SetLineRendererStatus(false);
         GameManager.instance.traitor.hasEnded = true; // Sets traitor.hasEnded to true after timeToMemorize is complete
 
         UIManager.instance.StartTimeToCompleteCoroutine();
@@ -127,7 +127,7 @@ public class LevelManager : MonoBehaviour {
                 TryStartLevel(); // Start next level
             } else if (!Player.hasWon && this._totalLevelsCompleted == GetTotalLevels()) {
                 GameManager.instance.player.OnPlayerWon(); // Player won!
-            } else SceneManager.LoadScene("DifficultySelectScene"); // Difficulty complete
+            } else OnDifficultyComplete(); // Difficulty complete
         } else GameManager.instance.player.OnPlayerLost(); // Player lost
     }
     
@@ -168,6 +168,11 @@ public class LevelManager : MonoBehaviour {
             GameManager.Difficulty.Hard => this.currentHardLevelsCompleted + 1 <= this._maxHardLevels,
             _ => false
         };
+    }
+    
+    private void OnDifficultyComplete() {
+        this.isDifficultyComplete = true;
+        GameManager.instance.HandleGameEnd();
     }
 
     public void StopAllCoroutines(bool includeLevelCoroutine) {

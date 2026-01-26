@@ -7,8 +7,8 @@ public class ScoreManager : MonoBehaviour {
     private const float lowTimePoints = 10f;
     private const float middleTimePoints = 15f;
     private const float highTimePoints = 20f;
-    private const float traitorKillPoints = 250f;
-    private const float penaltyPoints = 90f;
+    private const float traitorKillPoints = 235f;
+    private const float penaltyPoints = 80f;
 
     public float easyHighScore { get; private set; }
     public float mediumHighScore { get; private set; }
@@ -36,12 +36,11 @@ public class ScoreManager : MonoBehaviour {
         var currentTimeToComplete = GameManager.instance.timeToComplete;
         if (currentTimeToComplete > CalculateHighTimeToComplete()) {
             SetCurrentScoreByDiff(GetCurrentScoreByDiff() + highTimePoints * currentTimeToComplete);
-        } else if (currentTimeToComplete >= 0f && currentTimeToComplete < CalculateLowTimeToComplete()) {
-            SetCurrentScoreByDiff(GetCurrentScoreByDiff() + lowTimePoints * currentTimeToComplete);
+        } else if (currentTimeToComplete >= CalculateLowTimeToComplete() && currentTimeToComplete <= CalculateHighTimeToComplete()) {
+            SetCurrentScoreByDiff(GetCurrentScoreByDiff() + middleTimePoints * currentTimeToComplete);
         } else {
-            if (currentTimeToComplete >= CalculateLowTimeToComplete() &&
-                currentTimeToComplete <= CalculateHighTimeToComplete()) {
-                SetCurrentScoreByDiff(GetCurrentScoreByDiff() + middleTimePoints * currentTimeToComplete);
+            if (currentTimeToComplete >= 0f && currentTimeToComplete < CalculateLowTimeToComplete()) {
+                SetCurrentScoreByDiff(GetCurrentScoreByDiff() + lowTimePoints * currentTimeToComplete);
             }
         }
         if (GameManager.instance.traitor.isShipDestroyed || GameManager.instance.traitor.isDead) 
@@ -103,4 +102,5 @@ public class ScoreManager : MonoBehaviour {
     // Total scores used in GameUIManager
     public float GetTotalCurrentScore() => this._easyCurrentScore + this._mediumCurrentScore + this._hardCurrentScore;
     public float GetTotalHighScore() => this.easyHighScore + this.mediumHighScore + this.hardHighScore;
+    public float GetPenaltyPoints() => penaltyPoints;
 }

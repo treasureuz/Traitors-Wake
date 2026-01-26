@@ -22,6 +22,7 @@ public class PlayersSettingsManager : MonoBehaviour {
     
     private int _currentLivesCount;
     public bool hasPlayerWon { get; private set; }
+    public bool isPlayerOOL { get; private set; }
         
     void Awake() {
         if (instance) {
@@ -78,6 +79,7 @@ public class PlayersSettingsManager : MonoBehaviour {
     
     public void SavePlayersSettings() {
         this.hasPlayerWon = Player.hasWon;
+        this.isPlayerOOL = Player.isOutOfLives;
         switch (GameManager.instance.difficulty) {
             case GameManager.Difficulty.Easy: {
                 this._easyPlayerCurrentHealth = GameManager.instance.player.GetCurrentHealth(); 
@@ -108,6 +110,6 @@ public class PlayersSettingsManager : MonoBehaviour {
     public int DecrementCurrentLivesCount() => --this._currentLivesCount;
     public void ResetCurrentLivesCount() {
         this._currentLivesCount = this._maxLivesCount;
-        Player.isOutOfLives = false;
+        Player.isOutOfLives = false; isPlayerOOL = false;
     } 
 }

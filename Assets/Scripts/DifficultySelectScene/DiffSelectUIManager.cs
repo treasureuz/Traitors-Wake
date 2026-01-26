@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 public class DiffSelectUIManager : MonoBehaviour {
     [SerializeField] private GameObject _homeSpritesPrefab;
+    [SerializeField] private CanvasGroup _canvasGroup;
     [SerializeField] private Button _easyGoButton;
     [SerializeField] private Button _easyResetButton;
     [SerializeField] private Button _mediumGoButton;
@@ -34,8 +35,10 @@ public class DiffSelectUIManager : MonoBehaviour {
     }
     
     void Start() {
-        AdjustButtonsSettings(); TryForceWinSequence();
-        UpdateTexts(); // Updates levels and high score texts
+        AdjustButtonsSettings(); UpdateTexts(); // Updates levels and high score texts
+        if (PlayersSettingsManager.instance.hasPlayerWon) {
+            Instantiate(this._homeSpritesPrefab, this.transform.position, Quaternion.identity);
+        }
     }
 
     private void OnGo(GameManager.Difficulty difficulty) {
@@ -66,6 +69,7 @@ public class DiffSelectUIManager : MonoBehaviour {
     
     public void OnResetAll() {
         EventSystem.current.SetSelectedGameObject(null); // Removes "selectedButtonColor"
+        this._canvasGroup.alpha = 1f; // Reset alpha
         LevelManager.instance.ResetAll(); // Sets isCurrentEasy/Medium/HardCompleted to false, calls ResetRunState
         PlayersSettingsManager.instance.ResetCurrentLivesCount(); // Should make isOutOfLives false on player Start()
         Start(); // Calls AdjustButtonsSettings and UpdateTextsByDiff
@@ -84,12 +88,12 @@ public class DiffSelectUIManager : MonoBehaviour {
         // Can only play hard if medium is completed and hard isn't completed
         this._hardGoButton.interactable = !Player.isOutOfLives && LevelManager.instance.isCurrentMediumCompleted &&
                                           LevelManager.instance.NextLevelExistsByDiff(GameManager.Difficulty.Hard);
+        this._resetAllButton.interactable = CanResetAll();
     }
 
-    private void TryForceWinSequence() {
-        if (PlayersSettingsManager.instance.hasPlayerWon) {
-            Instantiate(this._homeSpritesPrefab, this.transform.position, Quaternion.identity);
-        }
+    private bool CanResetAll() {
+        if (!PlayersSettingsManager.instance.isPlayerOOL) return false;
+        this._canvasGroup.alpha = 0.85f; return true; // Dim canvas
     }
 
     private void UpdateTexts() {

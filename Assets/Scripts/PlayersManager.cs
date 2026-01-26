@@ -46,7 +46,7 @@ public abstract class PlayersManager : MonoBehaviour {
     }
 
     public virtual void ResetPlayerSettings() {
-        this._currentHealth = this._maxHealth;
+        this._currentHealth = this._maxHealth; isDead = false;
         this._weaponManager.SetCurrentMagazineCount(this._weaponManager.GetMaxMagazineCount());
     }
     

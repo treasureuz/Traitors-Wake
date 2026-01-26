@@ -19,6 +19,7 @@ public class UIManager : MonoBehaviour {
     [SerializeField] private Button _pauseButton;
     [SerializeField] private Button _pauseHomeButton;
     [SerializeField] private Button _endRestartButton;
+    [SerializeField] private Button _nextDiffButton;
     [SerializeField] private Button _endHomeButton;
     
     [Header("TMP References")]
@@ -41,6 +42,7 @@ public class UIManager : MonoBehaviour {
     [SerializeField] private float _endTextBGWidth = 720f;
 
     [Header("GameObject References")]
+    [SerializeField] private GameObject _winOOLScreenPrefab;
     [SerializeField] private GameObject _cannonBallSprite;
     [SerializeField] private GameObject _traitorsLineSprite;
     [SerializeField] private GameObject _hourglassIcon;
@@ -48,17 +50,28 @@ public class UIManager : MonoBehaviour {
     [SerializeField] private GameObject _heartIcon;
     [SerializeField] private GameObject _mapBorder;
     
+    [Header("Sprite References")]
+    [SerializeField] private Sprite _traitorBehindBars;
+    [SerializeField] private Sprite _traitorBrokenBars;
+    
     [Header("Image References")]
     [SerializeField] private List<Image> _livesIcons;
     [SerializeField] private List<Image> _bulletBars;
     [SerializeField] private Image _playerHealthBar;
     [SerializeField] private Image _traitorHealthBar;
 
-    [Header("Others")] 
+    [Header("Canvas References")]
     [SerializeField] private CanvasGroup _canvasGroup;
+    [SerializeField] private Canvas _endCanvas;
+    
+    [Header("Others")] 
     [SerializeField] private float _playerHealthBarSpeed = 3f;
     
     public static UIManager instance;
+    
+    private GameObject _spawnedWinOOLScreen;
+    private TextMeshProUGUI _bountyText;
+    private Image _winOOLImage;
     private RectTransform _topTextBG;
     private SpriteRenderer[] _mapBorderChildren;
     
@@ -71,17 +84,20 @@ public class UIManager : MonoBehaviour {
     private const string loadingLevel = "{Loading Level...}";
     private const string currentScoreText = "Current Score";
     private const string highScoreText = "High Score";
-    private const string restartText = "<color=#FFB90D><size=34.2px>[Restart]</size></color><size=28px><color=#FF0000>(-200)</size></color>";
-    private const string exitText = "<color=#FFB90D>[Exit]</color><size=30px><color=#FF0000>(-200)</size></color>";
+    private const string restartText = "<color=#FFB90D><size=35px>[Restart]</size></color>";
+    private const string exitText = "<color=#FFB90D>[Exit]</color>";
     private const string traitorHealthText = "<size=28px>{Traitor's Health}</size>";
     private const string tillerHealthText = "<size=27px>{Traitor's Tiller Health}</size>";
     private const string sternHealthText = "<size=27px>{Traitor's Stern Health}</size>";
-    private const string tillerEndText = "*TRAITOR'S SHIP LOST CONTROL!*"; 
-    private const string sternEndText = "*YOU BLEW OUT THE STERN!*"; 
-    private const string winText = "<color=#00FF00><size=45px>*TRAITOR CAPTURED!*</color></size>";
+    private const string tillerEndText = "<color=#00FF00>*YOU DISABLED HIS SHIP!*</color>"; 
+    private const string sternEndText = "<color=#00FF00>*YOU BLEW OUT THE STERN!*</color>";
+    private const string bountyWinText = "BOUNTY <color=#00FF00>CLAIMED!</color>";
+    private const string bountyOOLText = "BOUNTY <color=#FF0000>ESCAPED!</color>";
+    private const string topWinText = "<color=#00FF00><size=45px>*TRAITOR CAPTURED!*</size></color>";
     private const string loseText = "<color=#FF0000>*TRANSLATION MISMATCH*</color>";
     private const string deadText = "<color=#FF0000>*DOWN BUT NOT OUT*</color>";
-    private const string outOfLivesText = "<color=#FF0000>*YOU ARE OUT OF LIVES*</color>";
+    private const string topOOLText = "<color=#FF0000>*YOU ARE OUT OF LIVES*</color>";
+    private const string diffCompleteText = "<color=#00FF00><size=45px>*DIFFICULTY COMPLETE!*</size></color>";
 
     void Awake() {
         instance = this;
@@ -133,10 +149,7 @@ public class UIManager : MonoBehaviour {
         SetOnPauseButtons(true); // Activate Resume, Restart, Home
     }
     
-    public void OnResume() {
-        StartCoroutine(OnResumeCoroutine());
-    }
-
+    public void OnResume() => StartCoroutine(OnResumeCoroutine());
     private IEnumerator OnResumeCoroutine() {
         SetOnPauseButtons(false); // Disable Resume, Restart, Home
         yield return new WaitForSeconds(0.5f); // Wait before resuming game
@@ -150,30 +163,40 @@ public class UIManager : MonoBehaviour {
         GameManager.instance.GetPowerUpManagerByDiff().UndoStolenPowerUps();
         ScoreManager.instance.HandleScorePenalty(); // If player restarted level
         GameManager.isPaused = false; // Set isPaused to false on restart
-        OnRestart(); 
+        OnRestart(); OnPauseRestartExit(); // Reset restart color to original color
     }
+    public void OnPauseRestartEnter() {
+        TextMeshProUGUI restartTMP = this._pauseRestartButton.GetComponentInChildren<TextMeshProUGUI>();
+        restartTMP.text = "<color=#FFB90D><size=38.2px>[Restart]</size></color>";
+    }
+    
+    public void OnPauseRestartExit() {
+        TextMeshProUGUI restartTMP = this._pauseRestartButton.GetComponentInChildren<TextMeshProUGUI>();
+        restartTMP.text = $"{restartText}<color=#FF0000><size=27.5px>(-{ScoreManager.instance.GetPenaltyPoints()})</size></color>";
+    }
+    
     public void OnEndRestart() => OnRestart();
     
     private void OnRestart() {
         Debug.Log("Restart");
         EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
-        ResetCanvasUIAlpha(); OnRestartExit(); // Reset restart color to original color
+        ResetCanvasUIAlpha();
         // Calls ResetRunState if player restarted in first level 
         if (LevelManager.instance.GetTotalLevelsCompleted() == 0) LevelManager.hasResetRun = true;
         LevelManager.instance.StopAllCoroutines(true);
         LevelManager.instance.TryStartLevel(); // Restart current level
     }
 
-    public void OnRestartEnter() {
-        TextMeshProUGUI restartTMP = this._pauseRestartButton.GetComponentInChildren<TextMeshProUGUI>();
-        restartTMP.text = "<color=#FFB90D><size=38.2px>[Restart]</size></color>";
+    public void OnNextDifficulty() {
+        EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
+        // endRestartButton takes over nextDiffButton
+        this._nextDiffButton.gameObject.SetActive(false);
+        this._endRestartButton.gameObject.SetActive(true);
+        GameManager.instance.IncrementDifficulty(); // calls HandleDifficultySettings
+        if (LevelManager.instance.GetCurrentLevelByDiff() == 0) LevelManager.hasResetRun = true; // calls ResetRunState
+        LevelManager.instance.TryStartLevel(); // Start next level with higher difficulty
     }
     
-    public void OnRestartExit() {
-        TextMeshProUGUI restartTMP = this._pauseRestartButton.GetComponentInChildren<TextMeshProUGUI>();
-        restartTMP.text = restartText;
-    }
-
     public void OnHome() {
         SceneManager.LoadScene("DifficultySelectScene");
         // Undo power ups if player exited
@@ -181,7 +204,7 @@ public class UIManager : MonoBehaviour {
         if (GameManager.isPaused) GameManager.instance.GetPowerUpManagerByDiff().UndoStolenPowerUps();
         ScoreManager.instance.HandleScorePenalty(); // If player exit while in level
         GameManager.isPaused = false; // Set isPaused to false when player exits
-        ResetCanvasUIAlpha(); OnHomeExit(); // Reset home color to original color
+        ResetCanvasUIAlpha(); OnPauseHomeExit(); OnEndHomeExit(); // Reset home color to original color
     }
     
     public void OnHomeEnter() {
@@ -189,30 +212,81 @@ public class UIManager : MonoBehaviour {
         homeText.text = "<color=#FF0000>[Exit]</color>";
     }
 
-    public void OnHomeExit() {
+    public void OnPauseHomeExit() {
         TextMeshProUGUI homeText = this._pauseHomeButton.GetComponentInChildren<TextMeshProUGUI>();
+        homeText.text = $"{exitText}<color=#FF0000><size=30px>(-{ScoreManager.instance.GetPenaltyPoints()})</size></color>";
+    }
+    
+    public void OnEndHomeExit() {
+        if (this._spawnedWinOOLScreen) Destroy(this._spawnedWinOOLScreen);
+        TextMeshProUGUI homeText = this._endHomeButton.GetComponentInChildren<TextMeshProUGUI>();
         homeText.text = exitText;
     }
-
-    public void DimCanvasUI() {
-        this._canvasGroup.alpha = 0.65f;
-        this._canvasGroup.interactable = false;
-        ChangeBGObjectsAlpha();
-    }
-
-    private void ResetCanvasUIAlpha() {
-        this._canvasGroup.alpha = 1f;
-        this._canvasGroup.interactable = true;
-        ChangeBGObjectsAlpha();
-    }
-
-    private void ChangeBGObjectsAlpha() {
-        foreach (SpriteRenderer s in this._mapBorderChildren) {
-            s.color = new Color(s.color.r, s.color.g, s.color.b, this._canvasGroup.alpha);
+    
+    public void DisplayEndScreen() {
+        DimCanvasUI(); this._topTextBG.sizeDelta = new Vector2(this._endTextBGWidth, this._topTextBG.sizeDelta.y);
+        if (Player.hasWon) HandlePlayerWinScreen(); // Also works for Traitor's death 
+        else if (Player.isOutOfLives) HandlePlayerOOLScreen();
+        else if (GameManager.instance.player.isDead) {
+            this._topText.text = deadText; SetEndScreenButtons(true);
+        } else if (LevelManager.instance.isDifficultyComplete) HandleDiffCompleteScreen(); // Checks for isShipDestroyed
+        else {
+            this._topText.text = loseText; SetEndScreenButtons(true);
         }
-        foreach (SpriteRenderer s in GridManager.instance.tilesParentChildren) {
-            s.color = new Color(s.color.r, s.color.g, s.color.b, this._canvasGroup.alpha);
+    }
+    
+    // ReSharper disable Unity.PerformanceAnalysis
+    private void HandleBasePlayerEndScreen() {
+        this._endRestartButton.interactable = false; // Can't restart if player won/OOL
+        this._spawnedWinOOLScreen = Instantiate(this._winOOLScreenPrefab, this._endCanvas.transform, false);
+        this._bountyText = this._spawnedWinOOLScreen.GetComponentInChildren<TextMeshProUGUI>();
+        this._winOOLImage = this._spawnedWinOOLScreen.transform.Find("Win_OOLScreenBG/Win_OOLImageBG/Win_OOLImage").GetComponent<Image>();
+        Button exit = this._spawnedWinOOLScreen.GetComponentInChildren<Button>();
+        exit.onClick.AddListener(OnHome);
+    }
+    
+    private void HandlePlayerWinScreen() {
+        HandleBasePlayerEndScreen();
+        this._topText.text = topWinText; 
+        this._bountyText.text = bountyWinText;
+        this._winOOLImage.sprite = this._traitorBehindBars;
+    }
+    
+    private void HandlePlayerOOLScreen() {
+        HandleBasePlayerEndScreen(); 
+        this._topText.text = topOOLText; 
+        this._bountyText.text = bountyOOLText;
+        this._winOOLImage.sprite = this._traitorBrokenBars;
+    }
+    
+    private void HandleDiffCompleteScreen() {
+        LevelManager.instance.isDifficultyComplete = false;
+        if (GameManager.instance.traitor.isShipDestroyed) OnTraitorShipDestroyed();
+        else this._topText.text = diffCompleteText;
+        // nextDiffButton takes over endRestartButton
+        this._endRestartButton.gameObject.SetActive(false);
+        this._nextDiffButton.gameObject.SetActive(true);
+        SetEndScreenButtons(true); 
+    }
+    
+    private void OnTraitorShipDestroyed() {
+        switch(GameManager.instance.difficulty) {
+            case GameManager.Difficulty.Easy: this._topText.text = sternEndText; break;
+            case GameManager.Difficulty.Medium: this._topText.text = tillerEndText; break;
         }
+    }
+    
+    public void DisplayLoadingText() {
+        this._topTextBG.sizeDelta = new Vector2(this._mediumLevelTextBGWidth, this._topTextBG.sizeDelta.y);
+        this._topText.text = loadingLevel;
+    }
+    
+    public void DisplayLevelText(float level) {
+        // Adjust topText size based on the level text
+        this._topTextBG.sizeDelta = GameManager.instance.difficulty == GameManager.Difficulty.Medium 
+            ? new Vector2(this._mediumLevelTextBGWidth, this._topTextBG.sizeDelta.y) 
+            : new Vector2(this._baseLevelTextBGWidth, this._topTextBG.sizeDelta.y);
+        this._topText.text = $"{{Level {level}: {GameManager.instance.difficulty}}}";
     }
     
     public void UpdateScoreText() {
@@ -279,31 +353,25 @@ public class UIManager : MonoBehaviour {
     
     public void UpdatePowerUpsUI() {
         UpdateHotBarFeedText();
-        foreach (PowerUpManager.PowerUp powerUp in GameManager.instance.GetPowerUpManagerByDiff().GetActivatedPowerUps()) {
-            switch (powerUp) {
-                case PowerUpManager.PowerUp.AmmoSurplus: UpdateGiveAmmoText(); break;
-                case PowerUpManager.PowerUp.LineTrace: EnableTraitorsLineSprite(); break;
-                case PowerUpManager.PowerUp.ClearObstacles: EnableRockSprites(); break;
-                case PowerUpManager.PowerUp.BonusTime: UpdateTimeIncreaseText(); break;
-                case PowerUpManager.PowerUp.HealthBoost: UpdateHealthBoostText(); break;
-            }
-        }
-    }
-    
-    public void DisablePowerUp(PowerUpManager.PowerUp powerUp) {
-        switch (powerUp) {
-            case PowerUpManager.PowerUp.AmmoSurplus: this._cannonBallSprite.SetActive(false); break;
-            case PowerUpManager.PowerUp.LineTrace: this._traitorsLineSprite.SetActive(false); break;
-            case PowerUpManager.PowerUp.ClearObstacles: this._rockSprites.SetActive(false); break;
-            case PowerUpManager.PowerUp.BonusTime: this._hourglassIcon.SetActive(false); break;
-            case PowerUpManager.PowerUp.HealthBoost: this._heartIcon.SetActive(false); break;
-        }
+        if (GameManager.instance.GetPowerUpManagerByDiff().GetActivatedPowerUps().Contains(PowerUpManager.PowerUp.AmmoSurplus)){
+            UpdateGiveAmmoText();
+        } else this._cannonBallSprite.SetActive(false);
+        if (GameManager.instance.GetPowerUpManagerByDiff().GetActivatedPowerUps().Contains(PowerUpManager.PowerUp.BonusTime)){
+            UpdateTimeIncreaseText();
+        } else this._hourglassIcon.SetActive(false);
+        if (GameManager.instance.GetPowerUpManagerByDiff().GetActivatedPowerUps().Contains(PowerUpManager.PowerUp.HealthBoost)){
+            UpdateHealthBoostText();
+        } else this._heartIcon.SetActive(false);
+        this._traitorsLineSprite.SetActive(GameManager.instance.GetPowerUpManagerByDiff().GetActivatedPowerUps()
+            .Contains(PowerUpManager.PowerUp.TraitorsWake));
+        this._rockSprites.SetActive(GameManager.instance.GetPowerUpManagerByDiff().GetActivatedPowerUps()
+            .Contains(PowerUpManager.PowerUp.ClearObstacles));
     }
     
     public void UpdateHotBarFeedText() {
         this._hotbarFeedText.enabled = true;
         switch (GameManager.instance.GetPowerUpManagerByDiff().powerUp) {
-            case PowerUpManager.PowerUp.LineTrace: this._hotbarFeedText.text = "• Restored Traitor's Wake"; break;
+            case PowerUpManager.PowerUp.TraitorsWake: this._hotbarFeedText.text = "• Restored Traitor's Wake"; break;
             case PowerUpManager.PowerUp.ClearObstacles: this._hotbarFeedText.text = "• Cleared all obstacles"; break;
             case PowerUpManager.PowerUp.AmmoSurplus: {
                 this._hotbarFeedText.text = $"• Gave {GameManager.instance.GetPowerUpManagerByDiff().ammo} ammo"; break; }
@@ -314,42 +382,6 @@ public class UIManager : MonoBehaviour {
             }
             case PowerUpManager.PowerUp.None: this._hotbarFeedText.text = ""; break;
         }
-    }
-    
-    public void DisplayEndScreen() {
-        this._topTextBG.sizeDelta = new Vector2(this._endTextBGWidth, this._topTextBG.sizeDelta.y);
-        if (Player.hasWon) { // Also works for Traitor's death 
-            this._topText.text = winText;
-            this._endRestartButton.interactable = false; // Can't restart if won
-        } else if (Player.isOutOfLives) {
-            this._topText.text = outOfLivesText;
-            this._endRestartButton.interactable = false; // Can't restart if out of lives
-        } else if (GameManager.instance.player.isDead) this._topText.text = deadText;
-        else if (GameManager.instance.traitor.isShipDestroyed) OnTraitorShipDestroyed();
-        else this._topText.text = loseText;
-        DimCanvasUI(); SetEndScreenButtons(true);
-    }
-
-    private void OnTraitorShipDestroyed() {
-        switch(GameManager.instance.difficulty) {
-            case GameManager.Difficulty.Easy: this._topText.text = sternEndText; break;
-            case GameManager.Difficulty.Medium: this._topText.text = tillerEndText; break;
-        }
-        // Can't restart if traitor's ship are destroyed (All levels are "activated")
-        this._endRestartButton.interactable = false; 
-    }
-    
-    public void DisplayLoadingText() {
-        this._topTextBG.sizeDelta = new Vector2(this._mediumLevelTextBGWidth, this._topTextBG.sizeDelta.y);
-        this._topText.text = loadingLevel;
-    }
-    
-    public void DisplayLevelText(float level) {
-        // Adjust topText size based on the level text
-        this._topTextBG.sizeDelta = GameManager.instance.difficulty == GameManager.Difficulty.Medium 
-            ? new Vector2(this._mediumLevelTextBGWidth, this._topTextBG.sizeDelta.y) 
-            : new Vector2(this._baseLevelTextBGWidth, this._topTextBG.sizeDelta.y);
-        this._topText.text = $"{{Level {level}: {GameManager.instance.difficulty}}}";
     }
 
     private IEnumerator DisplayTimeToMemorize() {
@@ -411,6 +443,27 @@ public class UIManager : MonoBehaviour {
         StopCoroutine(this._timeToCompleteCoroutine);
         this._timeToCompleteCoroutine = null;
         this.isCompleting = false;
+    }
+    
+    public void DimCanvasUI() {
+        this._canvasGroup.alpha = 0.6f;
+        this._canvasGroup.interactable = false;
+        ChangeBGObjectsAlpha();
+    }
+
+    private void ResetCanvasUIAlpha() {
+        this._canvasGroup.alpha = 1f;
+        this._canvasGroup.interactable = true;
+        ChangeBGObjectsAlpha();
+    }
+
+    private void ChangeBGObjectsAlpha() {
+        foreach (SpriteRenderer s in this._mapBorderChildren) {
+            s.color = new Color(s.color.r, s.color.g, s.color.b, this._canvasGroup.alpha);
+        }
+        foreach (SpriteRenderer s in GridManager.instance.tilesParentChildren) {
+            s.color = new Color(s.color.r, s.color.g, s.color.b, this._canvasGroup.alpha);
+        }
     }
     
     public void SetActionButtons(bool enable) {

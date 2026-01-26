@@ -24,11 +24,11 @@ public class PowerUpManager : MonoBehaviour {
     private readonly List<float> _totalAddedTimeList = new();
 
     public bool hasClearedObstacles { get; private set; }
-    public bool isLineTrace { get; private set; }
+    public bool hasTraitorsWake { get; private set; }
     
     public enum PowerUp {
         AmmoSurplus = 0, 
-        LineTrace = 1, 
+        TraitorsWake = 1, 
         BonusTime = 2, 
         ClearObstacles = 3,
         HealthBoost = 4,
@@ -59,9 +59,9 @@ public class PowerUpManager : MonoBehaviour {
                 UIManager.instance.UpdateBulletBar(); // Enables all bullet bars up until currentMagCount
                 break;
             }
-            case PowerUp.LineTrace: {
+            case PowerUp.TraitorsWake: {
                 // Enable the AIManager.LineRenderer after timeToMemorize is done
-                this.isLineTrace = true;
+                this.hasTraitorsWake = true;
                 GameManager.instance.traitor.SetLineRendererStatus(true);
                 UIManager.instance.EnableTraitorsLineSprite();
                 break;
@@ -108,9 +108,8 @@ public class PowerUpManager : MonoBehaviour {
             if (this._activatedPowerUps.Contains(power)) continue;
             switch (power) {
                 case PowerUp.ClearObstacles: hasClearedObstacles = false; break;
-                case PowerUp.LineTrace: isLineTrace = false; break;
+                case PowerUp.TraitorsWake: hasTraitorsWake = false; break;
             }
-            UIManager.instance.DisablePowerUp(power); // Deactivates the power up sprite
         }
         this.powerUp = this._activatedPowerUps.Count == 0 ? PowerUp.None : this._activatedPowerUps[^1];
         ResetCurrentCollectedChests();
@@ -146,13 +145,16 @@ public class PowerUpManager : MonoBehaviour {
     
     public void ResetPowerUpsSettings() {
         this._activatedPowerUps.Clear();
+        this._totalAddedTimeList.Clear();
+        this._totalAmmoList.Clear();
+        this._totalHealPointsList.Clear();
         this.powerUp = PowerUp.None;
-        UIManager.instance.DisableAllPowerUpSprites(); // Disable hotbar sprites
-        this.totalAddedTime = 0;
-        this.totalAmmo = 0;
-        this.totalHealPoints = 0;
+        this.addedTime = 0; this.totalAddedTime = 0;
+        this.ammo = 0; this.totalAmmo = 0;
+        this.healPoints = 0; this.totalHealPoints = 0;
         this.hasClearedObstacles = false;
-        this.isLineTrace = false;
+        this.hasTraitorsWake = false;
+        UIManager.instance.DisableAllPowerUpSprites(); // Disable hotbar sprites
     }
     public List<PowerUp> GetActivatedPowerUps() => new (this._activatedPowerUps);
     public void ResetCurrentCollectedChests() => this._currentCollectedChests = 0;

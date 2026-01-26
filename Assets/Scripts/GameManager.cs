@@ -214,6 +214,11 @@ public class GameManager : MonoBehaviour {
         LevelManager.instance.StopAllCoroutines(true);
         UIManager.instance.DisplayEndScreen();
     }
+
+    public void IncrementDifficulty() {
+        SetDifficulty(++this.difficulty);
+        HandleDifficultySettings();
+    }
     
     public void SetDifficulty(Difficulty diff) => this.difficulty = diff;
     public void SetTimeToComplete(float time) => this.timeToComplete = time;

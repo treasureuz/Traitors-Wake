@@ -96,7 +96,7 @@ public class HomeUIManager : MonoBehaviour {
     private void DestroyAllPanelsExcept(GameObject prefabToInstantiate) {
         if (this._spawnedPanelUI) Destroy(this._spawnedPanelUI); // Destroy previous panel if it exists
         // Instantiate the panel (prefabToInstantiate)
-        this._spawnedPanelUI = Instantiate(prefabToInstantiate, _canvas.transform, false);
+        this._spawnedPanelUI = Instantiate(prefabToInstantiate, this._canvas.transform, false);
         this._activePanelPrefab = prefabToInstantiate;
         AddPanelsOnClickListeners();
     }
