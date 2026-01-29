@@ -56,11 +56,12 @@ public class LevelManager : MonoBehaviour {
         if (GetCurrentLevelByDiff() == 0) GameManager.instance.GetPowerUpManagerByDiff().ResetPowerUpsSettings();
         PlayersSettingsManager.instance.ApplyPlayersSettings(); // Apply saved players data/settings
         UIManager.instance.Start(); // Reset/Update every relevant UI Elements
-        // If player has won or is out of lives, don't generate a level
-        if (Player.hasWon || Player.isOutOfLives) {
+        // If player has won or is out of lives or difficulty is complete, don't generate a level
+        if (Player.hasWon || Player.isOutOfLives || isDifficultyComplete) {
             UIManager.instance.DimCanvasUI(); // Dim Canvas
             if (Player.hasWon) GameManager.instance.player.OnPlayerWon();
-            else GameManager.instance.player.OnPlayerOutOfLives();
+            else if (Player.isOutOfLives) GameManager.instance.player.OnPlayerOutOfLives();
+            else OnDifficultyComplete();
             return; 
         }
         // Else, generate level
@@ -221,6 +222,7 @@ public class LevelManager : MonoBehaviour {
     public void ResetAll() {
         Player.hasWon = false; hasResetRun = true; // calls ResetRunState on GO
         ScoreManager.instance.ResetCurrentScore(); // Sets easy/medium/hardCurrenScore to 0
+        isDifficultyComplete = false;
         this._totalLevelsCompleted = 0;
         this.currentEasyLevelsCompleted = 0;
         this.isCurrentEasyCompleted = false;

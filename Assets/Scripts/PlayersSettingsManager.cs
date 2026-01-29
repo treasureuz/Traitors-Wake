@@ -31,10 +31,10 @@ public class PlayersSettingsManager : MonoBehaviour {
         }
         instance = this;
         DontDestroyOnLoad(this.gameObject);
-        this._currentLivesCount = this._maxLivesCount; // this only happens once
     }
     
     void OnEnable() {
+        this._currentLivesCount = this._maxLivesCount; // this only happens once
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
@@ -107,9 +107,10 @@ public class PlayersSettingsManager : MonoBehaviour {
     
     public int GetCurrentLivesCount() => this._currentLivesCount;
     public int GetMaxLivesCount() => this._maxLivesCount;
-    public int DecrementCurrentLivesCount() => --this._currentLivesCount;
-    public void ResetCurrentLivesCount() {
+    public void DecrementCurrentLivesCount() => --this._currentLivesCount;
+    public void ResetSettings() {
         this._currentLivesCount = this._maxLivesCount;
         Player.isOutOfLives = false; isPlayerOOL = false;
+        hasPlayerWon = false;
     } 
 }

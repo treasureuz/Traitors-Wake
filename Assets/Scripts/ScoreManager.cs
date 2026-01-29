@@ -7,7 +7,9 @@ public class ScoreManager : MonoBehaviour {
     private const float lowTimePoints = 10f;
     private const float middleTimePoints = 15f;
     private const float highTimePoints = 20f;
-    private const float traitorKillPoints = 235f;
+    private const float sternDestroyedPoints = 635f;
+    private const float tillerDestroyedPoints = 850f;
+    private const float traitorDeathPoints = 1200f;
     private const float penaltyPoints = 80f;
 
     public float easyHighScore { get; private set; }
@@ -26,8 +28,8 @@ public class ScoreManager : MonoBehaviour {
         DontDestroyOnLoad(this.gameObject);
     }
 
-    //void Start() => SetHighScoreByDiff(0f); // Reset high score one time
-    
+    void Start() => SetHighScoreByDiff(0f); // Reset high score one time (for DiffSelectScene)
+
     // This is done by difficulty
     public void CalculateScores() {
         // HighTimeToComplete range = (CalculateHighTimeToComplete, GetTimeToComplete]
@@ -44,14 +46,25 @@ public class ScoreManager : MonoBehaviour {
             }
         }
         if (GameManager.instance.traitor.isShipDestroyed || GameManager.instance.traitor.isDead) 
-            SetCurrentScoreByDiff(GetCurrentScoreByDiff() + traitorKillPoints); 
+            CalculateTraitorDeathScore(); // Calculate only-if either traitor shipDestroyed or dead
         if (GetCurrentScoreByDiff() > GetHighScoreByDiff()) SetHighScoreByDiff(GetCurrentScoreByDiff());
     }
 
+    private void CalculateTraitorDeathScore() {
+        switch(GameManager.instance.difficulty) {
+            case GameManager.Difficulty.Easy: 
+                SetCurrentScoreByDiff(GetCurrentScoreByDiff() + sternDestroyedPoints); break;
+            case GameManager.Difficulty.Medium: 
+                SetCurrentScoreByDiff(GetCurrentScoreByDiff() + tillerDestroyedPoints); break;
+            case GameManager.Difficulty.Hard:
+                SetCurrentScoreByDiff(GetCurrentScoreByDiff() + traitorDeathPoints); break;
+        }
+    }
+    
     // On Restart or Exit
-    public void HandleScorePenalty() {
+    public void CalculateScorePenalty() {
         // *"isPaused" check might be unnecessary since this method is only called in their two places*
-        // Subtracts 200 points off current score
+        // Subtracts penaltyPoints off current score
         if (GameManager.isPaused) SetCurrentScoreByDiff(GetCurrentScoreByDiff() - penaltyPoints);
     }
 
@@ -102,5 +115,8 @@ public class ScoreManager : MonoBehaviour {
     // Total scores used in GameUIManager
     public float GetTotalCurrentScore() => this._easyCurrentScore + this._mediumCurrentScore + this._hardCurrentScore;
     public float GetTotalHighScore() => this.easyHighScore + this.mediumHighScore + this.hardHighScore;
+    public float GetTraitorDeathPoints() => traitorDeathPoints;
+    public float GetSternDestroyedPoints() => sternDestroyedPoints;
+    public float GetTillerDestroyedPoints() => tillerDestroyedPoints;
     public float GetPenaltyPoints() => penaltyPoints;
 }

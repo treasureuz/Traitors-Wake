@@ -12,7 +12,6 @@ public class HomeUIManager : MonoBehaviour {
     [SerializeField] private GameObject _powerUpsUIPrefab;
     [SerializeField] private GameObject _scoresUIPrefab;
     [SerializeField] private TextMeshProUGUI _titleText;
-    [SerializeField] private TextMeshProUGUI _controlsText;
     [SerializeField] private float _typewriterDelay = 0.55f;
     private Canvas _canvas;
 
@@ -22,7 +21,6 @@ public class HomeUIManager : MonoBehaviour {
     public static HomeUIManager instance;
     
     private const string titleText = "TRAITOR'S WAKE";
-    private const string controlsText = "<u>Controls</u>: W, A, S, D (*Arrow keys apply*)";
 
     void Awake() {
         if (instance) {
@@ -49,18 +47,16 @@ public class HomeUIManager : MonoBehaviour {
     
     private void Begin() {
         this._canvas = FindFirstObjectByType<Canvas>();
-        this._controlsText = this._canvas.transform.Find("ControlsText (TMP)").GetComponent<TextMeshProUGUI>();
         this._titleText = this._canvas.transform.Find("TitleCardBorder/TitleCard/TitleText (TMP)").GetComponent<TextMeshProUGUI>();
         DestroyAllPanelsExcept(this._activePanelPrefab); // Spawn active panel
     }
     
     void Start() {
-        foreach (HomeButtonsBehavior hb in FindObjectsByType<HomeButtonsBehavior>(FindObjectsSortMode.None)) {
-            this._homeButtons.Add(hb.GetComponent<Button>()); }
+        foreach (HomeButtonsBehavior hb in FindObjectsByType<HomeButtonsBehavior>(FindObjectsSortMode.None))
+            this._homeButtons.Add(hb.GetComponent<Button>());
         SetHomeButtons(false); // Deactivate homeButtons on start
         this._titleText.text = "";
         StartCoroutine(StartTitleAnimation());
-        this._controlsText.text = controlsText; // Set controls text
     }
     
     private IEnumerator StartTitleAnimation() {

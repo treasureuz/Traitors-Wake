@@ -2203,7 +2203,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -549.5, y: 0}
+  m_AnchoredPosition: {x: -549.5, y: 5}
   m_SizeDelta: {x: 556, y: 630}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4636627300577161920
@@ -2265,6 +2265,7 @@ MonoBehaviour:
   _easyLevelsCText: {fileID: 7170235574275094993}
   _mediumLevelsCText: {fileID: 753162121097701159}
   _hardLevelsCText: {fileID: 2393472894057800220}
+  _scoreCalculationText: {fileID: 1746584433027544146}
 --- !u!1 &5675333575762042718
 GameObject:
   m_ObjectHideFlags: 0
@@ -2685,8 +2686,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -25, y: -380}
-  m_SizeDelta: {x: 510, y: 50}
+  m_AnchoredPosition: {x: -18, y: -388}
+  m_SizeDelta: {x: 520, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3293999495174698590
 CanvasRenderer:
@@ -2719,9 +2720,10 @@ MonoBehaviour:
   m_text: 'Higher completion time = higher points.
 
     Restarting or exiting a level
-    costs 90 points.
+    = {-80} points.
 
-    Destroying the Traitor or his ship gives 250 points.'
+    Destroying the Traitor, his ship''s stern, or the tiller
+    = {1200}, {635}, and {200} points; respectively.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4a45160fc30d3fe4882edc2712c0b051, type: 2}
   m_sharedMaterial: {fileID: -462789608907736891, guid: 4a45160fc30d3fe4882edc2712c0b051, type: 2}
@@ -2787,7 +2789,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: -464.92383, w: 0}
+  m_margin: {x: 0, y: 0, z: -111.56152, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -3240,7 +3242,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -44}
+  m_AnchoredPosition: {x: 0, y: -45}
   m_SizeDelta: {x: 520, y: 490}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &415796908736972441

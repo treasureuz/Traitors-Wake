@@ -507,18 +507,18 @@ MonoBehaviour:
   _hardMinNumOfObstacles: 4
   _hardMaxNumOfObstacles: 5
   _easyPlayerMaxHealth: 70
-  _easyTraitorMaxHealth: 200
+  _easyTraitorMaxHealth: 150
   _mediumPlayerMaxHealth: 85
   _mediumTraitorMaxHealth: 175
   _hardPlayerMaxHealth: 100
-  _hardTraitorMaxHealth: 150
+  _hardTraitorMaxHealth: 200
   _easyTimeToMemorize: 3.78
   _mediumTimeToMemorize: 3.55
   _hardTimeToMemorize: 3.3
   _easyTimeToComplete: 100
   _mediumTimeToComplete: 100
   _hardTimeToComplete: 100
-  _easyPlayerTimeToMove: 0.28
+  _easyPlayerTimeToMove: 0.27
   _mediumPlayerTimeToMove: 0.25
   _hardPlayerTimeToMove: 0.23
   _easyTraitorTimeToMove: 0.4
@@ -2303,9 +2303,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6acc02461d9bc5943b6a82b3a8f09333, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelManager
-  _maxEasyLevels: 6
-  _maxMediumLevels: 5
-  _maxHardLevels: 4
+  _maxEasyLevels: 1
+  _maxMediumLevels: 1
+  _maxHardLevels: 1
   _timeBeforeLevelStart: 1
 --- !u!4 &716866653
 Transform:

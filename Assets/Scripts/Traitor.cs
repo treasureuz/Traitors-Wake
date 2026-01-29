@@ -111,7 +111,7 @@ public class Traitor : PlayersManager {
     protected override void OnPlayerLostOrDead() {
         if (GameManager.instance.difficulty == GameManager.Difficulty.Hard) isDead = true; // Only can "die" in final stage
         else this.isShipDestroyed = true; // Any other stage is destroying parts of the ship
-        LevelManager.instance.isDifficultyComplete = true; // Difficulty complete on traitor dead
+        LevelManager.instance.isDifficultyComplete = true; // Difficulty complete on traitor shipDestroyed or dead
         ScoreManager.instance.CalculateScores(); // Calculate currentScore with traitorKillPercent
         // Sets isCurrentEasy/Medium/HardCompleted to true and calls HandleGameEnd
         LevelManager.instance.HandleTraitorDeathByDiff(); 

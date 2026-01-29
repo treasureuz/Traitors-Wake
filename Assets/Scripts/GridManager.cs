@@ -98,7 +98,7 @@ public class GridManager : MonoBehaviour {
             // Generate a random tile position that is not in the obstacle tile list already (no duplicates)
             // Uses the moves of the AI, not including the last one.
             do {
-                randomPos = GameManager.instance.difficulty == GameManager.Difficulty.Hard ? 
+                randomPos = GameManager.instance.difficulty == GameManager.Difficulty.Hard ?
                     GameManager.instance.traitor.GetMovesPosByIndex
                         (Random.Range(0, GameManager.instance.traitor.GetMovesCount() - 1)) 
                     : new Vector2Int(Random.Range(1, this._width), Random.Range(1, this._height));

@@ -91,12 +91,12 @@ public class UIManager : MonoBehaviour {
     private const string sternHealthText = "<size=27px>{Traitor's Stern Health}</size>";
     private const string tillerEndText = "<color=#00FF00>*YOU DISABLED HIS SHIP!*</color>"; 
     private const string sternEndText = "<color=#00FF00>*YOU BLEW OUT THE STERN!*</color>";
-    private const string bountyWinText = "BOUNTY <color=#00FF00>CLAIMED!</color>";
-    private const string bountyOOLText = "BOUNTY <color=#FF0000>ESCAPED!</color>";
-    private const string topWinText = "<color=#00FF00><size=45px>*TRAITOR CAPTURED!*</size></color>";
+    private const string bountyWinText = "<color=#00FF00>TRAITOR CAPTURED!</color>";
+    private const string bountyOOLText = "<color=#FF0000>TRAITOR ESCAPED!</color>";
+    private const string topWinText = "<size=48px>*BOUNTY CLAIMED!*</size>";
+    private const string topOOLText = "*YOU ARE OUT OF LIVES*";
     private const string loseText = "<color=#FF0000>*TRANSLATION MISMATCH*</color>";
     private const string deadText = "<color=#FF0000>*DOWN BUT NOT OUT*</color>";
-    private const string topOOLText = "<color=#FF0000>*YOU ARE OUT OF LIVES*</color>";
     private const string diffCompleteText = "<color=#00FF00><size=45px>*DIFFICULTY COMPLETE!*</size></color>";
 
     void Awake() {
@@ -124,25 +124,28 @@ public class UIManager : MonoBehaviour {
     
     public void OnSubmit() {
         Debug.Log("Submit");
-        EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
-        // Disable action buttons
-        SetActionButtons(false);
+        //EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
+        if (!this._submitButton.interactable) return;
+        SetActionButtons(false); // Disable action buttons
         GameManager.instance.player.OnPlayerEnded(); // Sets hasEnded to true and updates score
      }
 
     public void OnUndo() {
         Debug.Log("Undo");
-        EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
+        //EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
+        if (!this._undoButton.interactable) return;
         StartCoroutine(GameManager.instance.player.UndoMove(GameManager.instance.player.TimeToMove));
     }
     
     public void OnReset() {
         Debug.Log("Reset");
-        EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
+        //EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
+        if (!this._resetButton.interactable) return;
         StartCoroutine(GameManager.instance.player.ResetMoves(GameManager.instance.player.TimeToMove));
     }
 
     public void OnPause() {
+        if (!this._pauseButton.interactable) return;
         GameManager.isPaused = true; DimCanvasUI();
         // this._pauseButton.interactable = false;
         // SetActionButtons(false); // Disable action buttons
@@ -161,7 +164,7 @@ public class UIManager : MonoBehaviour {
     public void OnPauseRestart() {
         // Undo power ups if player restarted
         GameManager.instance.GetPowerUpManagerByDiff().UndoStolenPowerUps();
-        ScoreManager.instance.HandleScorePenalty(); // If player restarted level
+        ScoreManager.instance.CalculateScorePenalty(); // If player restarted level
         GameManager.isPaused = false; // Set isPaused to false on restart
         OnRestart(); OnPauseRestartExit(); // Reset restart color to original color
     }
@@ -202,7 +205,7 @@ public class UIManager : MonoBehaviour {
         // Undo power ups if player exited
         LevelManager.instance.StopAllCoroutines(true);
         if (GameManager.isPaused) GameManager.instance.GetPowerUpManagerByDiff().UndoStolenPowerUps();
-        ScoreManager.instance.HandleScorePenalty(); // If player exit while in level
+        ScoreManager.instance.CalculateScorePenalty(); // If player exit while in level
         GameManager.isPaused = false; // Set isPaused to false when player exits
         ResetCanvasUIAlpha(); OnPauseHomeExit(); OnEndHomeExit(); // Reset home color to original color
     }
@@ -244,7 +247,7 @@ public class UIManager : MonoBehaviour {
         Button exit = this._spawnedWinOOLScreen.GetComponentInChildren<Button>();
         exit.onClick.AddListener(OnHome);
     }
-    
+
     private void HandlePlayerWinScreen() {
         HandleBasePlayerEndScreen();
         this._topText.text = topWinText; 
@@ -473,7 +476,10 @@ public class UIManager : MonoBehaviour {
     }
     
     public void SetPauseButton(bool enable) => this._pauseButton.interactable = enable;
-    private void SetOnPauseButtons(bool enable) => this._resumeButton.transform.parent.gameObject.SetActive(enable);
+    private void SetOnPauseButtons(bool enable) {
+        this._resumeButton.transform.parent.gameObject.SetActive(enable);
+        OnPauseHomeExit(); OnPauseRestartExit(); // Start with original text
+    }
     private void SetEndScreenButtons(bool enable) => this._endRestartButton.transform.parent.gameObject.SetActive(enable);
     
     public void DisableAllPowerUpSprites() {
@@ -485,4 +491,3 @@ public class UIManager : MonoBehaviour {
         this._hotbarFeedText.enabled = false;
     }
 }
-

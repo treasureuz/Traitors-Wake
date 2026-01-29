@@ -64,15 +64,15 @@ public class DiffSelectUIManager : MonoBehaviour {
                 LevelManager.instance.ResetCurrentLevelByDiff(GameManager.Difficulty.Medium); 
                 GameManager.instance.DecrementResetCount(diff); break;
             }
-        } Start(); // Calls AdjustButtonsSettings and UpdateTextsByDiff
+        } AdjustButtonsSettings(); UpdateTexts(); // Updates levels and high score texts
     }
     
     public void OnResetAll() {
         EventSystem.current.SetSelectedGameObject(null); // Removes "selectedButtonColor"
         this._canvasGroup.alpha = 1f; // Reset alpha
         LevelManager.instance.ResetAll(); // Sets isCurrentEasy/Medium/HardCompleted to false, calls ResetRunState
-        PlayersSettingsManager.instance.ResetCurrentLivesCount(); // Should make isOutOfLives false on player Start()
-        Start(); // Calls AdjustButtonsSettings and UpdateTextsByDiff
+        PlayersSettingsManager.instance.ResetSettings(); // Should make isOutOfLives false on player Start()
+        AdjustButtonsSettings(); UpdateTexts(); // Updates levels and high score texts
     }
     
     private void AdjustButtonsSettings() {
@@ -92,7 +92,8 @@ public class DiffSelectUIManager : MonoBehaviour {
     }
 
     private bool CanResetAll() {
-        if (!PlayersSettingsManager.instance.isPlayerOOL) return false;
+        // If player hasn't won or lost, keep resetAllButton disabled
+        if (!PlayersSettingsManager.instance.isPlayerOOL && !PlayersSettingsManager.instance.hasPlayerWon) return false;
         this._canvasGroup.alpha = 0.85f; return true; // Dim canvas
     }
 

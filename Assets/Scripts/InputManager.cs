@@ -20,9 +20,15 @@ public class InputManager : MonoBehaviour {
         this._right = playerInput.actions["Right"];
     }
 
+    // Movement Map
     public bool UpIsPressed() => this._up.IsPressed();
     public bool DownIsPressed() => this._down.IsPressed();
     public bool LeftIsPressed() => this._left.IsPressed();
     public bool RightIsPressed() => this._right.IsPressed();
-}
 
+    // GameAction Map
+    public void OnPause() => UIManager.instance.OnPause();
+    public void OnSubmit() => UIManager.instance.OnSubmit();
+    public void OnUndo() => UIManager.instance.OnUndo();
+    public void OnReset() => UIManager.instance.OnReset();
+}

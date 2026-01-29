@@ -525,18 +525,18 @@ MonoBehaviour:
   _hardMinNumOfObstacles: 4
   _hardMaxNumOfObstacles: 5
   _easyPlayerMaxHealth: 70
-  _easyTraitorMaxHealth: 200
+  _easyTraitorMaxHealth: 150
   _mediumPlayerMaxHealth: 85
   _mediumTraitorMaxHealth: 175
   _hardPlayerMaxHealth: 100
-  _hardTraitorMaxHealth: 150
+  _hardTraitorMaxHealth: 200
   _easyTimeToMemorize: 3.78
   _mediumTimeToMemorize: 3.55
   _hardTimeToMemorize: 3.3
   _easyTimeToComplete: 11.8
   _mediumTimeToComplete: 12.5
   _hardTimeToComplete: 13.2
-  _easyPlayerTimeToMove: 0.28
+  _easyPlayerTimeToMove: 0.27
   _mediumPlayerTimeToMove: 0.25
   _hardPlayerTimeToMove: 0.23
   _easyTraitorTimeToMove: 0.4
@@ -1383,8 +1383,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -555, y: 490}
-  m_SizeDelta: {x: 733.5, y: 50}
+  m_AnchoredPosition: {x: -530, y: 471.9}
+  m_SizeDelta: {x: 785, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1014319676
 MonoBehaviour:
@@ -1406,7 +1406,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Controls: W, A, S, D (*Arrow keys apply*)'
+  m_text: '<u>Controls</u>: W, A, S, D (*Arrow keys apply*).
+
+    <i>"SpaceBar"</i>
+    to Submit, <i>"E"</i> to Undo, <i>"R"</i> to Reset.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4a45160fc30d3fe4882edc2712c0b051, type: 2}
   m_sharedMaterial: {fileID: -462789608907736891, guid: 4a45160fc30d3fe4882edc2712c0b051, type: 2}
@@ -3022,7 +3025,6 @@ MonoBehaviour:
   _powerUpsUIPrefab: {fileID: 8400080725133008991, guid: e798d5b31f5e5c8418f53944f41c9817, type: 3}
   _scoresUIPrefab: {fileID: 5532927556658466821, guid: e8a1b7222d2ab1b45a1ad0f8391f6da1, type: 3}
   _titleText: {fileID: 330486850}
-  _controlsText: {fileID: 1014319676}
   _typewriterDelay: 0.178
 --- !u!1 &2109498546
 GameObject:
