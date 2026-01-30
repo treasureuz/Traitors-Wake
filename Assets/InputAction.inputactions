@@ -139,7 +139,7 @@
             "id": "c96d63e3-d5b5-48f3-a27c-526bae610c31",
             "actions": [
                 {
-                    "name": "Pause",
+                    "name": "Escape",
                     "type": "Button",
                     "id": "3d271dba-580c-4f15-8660-e1008cbeea11",
                     "expectedControlType": "",
@@ -216,7 +216,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Pause",
+                    "action": "Escape",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

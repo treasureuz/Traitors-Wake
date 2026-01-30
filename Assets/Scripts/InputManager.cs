@@ -27,7 +27,10 @@ public class InputManager : MonoBehaviour {
     public bool RightIsPressed() => this._right.IsPressed();
 
     // GameAction Map
-    public void OnPause() => UIManager.instance.OnPause();
+    public void OnEscape() {
+        if (GameManager.isPaused) UIManager.instance.OnResume();
+        else UIManager.instance.OnPause();
+    }
     public void OnSubmit() => UIManager.instance.OnSubmit();
     public void OnUndo() => UIManager.instance.OnUndo();
     public void OnReset() => UIManager.instance.OnReset();

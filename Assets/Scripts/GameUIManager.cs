@@ -124,7 +124,7 @@ public class UIManager : MonoBehaviour {
     
     public void OnSubmit() {
         Debug.Log("Submit");
-        //EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
+        EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
         if (!this._submitButton.interactable) return;
         SetActionButtons(false); // Disable action buttons
         GameManager.instance.player.OnPlayerEnded(); // Sets hasEnded to true and updates score
@@ -132,27 +132,28 @@ public class UIManager : MonoBehaviour {
 
     public void OnUndo() {
         Debug.Log("Undo");
-        //EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
+        EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
         if (!this._undoButton.interactable) return;
         StartCoroutine(GameManager.instance.player.UndoMove(GameManager.instance.player.TimeToMove));
     }
     
     public void OnReset() {
         Debug.Log("Reset");
-        //EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
+        EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
         if (!this._resetButton.interactable) return;
         StartCoroutine(GameManager.instance.player.ResetMoves(GameManager.instance.player.TimeToMove));
     }
 
     public void OnPause() {
-        if (!this._pauseButton.interactable) return;
+        if (GameManager.isPaused) return;
         GameManager.isPaused = true; DimCanvasUI();
-        // this._pauseButton.interactable = false;
-        // SetActionButtons(false); // Disable action buttons
         SetOnPauseButtons(true); // Activate Resume, Restart, Home
     }
     
-    public void OnResume() => StartCoroutine(OnResumeCoroutine());
+    public void OnResume() {
+        EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
+        StartCoroutine(OnResumeCoroutine());
+    }
     private IEnumerator OnResumeCoroutine() {
         SetOnPauseButtons(false); // Disable Resume, Restart, Home
         yield return new WaitForSeconds(0.5f); // Wait before resuming game
