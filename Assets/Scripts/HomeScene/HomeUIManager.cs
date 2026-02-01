@@ -11,15 +11,17 @@ public class HomeUIManager : MonoBehaviour {
     [SerializeField] private GameObject _storyUIPrefab;
     [SerializeField] private GameObject _powerUpsUIPrefab;
     [SerializeField] private GameObject _scoresUIPrefab;
+    [SerializeField] private AudioClip _buttonClick2;
     [SerializeField] private TextMeshProUGUI _titleText;
     [SerializeField] private float _typewriterDelay = 0.55f;
-    private Canvas _canvas;
 
+    public static HomeUIManager instance;
+
+    private Canvas _canvas;
     private GameObject _activePanelPrefab;
     private GameObject _spawnedPanelUI;
     private readonly List<Button> _homeButtons = new();
-    public static HomeUIManager instance;
-    
+
     private const string titleText = "TRAITOR'S WAKE";
 
     void Awake() {
@@ -71,21 +73,25 @@ public class HomeUIManager : MonoBehaviour {
 
     public void OnPlay() {
         EventSystem.current.SetSelectedGameObject(null); // Removes "selectedButtonColor"
+        AudioManager.instance.PlayClip(this._buttonClick2);
         SceneManager.LoadScene("DifficultySelectScene");
     }
 
     public void OnStory() {
         EventSystem.current.SetSelectedGameObject(null); // Removes "selectedButtonColor"
+        AudioManager.instance.PlayClip(this._buttonClick2);
         DestroyAllPanelsExcept(this._storyUIPrefab); // Shows storyUI
     }
     
     public void OnPowerUps() {
         EventSystem.current.SetSelectedGameObject(null); // Removes "selectedButtonColor"
+        AudioManager.instance.PlayClip(this._buttonClick2);
         DestroyAllPanelsExcept(this._powerUpsUIPrefab); // Shows powerUpsUI
     }
     
     public void OnScores() {
         EventSystem.current.SetSelectedGameObject(null); // Removes "selectedButtonColor"
+        AudioManager.instance.PlayClip(this._buttonClick2);
         DestroyAllPanelsExcept(this._scoresUIPrefab); // Shows powerUpsUI
     }
 

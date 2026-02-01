@@ -11,6 +11,8 @@ public class GridManager : MonoBehaviour {
     [SerializeField] private Tile _tilePrefab;
     [SerializeField] private GameObject _tilesParent;
     [SerializeField] private Sprite _openedChestSprite;
+    [SerializeField] private AudioClip[] _chestOpenClips;
+    [SerializeField] private AudioClip[] _rockBreakClips;
     [SerializeField] private LayerMask _gridAreaMask;
     [SerializeField] private int _width, _height;
     
@@ -84,7 +86,7 @@ public class GridManager : MonoBehaviour {
         if (!chestTile || chestTile.isOpened) return;
         // If chestTile is not opened and the player's position is on it, open the chest and activate its PowerUp
         // Also changes the chestTile sprite to the opened version
-        chestTile.isOpened = true; 
+        chestTile.isOpened = true; AudioManager.instance.PlayRandomClip(this._chestOpenClips);
         chestTile.transform.Find("Chest").GetComponent<SpriteRenderer>().sprite = this._openedChestSprite;
         GameManager.instance.GetPowerUpManagerByDiff().ActivatePowerUp();
         chestTile.PopTileType(); // this calls HandleTileType();
@@ -119,6 +121,7 @@ public class GridManager : MonoBehaviour {
         // Disables the obstacle (rock) sprite
         tileToRemove.transform.Find("Obstacle").gameObject.SetActive(false);
         Destroy(tileToRemove.GetComponent<BoxCollider2D>());
+        AudioManager.instance.PlayRandomClip(this._rockBreakClips);
         tileToRemove.PopTileType(); // Removes TileType.Obstacle
         this._obstacleTiles.Remove(position);
     }

@@ -3,10 +3,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using Random = UnityEngine.Random;
 
 public class Player : PlayersManager {
+    [Header("References")]
     [SerializeField] private List<Vector2Int> _directions;
-    
+
+    [Header("Audio")]
+    [SerializeField] private AudioClip _playerWinClip;
+    [SerializeField] private AudioClip _playerOOLClip;
+    [SerializeField] private AudioClip _heartLossClip;
+    [SerializeField] private AudioClip _buttonClick2;
+
     private InputManager _inputManager;
     
     public static bool hasWon;
@@ -21,12 +29,14 @@ public class Player : PlayersManager {
     }
 
     protected override void Start() {
-        base.Start(); isOutOfLives = PlayersSettingsManager.instance.GetCurrentLivesCount() <= 0;
+        base.Start(); // Plays random voicelines at random times
+        isOutOfLives = PlayersSettingsManager.instance.GetCurrentLivesCount() <= 0;
     }
     
     void Update() {
-        if (this.isDead || GameManager.isPaused || !GameManager.instance.traitor.hasEnded 
-            || GameManager.instance.traitor.isDead || GameManager.instance.traitor.isShipDestroyed || this.hasEnded) return;
+        if (this.isDead || GameManager.isPaused || !GameManager.instance.traitor.hasEnded ||
+            GameManager.instance.traitor.isDead || GameManager.instance.traitor.isShipDestroyed
+            || this.hasEnded) return;
         if (this._inputManager.UpIsPressed()) StartCoroutine(HandleMovement(Vector2Int.up, this._timeToMove));
         else if (this._inputManager.DownIsPressed()) StartCoroutine(HandleMovement(Vector2Int.down, this._timeToMove));
         else if (this._inputManager.LeftIsPressed()) StartCoroutine(HandleMovement(Vector2Int.left, this._timeToMove));
@@ -117,11 +127,12 @@ public class Player : PlayersManager {
         PlayersSettingsManager.instance.DecrementCurrentLivesCount();
         UIManager.instance.UpdateLivesIcons(); // 1 life gone
         if (PlayersSettingsManager.instance.GetCurrentLivesCount() > 0) return;
-        OnPlayerOutOfLives();
+        OnPlayerOutOfLives(); // Player is OOL
     }
     
     public void OnPlayerOutOfLives() { 
-        isOutOfLives = true; hasWon = false; 
+        isOutOfLives = true; hasWon = false;
+        AudioManager.instance.PlayClip(this._playerOOLClip);
         this.gameObject.SetActive(false); 
         LevelManager.instance.ResetAll(); // Sets isCurrentEasy/Medium/HardCompleted to false, calls ResetRunState
         GameManager.instance.HandleGameEnd(); // -> Out of Lives Screen
@@ -134,21 +145,23 @@ public class Player : PlayersManager {
         isDead = true; this.gameObject.SetActive(false); 
         InvokeOnDead(); // Calls OnPlayerLostOrDead
     }
-    
+
     public void OnPlayerLost() => OnPlayerLostOrDead(); // -> Mismatch Screen
     protected override void OnPlayerLostOrDead() {
-        hasWon = false; DecrementLives(); 
-        if (isOutOfLives) return; // Return if OOL
+        hasWon = false; DecrementLives();
+        if (isOutOfLives) return; // Return if player OOL
+        AudioManager.instance.PlayClip(this._heartLossClip);
         LevelManager.instance.ResetCurrentLevelByDiff(GameManager.instance.difficulty); // Calls ResetRunState
         GameManager.instance.HandleGameEnd(); // -> Mismatch/DBNO Screen
     }
     
     public void OnPlayerWon() {
-        hasWon = true; GameManager.instance.HandleGameEnd(); // -> Win Screen
+        hasWon = true; AudioManager.instance.PlayClip(this._playerWinClip);
+        GameManager.instance.HandleGameEnd(); // -> Win Screen
     }
     
     public void OnPlayerEnded() {
-        this.hasEnded = true;
+        this.hasEnded = true; AudioManager.instance.PlayClip(this._buttonClick2);
         UIManager.instance.SetActionButtons(false); // Disable buttons so player position isn't overwritten
         // After level completed, disable UI elements and determine the next event
         UIManager.instance.SetPauseButton(false); 

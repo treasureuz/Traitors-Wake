@@ -13,8 +13,7 @@ public class PWeaponManager : WeaponManager {
         if (this._owner.isDead || GameManager.isPaused || !GameManager.instance.traitor.hasEnded || this._owner.hasEnded
             || GameManager.instance.traitor.isShipDestroyed || !Mouse.current.leftButton.isPressed 
             || !GridManager.instance.IsWithinGridArea() || !HasBullets() || Time.time < this._nextShootTime) return;
-        Shoot();
-        UIManager.instance.UpdateBulletBar();
+        Shoot(); UIManager.instance.UpdateBulletBar();
         this._nextShootTime = Time.time + this._timeBetweenShots;
     }
 

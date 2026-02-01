@@ -90,7 +90,7 @@ public class Tile : MonoBehaviour {
                 break;
         }
     }
-    
+
     // For TileType.Obstacle
     private void OnCollisionEnter2D(Collision2D other) {
         Debug.Log("Collision!");

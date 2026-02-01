@@ -1,12 +1,23 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Random = UnityEngine.Random;
 using Vector3 = UnityEngine.Vector3;
 
 public abstract class PlayersManager : MonoBehaviour {
+    [Header("References")]
     [SerializeField] protected WeaponManager _weaponManager;
     [SerializeField] protected List<Vector2Int> _moves;
+
+    [Header("Voicelines")]
+    [SerializeField] protected AudioSource _audioSource;
+    [SerializeField] protected AudioClip[] _voiceLines;
+
+    [Header("Other Settings")]
+    [SerializeField] private float _minVoicelineTime = 3.412f;
+    [SerializeField] private float _maxVoicelineTime = 14.59f;
 
     protected static readonly Vector2Int spawnPos = Vector2Int.zero;
     public static Vector3 SpawnPosV3() => new(spawnPos.x, spawnPos.y, 0);
@@ -28,6 +39,8 @@ public abstract class PlayersManager : MonoBehaviour {
 
     protected virtual void Start() {
         isDead = false; OnDead += OnPlayerLostOrDead;
+        // Play random voicelines at random times
+        StartCoroutine(PlayVoicelines(this._minVoicelineTime, this._maxVoicelineTime));
     }
 
     private void OnDestroy() {
@@ -43,6 +56,13 @@ public abstract class PlayersManager : MonoBehaviour {
     
     public bool MovesEquals(PlayersManager otherPlayers) {
         return this._moves.SequenceEqual(otherPlayers._moves);
+    }
+
+    private IEnumerator PlayVoicelines(float minTime, float maxTime) {
+        yield return new WaitForSeconds(Random.Range(minTime, maxTime + 1));
+        if (!(this.isDead || GameManager.isPaused || GameManager.instance.traitor.isShipDestroyed
+            || this.hasEnded)) AudioManager.instance.PlayRandomClip(this._audioSource, this._voiceLines);
+        StartCoroutine(PlayVoicelines(minTime, maxTime));
     }
 
     public virtual void ResetPlayerSettings() {
@@ -66,5 +86,3 @@ public abstract class PlayersManager : MonoBehaviour {
     
     protected abstract void OnCollisionEnter2D(Collision2D collision);
 }
-    
-    

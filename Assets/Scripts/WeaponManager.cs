@@ -3,6 +3,7 @@ using UnityEngine;
 
 public abstract class WeaponManager : MonoBehaviour {
     [SerializeField] protected GameObject _bulletPrefab;
+    [SerializeField] protected AudioClip _cannonShot;
     [SerializeField] protected Transform _bulletSpawnPoint;
     [SerializeField] protected int _bulletMagazineCount = 10;
     [SerializeField] protected float _bulletDamage = 13.5f;
@@ -20,6 +21,7 @@ public abstract class WeaponManager : MonoBehaviour {
 
     protected abstract void HandleShoot();
     protected void Shoot() {
+        AudioManager.instance.PlayClip(this._cannonShot);
         Instantiate(this._bulletPrefab, this._bulletSpawnPoint.position, this._bulletSpawnPoint.rotation);
         this._currentMagazineCount--; // Decrement mag count
     }

@@ -14,6 +14,7 @@ public class DiffSelectUIManager : MonoBehaviour {
     [SerializeField] private Button _hardGoButton;
     [SerializeField] private Button _backButton;
     [SerializeField] private Button _resetAllButton;
+    [SerializeField] private AudioClip _buttonClick2;
     [SerializeField] private TextMeshProUGUI _easyLevelsText;
     [SerializeField] private TextMeshProUGUI _mediumLevelsText;
     [SerializeField] private TextMeshProUGUI _hardLevelsText;
@@ -43,6 +44,7 @@ public class DiffSelectUIManager : MonoBehaviour {
 
     private void OnGo(GameManager.Difficulty difficulty) {
         EventSystem.current.SetSelectedGameObject(null); // Removes "selectedButtonColor"
+        AudioManager.instance.PlayClip(this._buttonClick2);
         GameManager.instance.SetDifficulty(difficulty);
         if (LevelManager.instance.GetCurrentLevelByDiff() == 0) LevelManager.hasResetRun = true; // calls ResetRunState
         SceneManager.LoadScene("GameScene");
@@ -50,11 +52,13 @@ public class DiffSelectUIManager : MonoBehaviour {
 
     public void OnBack() {
         EventSystem.current.SetSelectedGameObject(null); // Removes "selectedButtonColor"
+        AudioManager.instance.PlayClip(this._buttonClick2);
         SceneManager.LoadScene("HomeScene");
     }
 
     private void OnReset(GameManager.Difficulty diff) {
         EventSystem.current.SetSelectedGameObject(null); // Removes "selectedButtonColor"
+        AudioManager.instance.PlayClip(this._buttonClick2);
         switch (diff) {
             case GameManager.Difficulty.Easy: { // Calls ResetRunState
                 LevelManager.instance.ResetCurrentLevelByDiff(GameManager.Difficulty.Easy);
@@ -69,6 +73,7 @@ public class DiffSelectUIManager : MonoBehaviour {
     
     public void OnResetAll() {
         EventSystem.current.SetSelectedGameObject(null); // Removes "selectedButtonColor"
+        AudioManager.instance.PlayClip(this._buttonClick2);
         this._canvasGroup.alpha = 1f; // Reset alpha
         LevelManager.instance.ResetAll(); // Sets isCurrentEasy/Medium/HardCompleted to false, calls ResetRunState
         PlayersSettingsManager.instance.ResetSettings(); // Should make isOutOfLives false on player Start()

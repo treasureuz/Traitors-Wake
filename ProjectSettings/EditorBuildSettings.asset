@@ -15,5 +15,8 @@ EditorBuildSettings:
     path: Assets/Scenes/DifficultySelectScene.unity
     guid: 42a906d138dc11a42ac6017387dcdecc
   m_configObjects:
+    com.unity.adaptivePerformance.basic.provider_settings: {fileID: 11400000, guid: 40db3579b4feda441bfdbc8d776e9bc1, type: 2}
+    com.unity.adaptiveperformance.loader_settings: {fileID: 11400000, guid: fa567a5fda7e43e4782a1596359b2dae, type: 2}
+    com.unity.adaptiveperformance.simulator.provider_settings: {fileID: 11400000, guid: 225772cce274b134e9d1c13fc42d7a0d, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 671bdd80f9fadf744b7d0af7986947f8, type: 3}
   m_UseUCBPForAssetBundles: 0

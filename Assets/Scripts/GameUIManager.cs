@@ -63,8 +63,9 @@ public class UIManager : MonoBehaviour {
     [Header("Canvas References")]
     [SerializeField] private CanvasGroup _canvasGroup;
     [SerializeField] private Canvas _endCanvas;
-    
-    [Header("Others")] 
+
+    [Header("Others")]
+    [SerializeField] private AudioClip _buttonClick2;
     [SerializeField] private float _playerHealthBarSpeed = 3f;
     
     public static UIManager instance;
@@ -134,6 +135,7 @@ public class UIManager : MonoBehaviour {
         Debug.Log("Undo");
         EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
         if (!this._undoButton.interactable) return;
+        AudioManager.instance.PlayClip(this._buttonClick2);
         StartCoroutine(GameManager.instance.player.UndoMove(GameManager.instance.player.TimeToMove));
     }
     
@@ -141,17 +143,20 @@ public class UIManager : MonoBehaviour {
         Debug.Log("Reset");
         EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
         if (!this._resetButton.interactable) return;
+        AudioManager.instance.PlayClip(this._buttonClick2);
         StartCoroutine(GameManager.instance.player.ResetMoves(GameManager.instance.player.TimeToMove));
     }
 
     public void OnPause() {
         if (GameManager.isPaused) return;
+        AudioManager.instance.PlayClip(this._buttonClick2);
         GameManager.isPaused = true; DimCanvasUI();
         SetOnPauseButtons(true); // Activate Resume, Restart, Home
     }
     
     public void OnResume() {
         EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
+        AudioManager.instance.PlayClip(this._buttonClick2);
         StartCoroutine(OnResumeCoroutine());
     }
     private IEnumerator OnResumeCoroutine() {
@@ -184,7 +189,7 @@ public class UIManager : MonoBehaviour {
     private void OnRestart() {
         Debug.Log("Restart");
         EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
-        ResetCanvasUIAlpha();
+        AudioManager.instance.PlayClip(this._buttonClick2); ResetCanvasUIAlpha();
         // Calls ResetRunState if player restarted in first level 
         if (LevelManager.instance.GetTotalLevelsCompleted() == 0) LevelManager.hasResetRun = true;
         LevelManager.instance.StopAllCoroutines(true);
@@ -193,6 +198,7 @@ public class UIManager : MonoBehaviour {
 
     public void OnNextDifficulty() {
         EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
+        AudioManager.instance.PlayClip(this._buttonClick2);
         // endRestartButton takes over nextDiffButton
         this._nextDiffButton.gameObject.SetActive(false);
         this._endRestartButton.gameObject.SetActive(true);
@@ -203,6 +209,7 @@ public class UIManager : MonoBehaviour {
     
     public void OnHome() {
         SceneManager.LoadScene("DifficultySelectScene");
+        AudioManager.instance.PlayClip(this._buttonClick2);
         // Undo power ups if player exited
         LevelManager.instance.StopAllCoroutines(true);
         if (GameManager.isPaused) GameManager.instance.GetPowerUpManagerByDiff().UndoStolenPowerUps();

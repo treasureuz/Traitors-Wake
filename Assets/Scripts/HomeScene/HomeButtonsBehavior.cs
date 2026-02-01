@@ -3,7 +3,6 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class HomeButtonsBehavior : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler {
-
     public void OnPointerClick(PointerEventData eventData) {
         if (!this.GetComponent<Button>().interactable) return;
         switch (this.gameObject.name) {

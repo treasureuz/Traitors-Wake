@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-4926641498765767256
+MonoBehaviour:
+  m_ObjectHideFlags: 2
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 21000, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: Standalone Settings
+  m_EditorClassIdentifier: UnityEngine.dll::UnityEngine.AdaptivePerformance.AdaptivePerformanceGeneralSettings
+  m_LoaderManagerInstance: {fileID: 172805349379045583}
+  m_InitManagerOnStart: 1
+  m_LastSelectedProvider: 
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 21010, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: AdaptivePerformanceGeneralSettings
+  m_EditorClassIdentifier: UnityEditor.dll::UnityEditor.AdaptivePerformance.Editor.AdaptivePerformanceGeneralSettingsPerBuildTarget
+  Keys: 01000000
+  Values:
+  - {fileID: -4926641498765767256}
+  m_EnableAdaptivePerformance: 1
+  m_Version: 6000.3
+--- !u!114 &172805349379045583
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 21001, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: Standalone Providers
+  m_EditorClassIdentifier: UnityEngine.dll::UnityEngine.AdaptivePerformance.AdaptivePerformanceManagerSettings
+  m_AutomaticLoading: 0
+  m_AutomaticRunning: 0
+  m_Loaders:
+  - {fileID: 11400000, guid: 2d6824c6cb3a6bd41a201906cb335ae5, type: 2}
+  - {fileID: 11400000, guid: f1ee27ec5dffff0438bea8f6fbb20914, type: 2}
