@@ -92,7 +92,7 @@ public class UIManager : MonoBehaviour {
     private const string sternHealthText = "<size=27px>{Traitor's Stern Health}</size>";
     private const string tillerEndText = "<color=#00FF00>*YOU DISABLED HIS SHIP!*</color>"; 
     private const string sternEndText = "<color=#00FF00>*YOU BLEW OUT THE STERN!*</color>";
-    private const string bountyWinText = "<color=#00FF00>TRAITOR CAPTURED!</color>";
+    private const string bountyWinText = "<color=#00FF00>TRAITOR SECURED!</color>";
     private const string bountyOOLText = "<color=#FF0000>TRAITOR ESCAPED!</color>";
     private const string topWinText = "<size=48px>*BOUNTY CLAIMED!*</size>";
     private const string topOOLText = "*YOU ARE OUT OF LIVES*";
