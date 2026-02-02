@@ -1,7 +1,5 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Rendering.VirtualTexturing;
 
 public class Tile : MonoBehaviour {
     [SerializeField] private Color _offsetColor, _baseColor;
@@ -9,9 +7,10 @@ public class Tile : MonoBehaviour {
     [SerializeField] private Sprite _rockSprite1, _rockSprite2;
     [SerializeField] private Sprite _chestSprite;
     [SerializeField] private Sprite _finishLineSprite;
-    [SerializeField] private SpriteRenderer _spriteRenderer;
+    private SpriteRenderer _spriteRenderer;
 
     private Stack<TileType> _tileTypesList;
+    private SpriteRenderer _chestSR;
     private SpriteRenderer _obstacleSR;
 
     private bool _isOffset;
@@ -26,9 +25,14 @@ public class Tile : MonoBehaviour {
 
     void Awake() {
         this._tileTypesList = new Stack<TileType>();
+        this._spriteRenderer = this.GetComponent<SpriteRenderer>();
+        this._chestSR = this.transform.Find("Chest").GetComponent<SpriteRenderer>();
+        this._obstacleSR = this.transform.Find("Obstacle").GetComponent<SpriteRenderer>();
+        // Deactivate obstacle and chest tile sprites
+        this._chestSR.gameObject.SetActive(false);
+        this._obstacleSR.gameObject.SetActive(false);
     }
-    
-    // ReSharper disable Unity.PerformanceAnalysis
+
     private void HandleTileType() {
         ColorTile(); // Colors this tile
         switch (this._tileTypesList.Peek()) { // Current tile type
@@ -37,23 +41,22 @@ public class Tile : MonoBehaviour {
             } 
             case TileType.Chest: {
                 // Assigns the unopened chestSprite and enables it
-                this.transform.Find("Chest").GetComponent<SpriteRenderer>().sprite = this._chestSprite;
-                this.transform.Find("Chest").gameObject.SetActive(true); 
+                this._chestSR.sprite = this._chestSprite;
+                this._chestSR.gameObject.SetActive(true);
                 this.tag = "ChestTile";
                 break;
             }
             case TileType.Obstacle: {
                 // Enables the obstacle (rock) sprite
-                this.transform.Find("Obstacle").gameObject.SetActive(true);
-                SpriteRenderer tileSR = this.transform.Find("Obstacle").GetComponent<SpriteRenderer>();
+                this._obstacleSR.gameObject.SetActive(true);
                 if (this._isOffset) {
                     // for the Asteroid sprite
-                    tileSR.sprite = this._rockSprite2;
-                    tileSR.transform.localScale = new Vector3(3, 3);
+                    this._obstacleSR.sprite = this._rockSprite2;
+                    this._obstacleSR.transform.localScale = new Vector3(3, 3);
                 } else {
                     // for the Rock sprite
-                    tileSR.sprite = this._rockSprite1;
-                    tileSR.transform.localScale = new Vector3(3.93f, 3.93f);
+                    this._obstacleSR.sprite = this._rockSprite1;
+                    this._obstacleSR.transform.localScale = new Vector3(3.93f, 3.93f);
                 }
                 this.tag = "ObstacleTile";
                 break;

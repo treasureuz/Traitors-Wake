@@ -97,19 +97,15 @@
     <None Include="Library\PackageCache\com.unity.test-framework.performance@0840f58e4562\ValidationExceptions.json" />
     <None Include="Library\PackageCache\com.unity.timeline@7f8b2fb101b6\package.json" />
     <None Include="Library\PackageCache\com.unity.modules.accessibility\package.json" />
-    <None Include="Library\PackageCache\com.unity.ide.visualstudio@a99d56dec63f\ValidationConfig.json" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Mobile.cginc" />
     <None Include="Library\PackageCache\com.unity.modules.terrainphysics\package.json" />
     <None Include="Library\PackageCache\com.unity.mathematics@19a9377c4ffa\package.json" />
     <None Include="Library\PackageCache\com.unity.burst@973857688024\ValidationExceptions.json" />
-    <None Include="Library\PackageCache\com.unity.memoryprofiler@34fef3cbda0a\package.json" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF SSD.shader" />
     <None Include="Library\PackageCache\com.unity.visualscripting@191c0d7e3b69\package.json" />
-    <None Include="Library\PackageCache\com.unity.editorcoroutines@54394ed3283c\package.json" />
     <None Include="Library\PackageCache\com.unity.collab-proxy@1ec4e416a4af\package.json" />
     <None Include="Library\PackageCache\com.unity.ugui@b9d1dd437cb9\PackageConversionData.json" />
     <None Include="Library\PackageCache\com.unity.modules.unitywebrequestassetbundle\package.json" />
-    <None Include="Library\PackageCache\com.unity.ide.visualstudio@a99d56dec63f\package.json" />
     <None Include="Library\PackageCache\com.unity.render-pipelines.core@9a9c0155552c\ValidationConfig.json" />
     <None Include="Library\PackageCache\com.unity.render-pipelines.core@9a9c0155552c\package.json" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Surface-Mobile.shader" />
@@ -135,7 +131,6 @@
     <None Include="Library\PackageCache\com.unity.2d.common@51e9484895c4\package.json" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF.shader" />
     <None Include="Library\PackageCache\com.unity.modules.vectorgraphics\package.json" />
-    <None Include="Library\PackageCache\com.unity.ide.visualstudio@a99d56dec63f\ValidationExceptions.json" />
     <None Include="Library\PackageCache\com.unity.modules.wind\package.json" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile SSD.shader" />
     <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
@@ -158,7 +153,6 @@
     <None Include="Library\PackageCache\com.unity.collab-proxy@1ec4e416a4af\ValidationConfig.json" />
     <None Include="Library\PackageCache\com.unity.shadergraph@3e48e962d639\GraphTemplates\Subgraphs\CanvasLinearSpaceConversion.hlsl" />
     <None Include="Library\PackageCache\com.unity.modules.xr\package.json" />
-    <None Include="Library\PackageCache\com.unity.profiling.core@8a49f7027d06\package.json" />
     <None Include="Library\PackageCache\com.unity.ugui@b9d1dd437cb9\Editor Resources\Shaders\TMP_Properties.cginc" />
     <None Include="Library\PackageCache\com.unity.modules.adaptiveperformance\package.json" />
     <None Include="Library\PackageCache\com.unity.timeline@7f8b2fb101b6\ValidationExceptions.json" />
@@ -191,7 +185,6 @@
     <None Include="Assets\TextMesh Pro\Sprites\EmojiOne.json" />
     <None Include="Library\PackageCache\com.unity.modules.ui\package.json" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Sprite.shader" />
-    <None Include="Library\PackageCache\com.unity.multiplayer.center@f01f4ba8d00a\package.json" />
     <Reference Include="UnityEngine">
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.3.6f1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>
     </Reference>
@@ -1035,10 +1028,6 @@
       <Project>{5b87a8e9-6f71-d31a-8462-9c6a43905836}</Project>
       <Name>Unity.2D.IK.Runtime</Name>
     </ProjectReference>
-    <ProjectReference Include="Unity.MemoryProfiler.csproj">
-      <Project>{cc60d101-0578-66e0-6a83-40aa40ecf8aa}</Project>
-      <Name>Unity.MemoryProfiler</Name>
-    </ProjectReference>
     <ProjectReference Include="Unity.VisualScripting.SettingsProvider.Editor.csproj">
       <Project>{a193d96d-6a79-1ed9-77b2-30bca6a35588}</Project>
       <Name>Unity.VisualScripting.SettingsProvider.Editor</Name>
@@ -1067,17 +1056,9 @@
       <Project>{bf68bbcf-7987-b4c9-32c6-d7852a15fcea}</Project>
       <Name>Unity.Timeline</Name>
     </ProjectReference>
-    <ProjectReference Include="Unity.MemoryProfiler.Editor.csproj">
-      <Project>{aa8b5936-65bd-882f-0b9e-4a7f0abc5cf5}</Project>
-      <Name>Unity.MemoryProfiler.Editor</Name>
-    </ProjectReference>
     <ProjectReference Include="PPv2URPConverters.csproj">
       <Project>{fe222bc5-e5e9-3206-6b58-21fab0c1b2f8}</Project>
       <Name>PPv2URPConverters</Name>
-    </ProjectReference>
-    <ProjectReference Include="Unity.EditorCoroutines.Editor.csproj">
-      <Project>{7bd486f9-ffbe-617a-4a6f-91847461cc7b}</Project>
-      <Name>Unity.EditorCoroutines.Editor</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.2D.Tooling.Editor.csproj">
       <Project>{eb973f0a-4e3a-85f1-24a6-9647fe28c6c6}</Project>
@@ -1147,13 +1128,17 @@
       <Project>{2625e7f1-a27d-6343-d4b4-d4b56d9a4592}</Project>
       <Name>Unity.2D.Psdimporter.Editor</Name>
     </ProjectReference>
+    <ProjectReference Include="Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary.csproj">
+      <Project>{233114fb-1651-9c35-d46c-538e9bee12e1}</Project>
+      <Name>Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary</Name>
+    </ProjectReference>
     <ProjectReference Include="Unity.VisualScripting.Flow.csproj">
       <Project>{00009601-ff39-f395-bf1d-eedee46f66fd}</Project>
       <Name>Unity.VisualScripting.Flow</Name>
     </ProjectReference>
-    <ProjectReference Include="Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary.csproj">
-      <Project>{233114fb-1651-9c35-d46c-538e9bee12e1}</Project>
-      <Name>Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary</Name>
+    <ProjectReference Include="Unity.RenderPipelines.Core.Runtime.csproj">
+      <Project>{1c5076d2-fbf9-f603-8185-79bc2b752ff6}</Project>
+      <Name>Unity.RenderPipelines.Core.Runtime</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.TextMeshPro.Editor.csproj">
       <Project>{0c805fb5-b3a4-50b9-d4f0-458591d7c468}</Project>
@@ -1179,14 +1164,6 @@
       <Project>{cd54710f-25f6-ccc8-4944-807f2e5d73d2}</Project>
       <Name>Unity.2D.SpriteShape.Runtime</Name>
     </ProjectReference>
-    <ProjectReference Include="Unity.VisualStudio.Editor.csproj">
-      <Project>{120a36af-b22c-77c8-8b49-713d58264d4b}</Project>
-      <Name>Unity.VisualStudio.Editor</Name>
-    </ProjectReference>
-    <ProjectReference Include="Unity.RenderPipelines.Core.Runtime.csproj">
-      <Project>{1c5076d2-fbf9-f603-8185-79bc2b752ff6}</Project>
-      <Name>Unity.RenderPipelines.Core.Runtime</Name>
-    </ProjectReference>
     <ProjectReference Include="Unity.2D.Tilemap.Editor.csproj">
       <Project>{fce18b20-0d89-193e-4caa-8e7757edaf59}</Project>
       <Name>Unity.2D.Tilemap.Editor</Name>
@@ -1199,13 +1176,13 @@
       <Project>{c6a8f14a-0563-3e7c-c961-bd71095625b8}</Project>
       <Name>Unity.Collections</Name>
     </ProjectReference>
-    <ProjectReference Include="Unity.Profiling.Core.csproj">
-      <Project>{1fe24e45-82d5-dcae-4599-1272bdba5bdc}</Project>
-      <Name>Unity.Profiling.Core</Name>
-    </ProjectReference>
     <ProjectReference Include="Unity.InputSystem.ForUI.csproj">
       <Project>{3aedca76-c9be-e40e-3cf8-61b4d606bc16}</Project>
       <Name>Unity.InputSystem.ForUI</Name>
+    </ProjectReference>
+    <ProjectReference Include="Unity.RenderPipelines.GPUDriven.Runtime.csproj">
+      <Project>{4c76a1ec-77fc-6e3e-afd3-d46a9106230a}</Project>
+      <Name>Unity.RenderPipelines.GPUDriven.Runtime</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.Timeline.Editor.csproj">
       <Project>{1b8b498e-a0e9-5c16-81ef-649ae1783564}</Project>
@@ -1214,10 +1191,6 @@
     <ProjectReference Include="Unity.VisualScripting.State.Editor.csproj">
       <Project>{b9aa15d8-7ce5-98f5-204d-87d7ebbd0e6d}</Project>
       <Name>Unity.VisualScripting.State.Editor</Name>
-    </ProjectReference>
-    <ProjectReference Include="Unity.RenderPipelines.GPUDriven.Runtime.csproj">
-      <Project>{4c76a1ec-77fc-6e3e-afd3-d46a9106230a}</Project>
-      <Name>Unity.RenderPipelines.GPUDriven.Runtime</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.Mathematics.csproj">
       <Project>{d29d75e8-540f-43ab-bfbc-65269706ea31}</Project>
@@ -1231,10 +1204,6 @@
       <Project>{2bdd8e61-f2a4-af79-fe36-fb3976726fc3}</Project>
       <Name>UnityEngine.UI</Name>
     </ProjectReference>
-    <ProjectReference Include="Unity.Multiplayer.Center.Common.csproj">
-      <Project>{49e76bff-4f5b-95dd-d509-3775654e4031}</Project>
-      <Name>Unity.Multiplayer.Center.Common</Name>
-    </ProjectReference>
     <ProjectReference Include="Unity.Burst.csproj">
       <Project>{7859167c-6bac-907f-2699-bc00f703c477}</Project>
       <Name>Unity.Burst</Name>
@@ -1247,17 +1216,9 @@
       <Project>{40cd5561-8e62-2ff4-efb8-5d0a32cf94af}</Project>
       <Name>Unity.InternalAPIEngineBridge.004</Name>
     </ProjectReference>
-    <ProjectReference Include="Unity.Multiplayer.Center.Editor.csproj">
-      <Project>{ad0be74e-9dff-8548-28ca-30eeab79168f}</Project>
-      <Name>Unity.Multiplayer.Center.Editor</Name>
-    </ProjectReference>
     <ProjectReference Include="Unity.RenderPipelines.Universal.Runtime.csproj">
       <Project>{734a2a34-a8d6-5d6f-bf55-50375a9876fc}</Project>
       <Name>Unity.RenderPipelines.Universal.Runtime</Name>
-    </ProjectReference>
-    <ProjectReference Include="Unity.MemoryProfiler.Editor.MemoryProfilerModule.csproj">
-      <Project>{26c7377c-5eb8-629e-477f-b0a7baab2047}</Project>
-      <Name>Unity.MemoryProfiler.Editor.MemoryProfilerModule</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.VisualScripting.State.csproj">
       <Project>{7b6b6330-ef26-db0d-a4c6-4b76802b5102}</Project>

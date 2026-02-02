@@ -8,7 +8,7 @@ using Vector3 = UnityEngine.Vector3;
 
 public abstract class PlayersManager : MonoBehaviour {
     [Header("References")]
-    [SerializeField] protected WeaponManager _weaponManager;
+    protected WeaponManager _weaponManager;
     [SerializeField] protected List<Vector2Int> _moves;
 
     [Header("Voicelines")]
@@ -35,6 +35,7 @@ public abstract class PlayersManager : MonoBehaviour {
 
     protected virtual void Awake() {
         this._moves = new List<Vector2Int>();
+        this._weaponManager = this.GetComponentInChildren<WeaponManager>();
     }
 
     protected virtual void Start() {

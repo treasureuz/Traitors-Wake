@@ -1,12 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting.Antlr3.Runtime.Tree;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using Vector3 = UnityEngine.Vector3;
 
 public class Traitor : PlayersManager {
-    [SerializeField] private LineRenderer _lineRenderer;
+    private LineRenderer _lineRenderer;
     
     private static readonly Vector2Int[] directions = { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
     private static readonly List<Vector2Int> validDirs = new();
@@ -19,9 +18,10 @@ public class Traitor : PlayersManager {
 
     protected override void Awake() {
         base.Awake();
+        this._lineRenderer = this.GetComponent<LineRenderer>();
         this._lineRenderer.positionCount = 1;
     }
-    
+
     private IEnumerator MoveSequence() {
         if (this.isMoving) yield break;
         this.isMoving = true;
@@ -100,7 +100,7 @@ public class Traitor : PlayersManager {
         // Pick next valid direction
         return weightedDirs[Random.Range(0, weightedDirs.Count)];
     }
-    
+
     protected override void OnDamaged(float damageAmount) {
         base.OnDamaged(damageAmount);
         UIManager.instance.UpdateTraitorHealth();

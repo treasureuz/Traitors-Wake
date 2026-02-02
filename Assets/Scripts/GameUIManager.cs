@@ -104,6 +104,8 @@ public class UIManager : MonoBehaviour {
         instance = this;
         this._topTextBG = this._topText.GetComponentInParent<Image>().rectTransform;
         this._mapBorderChildren = this._mapBorder.GetComponentsInChildren<SpriteRenderer>();
+        this._bountyText = this._winOOLScreenPrefab.GetComponentInChildren<TextMeshProUGUI>();
+        this._winOOLImage = this._winOOLScreenPrefab.transform.Find("Win_OOLScreenBG/Win_OOLImageBG/Win_OOLImage").GetComponent<Image>();
     }
     
     public void Start() {
@@ -245,29 +247,25 @@ public class UIManager : MonoBehaviour {
             this._topText.text = loseText; SetEndScreenButtons(true);
         }
     }
-    
-    // ReSharper disable Unity.PerformanceAnalysis
+
     private void HandleBasePlayerEndScreen() {
-        this._endRestartButton.interactable = false; // Can't restart if player won/OOL
         this._spawnedWinOOLScreen = Instantiate(this._winOOLScreenPrefab, this._endCanvas.transform, false);
-        this._bountyText = this._spawnedWinOOLScreen.GetComponentInChildren<TextMeshProUGUI>();
-        this._winOOLImage = this._spawnedWinOOLScreen.transform.Find("Win_OOLScreenBG/Win_OOLImageBG/Win_OOLImage").GetComponent<Image>();
         Button exit = this._spawnedWinOOLScreen.GetComponentInChildren<Button>();
         exit.onClick.AddListener(OnHome);
     }
 
     private void HandlePlayerWinScreen() {
-        HandleBasePlayerEndScreen();
-        this._topText.text = topWinText; 
+        this._topText.text = topWinText;
         this._bountyText.text = bountyWinText;
         this._winOOLImage.sprite = this._traitorBehindBars;
+        HandleBasePlayerEndScreen(); // Spawns the prefab with the win image
     }
     
     private void HandlePlayerOOLScreen() {
-        HandleBasePlayerEndScreen(); 
-        this._topText.text = topOOLText; 
+        this._topText.text = topOOLText;
         this._bountyText.text = bountyOOLText;
         this._winOOLImage.sprite = this._traitorBrokenBars;
+        HandleBasePlayerEndScreen(); // Spawns the prefab with the lose image
     }
     
     private void HandleDiffCompleteScreen() {

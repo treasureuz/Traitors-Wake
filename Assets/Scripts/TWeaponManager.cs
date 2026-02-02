@@ -6,13 +6,17 @@ public class TWeaponManager : WeaponManager {
 
     private float _timeBetweenShots;
 
-    void Awake() {
-        this._owner = this.GetComponentInParent<Traitor>();
+    protected override void Awake() {
+        base.Awake(); this._owner = this.GetComponentInParent<Traitor>();
     }
     
     void Start() {
         // Set start timeBetweenShots
         this._timeBetweenShots = Random.Range(this._minTimeBetweenShots, this._maxTimeBetweenShots);
+    }
+
+    protected override void Update() {
+        base.Update(); RotateTowardsTarget(GetTargetPosition());
     }
 
     protected override Vector3 GetTargetPosition() {

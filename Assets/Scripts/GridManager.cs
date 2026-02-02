@@ -1,19 +1,18 @@
 using System.Collections.Generic;
 using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class GridManager : MonoBehaviour {
     [SerializeField] private Transform _background;
-    [SerializeField] private Transform _cam;
-    [SerializeField] private SpriteRenderer _gridBorder;
+    private Camera _cam;
+    private SpriteRenderer _gridBorder;
     [SerializeField] private Tile _tilePrefab;
     [SerializeField] private GameObject _tilesParent;
     [SerializeField] private Sprite _openedChestSprite;
     [SerializeField] private AudioClip[] _chestOpenClips;
     [SerializeField] private AudioClip[] _rockBreakClips;
-    [SerializeField] private LayerMask _gridAreaMask;
+    private LayerMask _gridAreaMask;
     [SerializeField] private int _width, _height;
     
     public static GridManager instance;
@@ -30,19 +29,19 @@ public class GridManager : MonoBehaviour {
 
     void Awake() {
         instance = this;
+        this._cam = Camera.main;
+        this._gridAreaMask = LayerMask.GetMask(LayerMask.LayerToName(gameObject.layer));
+        this._gridBorder = GetComponent<SpriteRenderer>();
         this._gridBorder.enabled = false;
         this.tilesParentChildren = this._tilesParent.GetComponentsInChildren<SpriteRenderer>();
-        // Deactivate obstacle and chest tile sprites
-        this._tilePrefab.transform.Find("Obstacle").gameObject.SetActive(false);
-        this._tilePrefab.transform.Find("Chest").gameObject.SetActive(false);
     }
-    
+
     public void GenerateGrid() {
         ClearGrid();
         // Position the every relevant GameObject at the center of the grid (based on the width and height)
         var centerWidth = (float) this._width / 2 - 0.5f;
         var centerHeight = (float) this._height / 2 - 0.5f;
-        this._cam.position = new Vector3(centerWidth, centerHeight, -10); 
+        this._cam.transform.position = new Vector3(centerWidth, centerHeight, -10);
         this._gridBorder.enabled = true;
         this.transform.localScale = new Vector3(this._width + 0.09f, this._height + 0.09f, 1); // creates a border
         this.transform.position = new Vector3(centerWidth, centerHeight);
@@ -59,7 +58,7 @@ public class GridManager : MonoBehaviour {
     }
 
     public bool IsWithinGridArea() {
-        Vector2 worldPos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+        Vector2 worldPos = _cam.ScreenToWorldPoint(Mouse.current.position.ReadValue());
         return Physics2D.OverlapPoint(worldPos, _gridAreaMask);
     }
     

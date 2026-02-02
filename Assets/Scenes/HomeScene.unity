@@ -370,19 +370,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 376605907}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2092360167}
-        m_TargetAssemblyTypeName: HomeUIManager, Assembly-CSharp
-        m_MethodName: OnPowerUps
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &376605907
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1376,7 +1364,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -1.35}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 330, y: 15}
+  m_AnchoredPosition: {x: 370, y: 15}
   m_SizeDelta: {x: 480, y: 235}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &631145641
@@ -1912,19 +1900,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1032421130}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2092360167}
-        m_TargetAssemblyTypeName: HomeUIManager, Assembly-CSharp
-        m_MethodName: OnScores
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1032421130
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2149,19 +2125,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1478707220}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2092360167}
-        m_TargetAssemblyTypeName: HomeUIManager, Assembly-CSharp
-        m_MethodName: OnPlay
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1478707220
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2571,7 +2535,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 115, y: 15}
+  m_AnchoredPosition: {x: 155, y: 15}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1794724314
@@ -2657,19 +2621,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1794724317}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2092360167}
-        m_TargetAssemblyTypeName: HomeUIManager, Assembly-CSharp
-        m_MethodName: OnStory
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1794724317
 MonoBehaviour:
   m_ObjectHideFlags: 0

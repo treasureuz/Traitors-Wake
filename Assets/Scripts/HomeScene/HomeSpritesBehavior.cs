@@ -6,7 +6,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 
 public class HomeSpritesBehavior : MonoBehaviour {
-    [SerializeField] private GameObject [] _spritePrefabs;
+    [SerializeField] private GameObject[] _spritePrefabs;
     [SerializeField] private float _rotationSpeed = -75f;
     [SerializeField] private float _launchSpeed = 5.3f;
     [SerializeField] private float _minWaitTime = 2.1f;

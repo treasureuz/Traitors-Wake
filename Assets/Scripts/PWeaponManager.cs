@@ -5,14 +5,16 @@ using UnityEngine.InputSystem;
 public class PWeaponManager : WeaponManager {
     [SerializeField] private float _timeBetweenShots = 3f;
     
-    void Awake() {
-        this._owner = this.GetComponentInParent<Player>();
+    protected override void Awake() {
+        base.Awake(); this._owner = this.GetComponentInParent<Player>();
     }
-    
+
+    // ReSharper disable Unity.PerformanceAnalysis
     protected override void HandleShoot() {
         if (this._owner.isDead || GameManager.isPaused || !GameManager.instance.traitor.hasEnded || this._owner.hasEnded
-            || GameManager.instance.traitor.isShipDestroyed || !Mouse.current.leftButton.isPressed 
-            || !GridManager.instance.IsWithinGridArea() || !HasBullets() || Time.time < this._nextShootTime) return;
+            || GameManager.instance.traitor.isShipDestroyed || !Mouse.current.leftButton.isPressed ||
+            !GridManager.instance.IsWithinGridArea() || !HasBullets() || Time.time < this._nextShootTime) return;
+        RotateTowardsTarget(GetTargetPosition());
         Shoot(); UIManager.instance.UpdateBulletBar();
         this._nextShootTime = Time.time + this._timeBetweenShots;
     }
