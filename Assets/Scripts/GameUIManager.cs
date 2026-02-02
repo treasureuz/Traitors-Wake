@@ -65,6 +65,7 @@ public class UIManager : MonoBehaviour {
     [SerializeField] private Canvas _endCanvas;
 
     [Header("Others")]
+    [SerializeField] private AudioClip _buttonClick;
     [SerializeField] private AudioClip _buttonClick2;
     [SerializeField] private float _playerHealthBarSpeed = 3f;
     
@@ -269,6 +270,7 @@ public class UIManager : MonoBehaviour {
     }
     
     private void HandleDiffCompleteScreen() {
+        AudioManager.instance.PlayClip(this._buttonClick);
         LevelManager.instance.isDifficultyComplete = false;
         if (GameManager.instance.traitor.isShipDestroyed) OnTraitorShipDestroyed();
         else this._topText.text = diffCompleteText;

@@ -9,7 +9,6 @@ public class LevelManager : MonoBehaviour {
     [SerializeField] private int _maxHardLevels = 2;
     
     [Header("Other Settings")]
-    [SerializeField] private AudioClip _buttonClick;
     [SerializeField] private AudioClip _diffCompleteClip;
     [SerializeField] private float _timeBeforeLevelStart = 1f;
     
@@ -115,7 +114,7 @@ public class LevelManager : MonoBehaviour {
 
     public void DetermineNextEvent() {
         if (GameManager.instance.player.MovesEquals(GameManager.instance.traitor)) {
-            AudioManager.instance.PlayClip(this._buttonClick);
+
             // Calculate scores and display them
             ScoreManager.instance.CalculateScores(); UIManager.instance.UpdateScoreText();
             IncrementLevelsCompletedByDiff(); // Only increment if last level was completed

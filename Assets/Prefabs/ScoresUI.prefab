@@ -2723,7 +2723,7 @@ MonoBehaviour:
     = {-80} points.
 
     Destroying the Traitor, his ship''s stern, or the tiller
-    = {1200}, {635}, and {200} points; respectively.'
+    = {1200}, {635}, and {200} points, respectively.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4a45160fc30d3fe4882edc2712c0b051, type: 2}
   m_sharedMaterial: {fileID: -462789608907736891, guid: 4a45160fc30d3fe4882edc2712c0b051, type: 2}

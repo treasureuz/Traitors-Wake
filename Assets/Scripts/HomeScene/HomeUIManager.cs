@@ -13,16 +13,16 @@ public class HomeUIManager : MonoBehaviour {
     [SerializeField] private GameObject _scoresUIPrefab;
     [SerializeField] private AudioClip _buttonClick2;
     [SerializeField] private TextMeshProUGUI _titleText;
-    [SerializeField] private float _typewriterDelay = 0.55f;
+    //[SerializeField] private float _typewriterDelay = 0.55f;
 
     public static HomeUIManager instance;
 
     private Canvas _canvas;
     private GameObject _activePanelPrefab;
     private GameObject _spawnedPanelUI;
-    private readonly List<Button> _homeButtons = new();
+    //private readonly List<Button> _homeButtons = new();
 
-    private const string titleText = "TRAITOR'S WAKE";
+    //private const string titleText = "TRAITOR'S WAKE";
 
     void Awake() {
         if (instance) {
@@ -49,27 +49,27 @@ public class HomeUIManager : MonoBehaviour {
     
     private void Begin() {
         this._canvas = FindFirstObjectByType<Canvas>();
-        this._titleText = this._canvas.transform.Find("TitleCardBorder/TitleCard/TitleText (TMP)").GetComponent<TextMeshProUGUI>();
+        //this._titleText = this._canvas.transform.Find("TitleCardBorder/TitleCard/TitleText (TMP)").GetComponent<TextMeshProUGUI>();
         DestroyAllPanelsExcept(this._activePanelPrefab); // Spawn active panel
     }
     
-    void Start() {
-        foreach (HomeButtonsBehavior hb in FindObjectsByType<HomeButtonsBehavior>(FindObjectsSortMode.None))
-            this._homeButtons.Add(hb.GetComponent<Button>());
-        SetHomeButtons(false); // Deactivate homeButtons on start
-        this._titleText.text = "";
-        StartCoroutine(StartTitleAnimation());
-    }
+    // void Start() {
+    //     foreach (HomeButtonsBehavior hb in FindObjectsByType<HomeButtonsBehavior>(FindObjectsSortMode.None))
+    //         this._homeButtons.Add(hb.GetComponent<Button>());
+    //     SetHomeButtons(false); // Deactivate homeButtons on start
+    //     this._titleText.text = "";
+    //     StartCoroutine(StartTitleAnimation());
+    // }
     
-    private IEnumerator StartTitleAnimation() {
-        var index = 0;
-        while (index < titleText.Length) {
-            yield return new WaitForSeconds(this._typewriterDelay);
-            this._titleText.text += titleText[index++];
-        }
-        this._titleText.text = titleText;
-        SetHomeButtons(true); // Reactivate buttons after title animation is done
-    }
+    // private IEnumerator StartTitleAnimation() {
+    //     var index = 0;
+    //     while (index < titleText.Length) {
+    //         yield return new WaitForSeconds(this._typewriterDelay);
+    //         this._titleText.text += titleText[index++];
+    //     }
+    //     this._titleText.text = titleText;
+    //     SetHomeButtons(true); // Reactivate buttons after title animation is done
+    // }
 
     public void OnPlay() {
         EventSystem.current.SetSelectedGameObject(null); // Removes "selectedButtonColor"
@@ -119,9 +119,9 @@ public class HomeUIManager : MonoBehaviour {
         }
     }
     
-    private void SetHomeButtons(bool enable) {
-        foreach (Button button in this._homeButtons) {
-            button.interactable = enable;
-        }
-    }
+    // private void SetHomeButtons(bool enable) {
+    //     foreach (Button button in this._homeButtons) {
+    //         button.interactable = enable;
+    //     }
+    // }
 }
