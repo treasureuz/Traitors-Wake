@@ -84,12 +84,13 @@ public class DiffSelectUIManager : MonoBehaviour {
         // Can only play easy if easy isn't completed
         this._easyGoButton.interactable = !Player.isOutOfLives && !Player.hasWon && LevelManager.instance.NextLevelExistsByDiff(GameManager.Difficulty.Easy);
         this._easyResetButton.interactable = !Player.isOutOfLives && !Player.hasWon && 
-                                             GameManager.instance.easyResetCount > 0 && !this._easyGoButton.interactable;
+                                             GameManager.instance.easyResetCount > 0;
         // Can only play medium if easy is completed and medium isn't completed
         this._mediumGoButton.interactable = !Player.isOutOfLives && !Player.hasWon && LevelManager.instance.isCurrentEasyCompleted && 
                                             LevelManager.instance.NextLevelExistsByDiff(GameManager.Difficulty.Medium);
-        this._mediumResetButton.interactable = !Player.isOutOfLives && !Player.hasWon && GameManager.instance.mediumResetCount > 0 
-                                               && LevelManager.instance.isCurrentMediumCompleted;
+        this._mediumResetButton.interactable = !Player.isOutOfLives && !Player.hasWon && GameManager.instance.mediumResetCount > 0
+                                               && LevelManager.instance.isCurrentEasyCompleted;
+                               
         // Can only play hard if medium is completed and hard isn't completed
         this._hardGoButton.interactable = !Player.isOutOfLives && LevelManager.instance.isCurrentMediumCompleted &&
                                           LevelManager.instance.NextLevelExistsByDiff(GameManager.Difficulty.Hard);

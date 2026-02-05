@@ -135,7 +135,7 @@ public class Player : PlayersManager {
         AudioManager.instance.PlayClip(this._playerOOLClip);
         this.gameObject.SetActive(false); 
         LevelManager.instance.ResetAll(); // Sets isCurrentEasy/Medium/HardCompleted to false, calls ResetRunState
-        GameManager.instance.HandleGameEnd(); // -> Out of Lives Screen
+        LevelManager.instance.HandleLevelEnd(); // -> Out of Lives Screen
     }
     
     protected override void OnDamaged(float damageAmount) {
@@ -152,12 +152,12 @@ public class Player : PlayersManager {
         if (isOutOfLives) return; // Return if player OOL
         AudioManager.instance.PlayClip(this._heartLossClip);
         LevelManager.instance.ResetCurrentLevelByDiff(GameManager.instance.difficulty); // Calls ResetRunState
-        GameManager.instance.HandleGameEnd(); // -> Mismatch/DBNO Screen
+        LevelManager.instance.HandleLevelEnd(); // -> Mismatch/DBNO Screen
     }
     
     public void OnPlayerWon() {
         hasWon = true; AudioManager.instance.PlayClip(this._playerWinClip);
-        GameManager.instance.HandleGameEnd(); // -> Win Screen
+        LevelManager.instance.HandleLevelEnd(); // -> Win Screen
     }
     
     public void OnPlayerEnded() {

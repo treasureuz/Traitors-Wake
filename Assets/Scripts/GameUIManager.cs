@@ -19,9 +19,10 @@ public class UIManager : MonoBehaviour {
     [SerializeField] private Button _pauseButton;
     [SerializeField] private Button _pauseHomeButton;
     [SerializeField] private Button _endRestartButton;
-    [SerializeField] private Button _nextDiffButton;
     [SerializeField] private Button _endHomeButton;
-    
+    [SerializeField] private Button _nextLevelButton;
+    [SerializeField] private Button _nextDiffButton;
+
     [Header("TMP References")]
     [SerializeField] private TextMeshProUGUI _topText;
     [SerializeField] private TextMeshProUGUI _playerHealthText;
@@ -67,6 +68,7 @@ public class UIManager : MonoBehaviour {
     [Header("Others")]
     [SerializeField] private AudioClip _buttonClick;
     [SerializeField] private AudioClip _buttonClick2;
+    [SerializeField] private AudioClip _diffCompleteClip;
     [SerializeField] private float _playerHealthBarSpeed = 3f;
     
     public static UIManager instance;
@@ -99,7 +101,7 @@ public class UIManager : MonoBehaviour {
     private const string topOOLText = "*YOU ARE OUT OF LIVES*";
     private const string loseText = "<color=#FF0000>*TRANSLATION MISMATCH*</color>";
     private const string deadText = "<color=#FF0000>*DOWN BUT NOT OUT*</color>";
-    private const string diffCompleteText = "<color=#00FF00><size=45px>*DIFFICULTY COMPLETE!*</size></color>";
+    private const string levelCompleteText = "<color=#00FF00><size=48px>*LEVEL COMPLETE!*</size></color>";
 
     void Awake() {
         instance = this;
@@ -199,15 +201,24 @@ public class UIManager : MonoBehaviour {
         LevelManager.instance.TryStartLevel(); // Restart current level
     }
 
+    public void OnNextLevel() {
+        EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
+        AudioManager.instance.PlayClip(this._buttonClick2);
+        LevelManager.instance.TryStartLevel(); // Start next level
+        // endRestartButton takes over nextLevelButton
+        this._nextLevelButton.gameObject.SetActive(false);
+        this._endRestartButton.gameObject.SetActive(true);
+    }
+
     public void OnNextDifficulty() {
         EventSystem.current.SetSelectedGameObject(null); // removes "selectedButtonColor"
         AudioManager.instance.PlayClip(this._buttonClick2);
-        // endRestartButton takes over nextDiffButton
-        this._nextDiffButton.gameObject.SetActive(false);
-        this._endRestartButton.gameObject.SetActive(true);
         GameManager.instance.IncrementDifficulty(); // calls HandleDifficultySettings
         if (LevelManager.instance.GetCurrentLevelByDiff() == 0) LevelManager.hasResetRun = true; // calls ResetRunState
         LevelManager.instance.TryStartLevel(); // Start next level with higher difficulty
+        // endRestartButton takes over nextDiffButton
+        this._nextDiffButton.gameObject.SetActive(false);
+        this._endRestartButton.gameObject.SetActive(true);
     }
     
     public void OnHome() {
@@ -239,12 +250,14 @@ public class UIManager : MonoBehaviour {
     
     public void DisplayEndScreen() {
         DimCanvasUI(); this._topTextBG.sizeDelta = new Vector2(this._endTextBGWidth, this._topTextBG.sizeDelta.y);
-        if (Player.hasWon) HandlePlayerWinScreen(); // Also works for Traitor's death 
+        SetOnPauseButtons(false);
+        if (Player.hasWon) HandlePlayerWinScreen(); // Also works for Traitor's death
         else if (Player.isOutOfLives) HandlePlayerOOLScreen();
         else if (GameManager.instance.player.isDead) {
             this._topText.text = deadText; SetEndScreenButtons(true);
-        } else if (LevelManager.instance.isDifficultyComplete) HandleDiffCompleteScreen(); // Checks for isShipDestroyed
-        else {
+        } else if (LevelManager.instance.isLevelComplete) {
+            HandleLevelCompleteScreen(); // Checks if Difficulty is complete
+        } else {
             this._topText.text = loseText; SetEndScreenButtons(true);
         }
     }
@@ -268,12 +281,25 @@ public class UIManager : MonoBehaviour {
         this._winOOLImage.sprite = this._traitorBrokenBars;
         HandleBasePlayerEndScreen(); // Spawns the prefab with the lose image
     }
-    
-    private void HandleDiffCompleteScreen() {
+
+    private void HandleLevelCompleteScreen() {
         AudioManager.instance.PlayClip(this._buttonClick);
+        if (LevelManager.instance.isDifficultyComplete) {
+            HandleDiffCompleteScreen(); return;
+        }
+        LevelManager.instance.isLevelComplete = false;
+        this._topText.text = levelCompleteText;
+        // nextLevelButton takes over endRestartButton
+        this._endRestartButton.gameObject.SetActive(false);
+        this._nextLevelButton.gameObject.SetActive(true);
+        SetEndScreenButtons(true);
+    }
+
+    private void HandleDiffCompleteScreen() {
+        AudioManager.instance.PlayClip(this._diffCompleteClip);
         LevelManager.instance.isDifficultyComplete = false;
         if (GameManager.instance.traitor.isShipDestroyed) OnTraitorShipDestroyed();
-        else this._topText.text = diffCompleteText;
+        else this._topText.text = $"<color=#00FF00><size=47px>*{GameManager.instance.difficulty} COMPLETE!*</size></color>";
         // nextDiffButton takes over endRestartButton
         this._endRestartButton.gameObject.SetActive(false);
         this._nextDiffButton.gameObject.SetActive(true);

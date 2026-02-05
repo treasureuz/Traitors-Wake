@@ -9,7 +9,6 @@ public class LevelManager : MonoBehaviour {
     [SerializeField] private int _maxHardLevels = 2;
     
     [Header("Other Settings")]
-    [SerializeField] private AudioClip _diffCompleteClip;
     [SerializeField] private float _timeBeforeLevelStart = 1f;
     
     private Coroutine _levelCoroutine;
@@ -25,6 +24,7 @@ public class LevelManager : MonoBehaviour {
     public bool isCurrentMediumCompleted { get; private set; }
     public bool isCurrentHardCompleted { get; private set; }
     public bool isDifficultyComplete { get; set; }
+    public bool isLevelComplete {get; set;}
 
     void Awake() {
         if (instance) {
@@ -58,11 +58,12 @@ public class LevelManager : MonoBehaviour {
         PlayersSettingsManager.instance.ApplyPlayersSettings(); // Apply saved players data/settings
         UIManager.instance.Start(); // Reset/Update every relevant UI Elements
         // If player has won or is out of lives or difficulty is complete, don't generate a level
+        // This is assuming the "Go" Button in DiffScene is interactable
         if (Player.hasWon || Player.isOutOfLives || isDifficultyComplete) {
             UIManager.instance.DimCanvasUI(); // Dim Canvas
             if (Player.hasWon) GameManager.instance.player.OnPlayerWon();
             else if (Player.isOutOfLives) GameManager.instance.player.OnPlayerOutOfLives();
-            else OnDifficultyComplete();
+            else OnLevelComplete(); // Handles this Difficulty complete scenario
             return; 
         }
         // Else, generate level
@@ -114,7 +115,6 @@ public class LevelManager : MonoBehaviour {
 
     public void DetermineNextEvent() {
         if (GameManager.instance.player.MovesEquals(GameManager.instance.traitor)) {
-
             // Calculate scores and display them
             ScoreManager.instance.CalculateScores(); UIManager.instance.UpdateScoreText();
             IncrementLevelsCompletedByDiff(); // Only increment if last level was completed
@@ -123,14 +123,16 @@ public class LevelManager : MonoBehaviour {
             // If next level exists, send the player to the next level
             // Else if player beat the final level and hasn't already won, call EndGame -> Win Screen
             // Else, player completed a difficulty so take them back to DifficultySelectScene
-            if (HasNextLevelForDifficulty()) {
-                // Save and apply if next level exist, instead let Player.OnDestroy do the job
-                PlayersSettingsManager.instance.SavePlayersSettings();
-                PlayersSettingsManager.instance.ApplyPlayersSettings(); // Apply saved players data/settings7
-                TryStartLevel(); // Start next level
-            } else if (!Player.hasWon && this._totalLevelsCompleted == GetTotalLevels()) {
+            if (!Player.hasWon && this._totalLevelsCompleted == GetTotalLevels()) {
                 GameManager.instance.player.OnPlayerWon(); // Player won!
-            } else OnDifficultyComplete(); // Difficulty complete
+            } else {
+                if (HasNextLevelForDifficulty()) {
+                    // Save and apply if next level exist, instead let Player.OnDestroy do the job
+                    PlayersSettingsManager.instance.SavePlayersSettings();
+                    PlayersSettingsManager.instance.ApplyPlayersSettings(); // Apply saved players data/settings
+                } else this.isDifficultyComplete = true; // Difficulty complete
+                OnLevelComplete(); // calls HandleLevelEnd -> LevelComplete screen
+            }
         } else GameManager.instance.player.OnPlayerLost(); // Player lost
     }
     
@@ -172,11 +174,15 @@ public class LevelManager : MonoBehaviour {
             _ => false
         };
     }
-    
-    private void OnDifficultyComplete() {
-        this.isDifficultyComplete = true;
-        AudioManager.instance.PlayClip(this._diffCompleteClip);
-        GameManager.instance.HandleGameEnd();
+
+    private void OnLevelComplete() {
+        // Sfx is played in HandleLevelCompleteScreen -> Checks if Difficulty is complete
+        this.isLevelComplete = true; HandleLevelEnd();
+    }
+
+    public void HandleLevelEnd() {
+        StopAllCoroutines(true);
+        UIManager.instance.DisplayEndScreen();
     }
 
     public void StopAllCoroutines(bool includeLevelCoroutine) {
@@ -243,13 +249,13 @@ public class LevelManager : MonoBehaviour {
             case GameManager.Difficulty.Easy: {
                 this.currentEasyLevelsCompleted = GetMaxEasyLevels();
                 this.isCurrentEasyCompleted = true; 
-                GameManager.instance.HandleGameEnd(); // calls DisplayEndScreen -> OnTraitorShipDestroyed
+                HandleLevelEnd(); // calls DisplayEndScreen -> OnTraitorShipDestroyed
                 break;
             }
             case GameManager.Difficulty.Medium: {
                 this.currentMediumLevelsCompleted = GetMaxMediumLevels();
                 this.isCurrentMediumCompleted = true; 
-                GameManager.instance.HandleGameEnd(); // calls DisplayEndScreen -> OnTraitorShipDestroyed
+                HandleLevelEnd(); // calls DisplayEndScreen -> OnTraitorShipDestroyed
                 break;
             }
             case GameManager.Difficulty.Hard: {

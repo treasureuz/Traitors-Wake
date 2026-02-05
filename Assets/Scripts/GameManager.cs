@@ -209,11 +209,6 @@ public class GameManager : MonoBehaviour {
         // Set finishPos based on the above set width and height
         this._finishPos = new Vector2Int(GridManager.instance.Width - 1, GridManager.instance.Height - 1);
     }
-    
-    public void HandleGameEnd() {
-        LevelManager.instance.StopAllCoroutines(true);
-        UIManager.instance.DisplayEndScreen();
-    }
 
     public void IncrementDifficulty() {
         SetDifficulty(++this.difficulty);
