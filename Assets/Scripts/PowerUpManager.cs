@@ -112,7 +112,7 @@ public class PowerUpManager : MonoBehaviour {
             }
         }
         this.powerUp = this._activatedPowerUps.Count == 0 ? PowerUp.None : this._activatedPowerUps[^1];
-        ResetCurrentCollectedChests();
+        ResetCurrentCollectedChests(); // Reset collectedChests to 0 (*technically is handled in TryStartLevel*)
         UIManager.instance.UpdatePowerUpsUI();
     }
 

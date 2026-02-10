@@ -20,9 +20,9 @@ public class LevelManager : MonoBehaviour {
     public int currentEasyLevelsCompleted { get; private set; }
     public int currentMediumLevelsCompleted { get; private set; }
     public int currentHardLevelsCompleted { get; private set; }
-    public bool isCurrentEasyCompleted { get; private set; }
-    public bool isCurrentMediumCompleted { get; private set; }
-    public bool isCurrentHardCompleted { get; private set; }
+    public bool isEasyCompleted { get; private set; }
+    public bool isMediumCompleted { get; private set; }
+    public bool isHardCompleted { get; private set; }
     public bool isDifficultyComplete { get; set; }
     public bool isLevelComplete {get; set;}
 
@@ -55,6 +55,8 @@ public class LevelManager : MonoBehaviour {
         if (hasResetRun) ResetRunState(); 
         // Reset Power Ups on start of new/reset difficulty, *can be called twice*
         if (GetCurrentLevelByDiff() == 0) GameManager.instance.GetPowerUpManagerByDiff().ResetPowerUpsSettings();
+        // Reset collectedChests to 0 per level
+        GameManager.instance.GetPowerUpManagerByDiff().ResetCurrentCollectedChests();
         PlayersSettingsManager.instance.ApplyPlayersSettings(); // Apply saved players data/settings
         UIManager.instance.Start(); // Reset/Update every relevant UI Elements
         // If player has won or is out of lives or difficulty is complete, don't generate a level
@@ -118,12 +120,12 @@ public class LevelManager : MonoBehaviour {
             // Calculate scores and display them
             ScoreManager.instance.CalculateScores(); UIManager.instance.UpdateScoreText();
             IncrementLevelsCompletedByDiff(); // Only increment if last level was completed
-            // Set currentCollectedChests to 0 per level
-            GameManager.instance.GetPowerUpManagerByDiff().ResetCurrentCollectedChests(); 
-            // If next level exists, send the player to the next level
-            // Else if player beat the final level and hasn't already won, call EndGame -> Win Screen
-            // Else, player completed a difficulty so take them back to DifficultySelectScene
-            if (!Player.hasWon && this._totalLevelsCompleted == GetTotalLevels()) {
+            // Increment totalLevelsCompleted if the current difficulty wasn't already completed
+            if (!GetIsCurrentDiffCompleted()) ++this._totalLevelsCompleted;
+            // If player beat the final level, call HandleLevelEnd -> WinScreen
+            // Else if there's a next level, send player to the next level,
+            // Else the player completed the difficulty: OnLevelComplete -> DiffCompleteScreen
+            if (this._totalLevelsCompleted == GetTotalLevels()) {
                 GameManager.instance.player.OnPlayerWon(); // Player won!
             } else {
                 if (HasNextLevelForDifficulty()) {
@@ -139,27 +141,18 @@ public class LevelManager : MonoBehaviour {
     private bool HasNextLevelForDifficulty() {
         switch(GameManager.instance.difficulty){
             case GameManager.Difficulty.Easy: {
-                // Return true -- can advance, therefore difficulty incomplete
-                if (!this.isCurrentEasyCompleted) ++this._totalLevelsCompleted;
                 if (NextLevelExistsByDiff(GameManager.Difficulty.Easy)) return true;
-                // Return false -- can't advance, therefore difficulty completed
-                this.isCurrentEasyCompleted = true;
+                this.isEasyCompleted = true;
                 return false;
             }
             case GameManager.Difficulty.Medium: {
-                // Return true -- can advance, therefore difficulty incomplete
-                if (!this.isCurrentMediumCompleted) ++this._totalLevelsCompleted;
                 if (NextLevelExistsByDiff(GameManager.Difficulty.Medium)) return true;
-                // Return false -- can't advance, therefore difficulty completed
-                this.isCurrentMediumCompleted = true; 
+                this.isMediumCompleted = true;
                 return false; 
             }
             case GameManager.Difficulty.Hard: {
-                // Return true -- can advance, therefore difficulty incomplete
-                if (!this.isCurrentHardCompleted) ++this._totalLevelsCompleted;
                 if (NextLevelExistsByDiff(GameManager.Difficulty.Hard)) return true;
-                // Return false -- can't advance, therefore difficulty completed
-                this.isCurrentHardCompleted = true;
+                this.isHardCompleted = true;
                 return false;
             }
             default: return false;
@@ -214,15 +207,15 @@ public class LevelManager : MonoBehaviour {
         hasResetRun = true; // calls ResetRunState on GO
         switch (diff) {
             case GameManager.Difficulty.Easy: {
-                if (!this.isCurrentEasyCompleted) this._totalLevelsCompleted -= this.currentEasyLevelsCompleted;
+                if (!this.isEasyCompleted) this._totalLevelsCompleted -= this.currentEasyLevelsCompleted;
                 this.currentEasyLevelsCompleted = 0; break;
             }
             case GameManager.Difficulty.Medium: {
-                if (!this.isCurrentMediumCompleted) this._totalLevelsCompleted -= this.currentMediumLevelsCompleted;
+                if (!this.isMediumCompleted) this._totalLevelsCompleted -= this.currentMediumLevelsCompleted;
                 this.currentMediumLevelsCompleted = 0; break;
             }
             case GameManager.Difficulty.Hard: {
-                if (!this.isCurrentHardCompleted) this._totalLevelsCompleted -= this.currentHardLevelsCompleted;
+                if (!this.isHardCompleted) this._totalLevelsCompleted -= this.currentHardLevelsCompleted;
                 this.currentHardLevelsCompleted = 0; break;
             }
         } 
@@ -234,11 +227,11 @@ public class LevelManager : MonoBehaviour {
         isDifficultyComplete = false;
         this._totalLevelsCompleted = 0;
         this.currentEasyLevelsCompleted = 0;
-        this.isCurrentEasyCompleted = false;
+        this.isEasyCompleted = false;
         this.currentMediumLevelsCompleted = 0;
-        this.isCurrentMediumCompleted = false;
+        this.isMediumCompleted = false;
         this.currentHardLevelsCompleted = 0;
-        this.isCurrentHardCompleted = false;
+        this.isHardCompleted = false;
         GameManager.instance.ResetResetCounts();
     }
     
@@ -248,19 +241,19 @@ public class LevelManager : MonoBehaviour {
         switch (GameManager.instance.difficulty) {
             case GameManager.Difficulty.Easy: {
                 this.currentEasyLevelsCompleted = GetMaxEasyLevels();
-                this.isCurrentEasyCompleted = true; 
+                this.isEasyCompleted = true;
                 HandleLevelEnd(); // calls DisplayEndScreen -> OnTraitorShipDestroyed
                 break;
             }
             case GameManager.Difficulty.Medium: {
                 this.currentMediumLevelsCompleted = GetMaxMediumLevels();
-                this.isCurrentMediumCompleted = true; 
+                this.isMediumCompleted = true;
                 HandleLevelEnd(); // calls DisplayEndScreen -> OnTraitorShipDestroyed
                 break;
             }
             case GameManager.Difficulty.Hard: {
                 this.currentHardLevelsCompleted = GetMaxHardLevels();
-                this.isCurrentHardCompleted = true;
+                this.isHardCompleted = true;
                 // Player wins if traitor is killed in final stage (Hard)
                 GameManager.instance.player.OnPlayerWon(); // calls DisplayEndScreen -> Win Screen
                 break; 
@@ -276,6 +269,15 @@ public class LevelManager : MonoBehaviour {
         }
     }
     public int GetTotalLevelsCompleted() => this._totalLevelsCompleted;
+
+    private bool GetIsCurrentDiffCompleted() {
+        return GameManager.instance.difficulty switch {
+            GameManager.Difficulty.Easy => this.isEasyCompleted,
+            GameManager.Difficulty.Medium => this.isMediumCompleted,
+            GameManager.Difficulty.Hard => this.isHardCompleted,
+            _ => false
+        };
+    }
     
     private int GetMaxLevelsByDiff() {
         return GameManager.instance.difficulty switch {

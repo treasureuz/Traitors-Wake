@@ -86,13 +86,13 @@ public class DiffSelectUIManager : MonoBehaviour {
         this._easyResetButton.interactable = !Player.isOutOfLives && !Player.hasWon && 
                                              GameManager.instance.easyResetCount > 0;
         // Can only play medium if easy is completed and medium isn't completed
-        this._mediumGoButton.interactable = !Player.isOutOfLives && !Player.hasWon && LevelManager.instance.isCurrentEasyCompleted && 
+        this._mediumGoButton.interactable = !Player.isOutOfLives && !Player.hasWon && LevelManager.instance.isEasyCompleted &&
                                             LevelManager.instance.NextLevelExistsByDiff(GameManager.Difficulty.Medium);
         this._mediumResetButton.interactable = !Player.isOutOfLives && !Player.hasWon && GameManager.instance.mediumResetCount > 0
-                                               && LevelManager.instance.isCurrentEasyCompleted;
+                                               && LevelManager.instance.isEasyCompleted;
                                
         // Can only play hard if medium is completed and hard isn't completed
-        this._hardGoButton.interactable = !Player.isOutOfLives && LevelManager.instance.isCurrentMediumCompleted &&
+        this._hardGoButton.interactable = !Player.isOutOfLives && LevelManager.instance.isMediumCompleted &&
                                           LevelManager.instance.NextLevelExistsByDiff(GameManager.Difficulty.Hard);
         this._resetAllButton.interactable = CanResetAll();
     }
@@ -104,21 +104,21 @@ public class DiffSelectUIManager : MonoBehaviour {
     }
 
     private void UpdateTexts() {
-        this._easyLevelsText.text = LevelManager.instance.isCurrentEasyCompleted
+        this._easyLevelsText.text = LevelManager.instance.isEasyCompleted
             ? $"{levelsText}: {LevelManager.instance.currentEasyLevelsCompleted}/{LevelManager.instance.GetMaxEasyLevels()} " 
               + "<color=#FFFFFF>(*C.*)</color>"
             : $"{levelsText}: {LevelManager.instance.currentEasyLevelsCompleted}/{LevelManager.instance.GetMaxEasyLevels()}";
         this._easyHSText.text = $"{highScoreText}: {ScoreManager.instance.easyHighScore:F2}";
         this._easyResetButton.GetComponentInChildren<TextMeshProUGUI>().text =
               $"{resetText} ({GameManager.instance.easyResetCount}/{GameManager.instance.GetMaxResetCount(GameManager.Difficulty.Easy)})";
-        this._mediumLevelsText.text = LevelManager.instance.isCurrentMediumCompleted
+        this._mediumLevelsText.text = LevelManager.instance.isMediumCompleted
             ? $"{levelsText}: {LevelManager.instance.currentMediumLevelsCompleted}/{LevelManager.instance.GetMaxMediumLevels()} " 
               + "<color=#FFFFFF>(*C.*)</color>"
             : $"{levelsText}: {LevelManager.instance.currentMediumLevelsCompleted}/{LevelManager.instance.GetMaxMediumLevels()}";
         this._mediumHSText.text = $"{highScoreText}: {ScoreManager.instance.mediumHighScore:F2}";
         this._mediumResetButton.GetComponentInChildren<TextMeshProUGUI>().text = 
             $"{resetText} ({GameManager.instance.mediumResetCount}/{GameManager.instance.GetMaxResetCount(GameManager.Difficulty.Medium)})";
-        this._hardLevelsText.text = LevelManager.instance.isCurrentHardCompleted 
+        this._hardLevelsText.text = LevelManager.instance.isHardCompleted
             ? $"{levelsText}: {LevelManager.instance.currentHardLevelsCompleted}/{LevelManager.instance.GetMaxHardLevels()} " 
               + "<color=#FFFFFF>(*C.*)</color>"
             : $"{levelsText}: {LevelManager.instance.currentHardLevelsCompleted}/{LevelManager.instance.GetMaxHardLevels()}";
