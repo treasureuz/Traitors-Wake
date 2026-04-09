@@ -1458,7 +1458,7 @@ MonoBehaviour:
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 0.5
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -2841,8 +2841,6 @@ MonoBehaviour:
   _maxEasyLevels: 6
   _maxMediumLevels: 5
   _maxHardLevels: 4
-  _buttonClick: {fileID: 8300000, guid: 97943ef136341634fa5cc87b567912d1, type: 3}
-  _diffCompleteClip: {fileID: 8300000, guid: f85e1f1a74d97fc4dbc0001d5f71faa1, type: 3}
   _timeBeforeLevelStart: 1
 --- !u!4 &1917764844
 Transform:
@@ -3320,7 +3318,6 @@ MonoBehaviour:
   _scoresUIPrefab: {fileID: 5532927556658466821, guid: e8a1b7222d2ab1b45a1ad0f8391f6da1, type: 3}
   _buttonClick2: {fileID: 8300000, guid: 72e38bef2ca71554a82dc78b5d7a3af6, type: 3}
   _titleText: {fileID: 330486850}
-  _typewriterDelay: 0.178
 --- !u!1 &2109498546
 GameObject:
   m_ObjectHideFlags: 0
