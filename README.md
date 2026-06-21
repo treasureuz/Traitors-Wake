@@ -1,5 +1,4 @@
 # Traitor's Wake
-Description: Grid-based memory game; Pirate-themed.
 - Different paths/lanes/lines created that the user must 1:1 recreate to pass the level
 - The path is highlighted after each play
 - The user is only given a few seconds to memorize the highlighted path
